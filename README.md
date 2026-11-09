@@ -153,6 +153,13 @@ folder. The `published` container is public on purpose: the data is open, and CO
 access to the site. The `raw` container is private. Releases are never expired by age, so the site
 keeps working if the source stops updating.
 
+When a release is published, whether because the source has new data or a refresh was forced, the
+ingest can email the developer a short English notice. It uses Azure Communication Services Email
+with the function app's managed identity, so there are no secrets. The recipient is not stored in the
+repository. Pass it when deploying (`-p notifyEmail=you@example.com`), or set the `NOTIFY_EMAIL_TO`
+app setting (comma-separated for several addresses). Without it no emails are sent. A failed send is
+logged and never fails the ingest.
+
 The storage website has no custom response headers, so security headers such as
 `X-Frame-Options` need a CDN or Front Door in front of it if you want them.
 

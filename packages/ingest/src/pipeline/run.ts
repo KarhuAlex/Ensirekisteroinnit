@@ -1,6 +1,7 @@
 import { RELEASE_FORMAT, SCHEMA_VERSION, type LatestPointer } from '@regs/core';
 import type { SourceAdapter } from '../adapters/types.js';
 import { consoleLogger, type Logger } from '../logger.js';
+import type { Notifier, PublishNotice, PublishReason } from '../notify/types.js';
 import type { ObjectStore } from '../storage/types.js';
 import { buildRelease } from './release.js';
 import { validateDataset, type ValidationLimits } from './validate.js';
@@ -15,6 +16,7 @@ export interface IngestOptions {
   rawStore: ObjectStore;
   publishedStore: ObjectStore;
   logger?: Logger;
+  notifier?: Notifier;
   /** Publish even if the source version is unchanged. */
   force?: boolean;
   now?: () => Date;
@@ -31,8 +33,9 @@ export async function runIngest(opts: IngestOptions): Promise<IngestResult> {
 
   const version = await opts.adapter.getVersion();
   const current = await readLatest(opts.publishedStore);
-  const upToDate = current?.sourceVersion === version && current.format === RELEASE_FORMAT;
-  if (!opts.force && upToDate) {
+  const sourceChanged = current?.sourceVersion !== version;
+  const formatChanged = current?.format !== RELEASE_FORMAT;
+  if (!opts.force && !sourceChanged && !formatChanged) {
     log.info(`Source unchanged (${version}); nothing to do.`);
     return { status: 'skipped', sourceVersion: version };
   }
@@ -69,12 +72,38 @@ export async function runIngest(opts: IngestOptions): Promise<IngestResult> {
   });
 
   log.info(`Published release ${release.id} (${release.files.length} files).`);
+  await notify(opts.notifier, log, {
+    reason: publishReason(opts.force ?? false, sourceChanged),
+    release: release.id,
+    sourceVersion: dataset.sourceVersion,
+    previousSourceVersion: current?.sourceVersion ?? null,
+    files: release.files.length,
+    generatedAt: release.generatedAt,
+  });
   return {
     status: 'published',
     sourceVersion: dataset.sourceVersion,
     release: release.id,
     files: release.files.length,
   };
+}
+
+function publishReason(force: boolean, sourceChanged: boolean): PublishReason {
+  if (force) return 'forced';
+  return sourceChanged ? 'new-source' : 'format-upgrade';
+}
+
+/** The release is already live, so a failed notification is logged and does not fail the run. */
+async function notify(
+  notifier: Notifier | undefined,
+  log: Logger,
+  notice: PublishNotice,
+): Promise<void> {
+  try {
+    await notifier?.published(notice);
+  } catch (err) {
+    log.warn('Could not send the update notification.', err);
+  }
 }
 
 async function readLatest(store: ObjectStore): Promise<LatestPointer | null> {

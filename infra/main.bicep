@@ -3,7 +3,7 @@
 //   az group create -n rg-regs-prod -l swedencentral
 //   az deployment group create -g rg-regs-prod -f infra/main.bicep -p infra/main.prod.bicepparam
 //
-// Creates data storage (public `published` container, private `raw`), a Function App on Flex
+// Creates an Azure Communication Services email sender for update notifications, data storage (public `published` container, private `raw`), a Function App on Flex
 // Consumption with a managed identity, Application Insights and a storage static website for the
 // frontend.
 
@@ -22,6 +22,9 @@ param location string = resourceGroup().location
 
 @description('Ingest schedule as an NCRONTAB expression in UTC. 08:00 and 12:00 UTC = 10:00/14:00 in winter.')
 param ingestSchedule string = '0 0 8,12 * * *'
+
+@description('Address that gets an email when the data is updated. Leave empty to turn emails off. Pass it at deployment time so it stays out of the repo.')
+param notifyEmail string = ''
 
 var suffix = toLower('${appName}${environment}')
 var unique = uniqueString(resourceGroup().id)
@@ -61,6 +64,14 @@ module storage 'modules/storage.bicep' = {
   }
 }
 
+module email 'modules/email.bicep' = {
+  name: 'email'
+  params: {
+    suffix: suffix
+    tags: tags
+  }
+}
+
 module functionApp 'modules/function-app.bicep' = {
   name: 'function-app'
   params: {
@@ -72,6 +83,10 @@ module functionApp 'modules/function-app.bicep' = {
     dataStorageAccountName: storage.outputs.dataAccountName
     appInsightsConnectionString: monitoring.outputs.connectionString
     ingestSchedule: ingestSchedule
+    communicationServiceName: email.outputs.name
+    communicationEndpoint: email.outputs.endpoint
+    notifySender: email.outputs.senderAddress
+    notifyEmail: notifyEmail
   }
 }
 

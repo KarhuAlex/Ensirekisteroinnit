@@ -10,4 +10,6 @@ export * from './pipeline/release.js';
 export * from './pipeline/validate.js';
 export type { ObjectStore, PutOptions } from './storage/types.js';
 export { FsStore } from './storage/fs-store.js';
+export * from './notify/types.js';
+export { AcsEmailNotifier, type AcsEmailOptions } from './notify/acs-email.js';
 export { BlobStore } from './storage/blob-store.js';
