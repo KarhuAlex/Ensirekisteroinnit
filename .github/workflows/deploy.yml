@@ -1,11 +1,11 @@
 name: Deploy
 
-# Runs on pushes to main and by hand. It signs in to Azure with OpenID Connect, so no Azure secrets are stored.
+# Called by ci.yml after every check has passed on main, and can be started by hand. It signs in to
+# Azure with OpenID Connect, so no Azure secrets are stored.
 # Needs these repository variables: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
 # FUNCTION_APP_NAME, WEB_STORAGE_ACCOUNT, DATA_BASE_URL.
 on:
-  push:
-    branches: [main]
+  workflow_call:
   workflow_dispatch:
 
 permissions:

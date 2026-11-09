@@ -8,9 +8,10 @@ on:
 permissions:
   contents: read
 
+# Only superseded pull request runs are cancelled; a deploy that is already running must finish.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -36,3 +37,11 @@ jobs:
         run: |
           az bicep install
           az bicep build --file infra/main.bicep --stdout > /dev/null
+
+  deploy:
+    needs: [verify, bicep]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/deploy.yml
