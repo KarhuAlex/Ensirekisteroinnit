@@ -1,4 +1,6 @@
 import {
+  FUEL_GROUP_IDS,
+  FUEL_GROUP_OF,
   FUEL_IDS,
   SCHEMA_VERSION,
   type Dataset,
@@ -6,6 +8,8 @@ import {
   type EntitySummary,
   type FuelId,
   type Manifest,
+  type Matrix,
+  type MatrixRow,
   type Period,
 } from '@regs/core';
 
@@ -66,6 +70,7 @@ export function buildRelease(dataset: Dataset, now: Date = new Date()): Release 
 
   const files: ReleaseFile[] = [];
   const summaries: EntitySummary[] = [];
+  const matrixRows: MatrixRow[] = [];
   const usedFuels = new Set<FuelId>();
   const tailStart = Math.max(0, months.length - 12);
 
@@ -97,6 +102,7 @@ export function buildRelease(dataset: Dataset, now: Date = new Date()): Release 
     };
     files.push({ path: `entities/${entity.id}.json`, body: JSON.stringify(entitySeries) });
     summaries.push({ ...entity, total, last12, bevLast12 });
+    matrixRows.push(matrixRow(entity.id, perFuel, months.length));
   }
 
   const generatedAt = now.toISOString();
@@ -120,6 +126,23 @@ export function buildRelease(dataset: Dataset, now: Date = new Date()): Release 
 
   files.push({ path: 'manifest.json', body: JSON.stringify(manifest) });
   files.push({ path: 'entities.json', body: JSON.stringify(summaries) });
+  const matrix: Matrix = {
+    schemaVersion: SCHEMA_VERSION,
+    months,
+    groups: [...FUEL_GROUP_IDS],
+    rows: matrixRows,
+  };
+  files.push({ path: 'matrix.json', body: JSON.stringify(matrix) });
 
   return { id, generatedAt, manifest, files };
+}
+
+function matrixRow(id: string, perFuel: Map<FuelId, number[]>, monthCount: number): MatrixRow {
+  const counts = new Array<number>(FUEL_GROUP_IDS.length * monthCount).fill(0);
+  for (const [fuel, values] of perFuel) {
+    const offset = FUEL_GROUP_IDS.indexOf(FUEL_GROUP_OF[fuel]) * monthCount;
+    for (let m = 0; m < monthCount; m++)
+      counts[offset + m] = (counts[offset + m] ?? 0) + (values[m] ?? 0);
+  }
+  return { id, counts };
 }

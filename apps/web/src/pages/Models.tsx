@@ -14,6 +14,7 @@ import { Icon } from '../components/Icon';
 import { PageHeader, Segmented, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
+import { inLevel } from '../lib/entityLevel';
 import { displayName } from '../lib/names';
 import { percent } from '../lib/stats';
 
@@ -43,9 +44,7 @@ export function Models() {
     () =>
       entities
         .filter((e) => e.kind !== 'total')
-        .filter((e) =>
-          filter === 'all' ? true : filter === 'make' ? e.kind === 'make' : e.kind !== 'make',
-        )
+        .filter((e) => filter === 'all' || inLevel(e.kind, filter))
         .map((e) => ({
           id: e.id,
           name: displayName(e.label),

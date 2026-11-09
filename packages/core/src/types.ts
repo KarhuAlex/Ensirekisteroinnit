@@ -1,7 +1,10 @@
-import type { FuelId } from './fuels.js';
+import type { FuelGroupId, FuelId } from './fuels.js';
 
 /** Calendar month, `YYYY-MM`. */
 export type Period = string;
+
+/** Id of the entity that counts all passenger cars. */
+export const TOTAL_ENTITY_ID = 'total';
 
 export type EntityKind = 'total' | 'make' | 'group' | 'model';
 
@@ -38,12 +41,17 @@ export interface Dataset {
 
 export const SCHEMA_VERSION = 1;
 
+/** Bumped when a release gains or changes files. Ingest rebuilds an older-format release even if the source is unchanged. */
+export const RELEASE_FORMAT = 2;
+
 /** Short-cached pointer to the current immutable release. */
 export interface LatestPointer {
   schemaVersion: typeof SCHEMA_VERSION;
   release: string;
   sourceVersion: string;
   generatedAt: string;
+  /** Absent on releases published before formats existed. */
+  format?: number;
 }
 
 export interface Manifest {
@@ -75,4 +83,17 @@ export interface EntitySeries {
   label: string;
   kind: EntityKind;
   series: Partial<Record<FuelId, number[]>>;
+}
+
+export interface MatrixRow {
+  id: string;
+  /** Group by group: index = groupIndex * monthCount + monthIndex. */
+  counts: number[];
+}
+
+export interface Matrix {
+  schemaVersion: typeof SCHEMA_VERSION;
+  months: Period[];
+  groups: FuelGroupId[];
+  rows: MatrixRow[];
 }

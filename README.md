@@ -17,6 +17,9 @@ the site stays fast and keeps working when the upstream service is slow or down.
   figures. Its headline sentence is computed from the data.
 - The makes and models page lists 700+ makes and model series, searchable and sortable. Each model
   has a page with monthly or yearly registrations by fuel type.
+- The review page ranks makes or models for any period: one month, several months, a year or
+  several years. It can filter by fuel, compare with the previous period or a year earlier, and
+  export CSV. Every choice is kept in the URL, so views can be shared.
 - The table page shows all passenger cars by month or year, sortable and searchable, with CSV export.
 - Fuel types differ in shape as well as colour. Charts can be stepped through with the keyboard and
   are read out by screen readers. There are light and dark themes.
@@ -48,10 +51,10 @@ Design decisions:
   database migration, so replacing the source means writing one new adapter and changing nothing
   else.
 - The web app depends only on a small, versioned JSON format (`manifest.json`, `entities.json`,
-  `entities/<id>.json`), never on the upstream API.
+  `entities/<id>.json`, `matrix.json`), never on the upstream API.
 - Each ingest writes a complete release folder and updates `latest.json` last. Readers see either
-  the old release or the new one, never a partial one.
-- A run first compares the source's version stamp and exits if nothing changed. If validation fails,
+  the old release or the new one, never a partial one. Release files are gzip-compressed.
+- A run first compares the source's version stamp and exits if nothing changed and the published release has the current format version (`RELEASE_FORMAT`), so a release that gains new files is rebuilt even when the source is unchanged. If validation fails,
   the run aborts and the previous release keeps being served.
 - There is no database. A release is a few MB, and static JSON on blob storage is simpler, cheaper
   and faster than a query layer.
@@ -167,7 +170,7 @@ The storage website has no custom response headers, so security headers such as
 - Municipality-level views (the source table already has a municipality dimension).
 - Vehicle stock ("cars in use") by make and model, from Traficom's open vehicle register and
   quarterly statistics files.
-- Model comparison and shareable chart links.
+- Side-by-side model comparison.
 
 ## Licence
 

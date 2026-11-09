@@ -1,4 +1,4 @@
-import type { FuelGroupId } from '@regs/core';
+import { TOTAL_ENTITY_ID, type FuelGroupId } from '@regs/core';
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -14,25 +14,17 @@ import { Icon } from '../components/Icon';
 import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { useI18n } from '../i18n';
+import { downloadCsv } from '../lib/download';
 import { buildPeriodRows, toCsv, type PeriodRow } from '../lib/periodRows';
 import { buildSeriesView } from '../lib/seriesView';
 import { STACK_ORDER } from '../lib/stats';
 
 type Granularity = 'month' | 'year';
 
-function download(filename: string, content: string): void {
-  const url = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
 export function TablePage() {
   const { t, fmt } = useI18n();
   const { manifest } = useCatalog();
-  const { series, error } = useEntitySeries('total');
+  const { series, error } = useEntitySeries(TOTAL_ENTITY_ID);
   const [granularity, setGranularity] = useState<Granularity>('month');
   const [query, setQuery] = useState('');
   const [sorting, setSorting] = useState<SortingState>([{ id: 'period', desc: true }]);
@@ -130,7 +122,7 @@ export function TablePage() {
           className="button"
           disabled={rowCount === 0}
           onClick={() =>
-            download(
+            downloadCsv(
               `registrations-${granularity}.csv`,
               toCsv(table.getRowModel().rows.map((r) => r.original)),
             )

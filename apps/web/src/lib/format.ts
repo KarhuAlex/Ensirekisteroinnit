@@ -5,7 +5,10 @@ export interface Formatters {
   /** `null` renders as a dash. */
   pct(value: number | null): string;
   decimal(value: number): string;
+  signedInt(value: number): string;
+  monthName(month: number): string;
   signed(value: number | null, unit: string): string;
+  signedPct(value: number | null): string;
   month(period: string): string;
   date(iso: string): string;
 }
@@ -24,21 +27,27 @@ export function makeFormatters(lang: Lang): Formatters {
     year: 'numeric',
     timeZone: 'UTC',
   });
+  const monthNameFmt = new Intl.DateTimeFormat(locale, { month: 'long', timeZone: 'UTC' });
   const dateFmt = new Intl.DateTimeFormat(locale, {
     dateStyle: 'medium',
     timeZone: 'Europe/Helsinki',
   });
   const percentSuffix = lang === 'fi' ? `${NBSP}%` : '%';
 
+  const signed = (v: number | null, unit: string): string => {
+    if (v === null || !Number.isFinite(v)) return '–';
+    const sign = v > 0 ? '+' : v < 0 ? '−' : '';
+    return `${sign}${dec1.format(Math.abs(v))}${unit}`;
+  };
+
   return {
     int: (v) => int.format(v),
     decimal: (v) => dec1.format(v),
     pct: (v) => (v === null || !Number.isFinite(v) ? '–' : `${dec1.format(v)}${percentSuffix}`),
-    signed: (v, unit) => {
-      if (v === null || !Number.isFinite(v)) return '–';
-      const sign = v > 0 ? '+' : v < 0 ? '−' : '';
-      return `${sign}${dec1.format(Math.abs(v))}${unit}`;
-    },
+    signedInt: (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${int.format(Math.abs(v))}`,
+    monthName: (month) => monthNameFmt.format(new Date(Date.UTC(2000, month - 1, 1))),
+    signedPct: (v) => signed(v, percentSuffix),
+    signed,
     month: (period) => monthFmt.format(new Date(`${period}-01T00:00:00Z`)),
     date: (iso) => dateFmt.format(new Date(iso)),
   };

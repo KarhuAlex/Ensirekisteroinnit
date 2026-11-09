@@ -1,5 +1,6 @@
 import { DefaultAzureCredential } from '@azure/identity';
 import { BlobServiceClient, type ContainerClient } from '@azure/storage-blob';
+import { encodeBody } from './encode.js';
 import type { ObjectStore, PutOptions } from './types.js';
 
 export class BlobStore implements ObjectStore {
@@ -25,10 +26,12 @@ export class BlobStore implements ObjectStore {
 
   async put(path: string, body: string, options: PutOptions = {}): Promise<void> {
     const blob = this.container.getBlockBlobClient(path);
-    await blob.upload(body, Buffer.byteLength(body), {
+    const { data, contentEncoding } = encodeBody(body, options.compress ?? false);
+    await blob.upload(data, data.length, {
       blobHTTPHeaders: {
         blobContentType: options.contentType ?? 'application/json; charset=utf-8',
         ...(options.cacheControl ? { blobCacheControl: options.cacheControl } : {}),
+        ...(contentEncoding ? { blobContentEncoding: contentEncoding } : {}),
       },
     });
   }

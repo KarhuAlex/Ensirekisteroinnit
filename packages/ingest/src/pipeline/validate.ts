@@ -1,4 +1,4 @@
-import type { Dataset } from '@regs/core';
+import { TOTAL_ENTITY_ID, type Dataset } from '@regs/core';
 
 export interface ValidationLimits {
   minEntities: number;
@@ -19,7 +19,9 @@ export const DEFAULT_LIMITS: ValidationLimits = {
 export function validateDataset(dataset: Dataset, limits: ValidationLimits = DEFAULT_LIMITS): void {
   const problems: string[] = [];
 
-  if (!dataset.entities.some((e) => e.kind === 'total')) problems.push('no "total" entity');
+  if (!dataset.entities.some((e) => e.kind === 'total' && e.id === TOTAL_ENTITY_ID)) {
+    problems.push(`no "${TOTAL_ENTITY_ID}" entity`);
+  }
   if (dataset.entities.length < limits.minEntities) {
     problems.push(`only ${dataset.entities.length} entities (expected ≥ ${limits.minEntities})`);
   }

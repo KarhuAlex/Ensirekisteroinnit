@@ -7,6 +7,7 @@ import { ModelDetail } from './pages/ModelDetail';
 import { Models } from './pages/Models';
 import { NotFound } from './pages/NotFound';
 import { Overview } from './pages/Overview';
+import { Review } from './pages/Review';
 import { TablePage } from './pages/TablePage';
 
 function LangRoute() {
@@ -28,6 +29,7 @@ export function App() {
           <Route path="/:lang" element={<LangRoute />}>
             <Route element={<Layout />}>
               <Route index element={<Overview />} />
+              <Route path="review" element={<Review />} />
               <Route path="models" element={<Models />} />
               <Route path="models/:id" element={<ModelDetail />} />
               <Route path="table" element={<TablePage />} />

@@ -1,6 +1,7 @@
 export interface PutOptions {
   contentType?: string;
   cacheControl?: string;
+  compress?: boolean;
 }
 
 /** Minimal object-store abstraction so the pipeline runs against disk, Azurite or Azure Blob. */

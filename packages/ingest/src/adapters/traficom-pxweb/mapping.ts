@@ -1,4 +1,4 @@
-import type { Entity, FuelId, Period } from '@regs/core';
+import { TOTAL_ENTITY_ID, type Entity, type FuelId, type Period } from '@regs/core';
 
 /** Traficom fuel codes (table 050_ensirek_tau_105) mapped to canonical fuel ids. */
 export const FUEL_CODE_MAP: Readonly<Record<string, FuelId>> = {
@@ -73,7 +73,7 @@ export function buildEntities(values: readonly SourceValue[]): {
 
   const entities: Entity[] = [];
   for (const draft of drafts) {
-    let id = draft.kind === 'total' ? 'total' : slugify(draft.label);
+    let id = draft.kind === 'total' ? TOTAL_ENTITY_ID : slugify(draft.label);
     if (!id || usedIds.has(id)) id = `${id ? `${id}-` : ''}${slugify(draft.code) || 'x'}`;
     usedIds.add(id);
     idByCode.set(draft.code, id);

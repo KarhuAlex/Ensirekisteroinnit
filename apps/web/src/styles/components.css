@@ -712,3 +712,147 @@ mark {
     min-height: 36px;
   }
 }
+
+/* Review */
+.review-controls {
+  display: grid;
+  gap: var(--s-4);
+  margin-block: var(--s-5);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--rule);
+}
+.review-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-5);
+}
+.period-picker {
+  display: grid;
+  gap: var(--s-3);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: var(--r-2);
+  background: var(--ground);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: var(--step--1);
+  cursor: pointer;
+}
+.chip:hover {
+  border-color: var(--ink);
+}
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--ground);
+}
+.period-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-3) var(--s-4);
+}
+.period-end {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.period-end legend {
+  padding: 0;
+  margin-bottom: 4px;
+  color: var(--ink-2);
+  font-size: var(--step--1);
+}
+.period-picker select {
+  height: 44px;
+  padding: 0 10px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: var(--r-2);
+  background: var(--ground);
+  color: var(--ink);
+  font: inherit;
+}
+.period-picker select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.stepper {
+  display: flex;
+  gap: 8px;
+}
+.stepper .tool-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.fuel-filter .plates {
+  margin-bottom: var(--s-2);
+}
+.hint {
+  margin: 0;
+  font-size: var(--step--1);
+}
+
+.rank-name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.rank {
+  min-width: 2ch;
+  color: var(--ink-3);
+  font-weight: 700;
+  text-align: right;
+}
+.make {
+  display: block;
+  font-size: var(--step--1);
+}
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+}
+.change--pos {
+  color: var(--pos);
+}
+.change--neg {
+  color: var(--neg);
+}
+.fuel-mix {
+  display: flex;
+  width: 140px;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--ground-3);
+}
+.fuel-mix-seg--bev {
+  background: var(--fuel-bev);
+}
+.fuel-mix-seg--phev {
+  background: var(--fuel-phev);
+}
+.fuel-mix-seg--petrol {
+  background: var(--fuel-petrol);
+}
+.fuel-mix-seg--diesel {
+  background: var(--fuel-diesel);
+}
+.fuel-mix-seg--other {
+  background: var(--fuel-other);
+}
+.hero-link {
+  margin: var(--s-3) 0 0;
+  color: var(--ink-2);
+}

@@ -9,6 +9,7 @@ export function usePageTitle(title: string): void {
 export interface SegmentedOption<T extends string> {
   value: T;
   label: string;
+  disabled?: boolean;
 }
 
 export function Segmented<T extends string>({
@@ -29,6 +30,7 @@ export function Segmented<T extends string>({
           key={o.value}
           type="button"
           aria-pressed={o.value === value}
+          disabled={o.disabled}
           onClick={() => onChange(o.value)}
         >
           {o.label}

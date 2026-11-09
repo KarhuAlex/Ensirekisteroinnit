@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION, type LatestPointer } from '@regs/core';
+import { RELEASE_FORMAT, SCHEMA_VERSION, type LatestPointer } from '@regs/core';
 import type { SourceAdapter } from '../adapters/types.js';
 import { consoleLogger, type Logger } from '../logger.js';
 import type { ObjectStore } from '../storage/types.js';
@@ -31,7 +31,8 @@ export async function runIngest(opts: IngestOptions): Promise<IngestResult> {
 
   const version = await opts.adapter.getVersion();
   const current = await readLatest(opts.publishedStore);
-  if (!opts.force && current?.sourceVersion === version) {
+  const upToDate = current?.sourceVersion === version && current.format === RELEASE_FORMAT;
+  if (!opts.force && upToDate) {
     log.info(`Source unchanged (${version}); nothing to do.`);
     return { status: 'skipped', sourceVersion: version };
   }
@@ -50,6 +51,7 @@ export async function runIngest(opts: IngestOptions): Promise<IngestResult> {
     await opts.publishedStore.put(`${release.id}/${file.path}`, file.body, {
       contentType: 'application/json; charset=utf-8',
       cacheControl: IMMUTABLE,
+      compress: true,
     });
   }
 
@@ -59,6 +61,7 @@ export async function runIngest(opts: IngestOptions): Promise<IngestResult> {
     release: release.id,
     sourceVersion: dataset.sourceVersion,
     generatedAt: release.generatedAt,
+    format: RELEASE_FORMAT,
   };
   await opts.publishedStore.put(LATEST_POINTER_PATH, JSON.stringify(pointer), {
     contentType: 'application/json; charset=utf-8',

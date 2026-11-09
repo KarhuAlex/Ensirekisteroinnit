@@ -1,3 +1,4 @@
+import { TOTAL_ENTITY_ID } from '@regs/core';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FuelChart } from '../components/FuelChart';
@@ -19,7 +20,7 @@ function bevStoryKey(delta: number | null): 'story.bevUp' | 'story.bevDown' | 's
 export function Overview() {
   const { lang, t, fmt } = useI18n();
   const { manifest } = useCatalog();
-  const { series, error } = useEntitySeries('total');
+  const { series, error } = useEntitySeries(TOTAL_ENTITY_ID);
   usePageTitle(t('app.title'));
 
   const axis = useTimeAxis();
@@ -48,6 +49,9 @@ export function Overview() {
       <div className="hero">
         <SearchBox variant="hero" />
         <PopularModels />
+        <p className="hero-link">
+          {t('review.teaser')} <Link to={`/${lang}/review`}>{t('review.teaserLink')}</Link>
+        </p>
       </div>
 
       {error ? (
