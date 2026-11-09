@@ -69,10 +69,6 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - name: Enable static website hosting
-        run: >
-          az storage blob service-properties update --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login
-          --static-website --index-document index.html --404-document index.html
       # Hashed assets never change, so they can be cached for a year. Pages and icons are revalidated.
       - name: Upload assets
         run: >

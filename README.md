@@ -127,12 +127,20 @@ far, so review the first deployment.
    az role assignment create --assignee <appId> --role "Storage Blob Data Contributor" --scope $(az storage account show -g rg-regs-prod -n <webStorageAccountName> --query id -o tsv)
    ```
 
-3. Set these repository variables (Settings, Secrets and variables, Actions, Variables):
+3. Enable static website hosting on the web storage account once. The deployment identity can write
+   files but not change the account's service settings, so do this with your own account:
+
+   ```bash
+   az role assignment create --assignee-object-id <your object id> --assignee-principal-type User --role "Storage Blob Data Owner" --scope <web storage account id>
+   az storage blob service-properties update --account-name <webStorageAccountName> --auth-mode login --static-website --index-document index.html --404-document index.html
+   ```
+
+4. Set these repository variables (Settings, Secrets and variables, Actions, Variables):
    `AZURE_CLIENT_ID` (the app id), `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `FUNCTION_APP_NAME`
    (output `functionAppName`), `WEB_STORAGE_ACCOUNT` (output `webStorageAccountName`) and
    `DATA_BASE_URL` (output `dataBaseUrl`).
-4. Push to `main` or run the _Deploy_ workflow. The site is served at the `siteUrl` output.
-5. Load the first data instead of waiting for the schedule:
+5. Push to `main` or run the _Deploy_ workflow. The site is served at the `siteUrl` output.
+6. Load the first data instead of waiting for the schedule:
    `POST https://<functionAppName>.azurewebsites.net/api/ingest?force=true` with the function key in
    the `x-functions-key` header.
 
