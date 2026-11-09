@@ -2,7 +2,7 @@ name: Deploy
 
 # Runs on pushes to main and by hand. It signs in to Azure with OpenID Connect, so no Azure secrets are stored.
 # Needs these repository variables: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
-# RESOURCE_GROUP, FUNCTION_APP_NAME, STATIC_WEB_APP_NAME, DATA_BASE_URL.
+# FUNCTION_APP_NAME, WEB_STORAGE_ACCOUNT, DATA_BASE_URL.
 on:
   push:
     branches: [main]
@@ -18,16 +18,15 @@ concurrency:
 
 env:
   FUNCTION_APP_NAME: ${{ vars.FUNCTION_APP_NAME }}
-  STATIC_WEB_APP_NAME: ${{ vars.STATIC_WEB_APP_NAME }}
-  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  WEB_STORAGE_ACCOUNT: ${{ vars.WEB_STORAGE_ACCOUNT }}
 
 jobs:
   functions:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -35,7 +34,7 @@ jobs:
       - run: npm run build:node
       - name: Bundle function package
         run: npm run package -w @regs/functions
-      - uses: azure/login@v2
+      - uses: azure/login@v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
@@ -50,8 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -65,21 +64,25 @@ jobs:
         run: npm run build -w @regs/web
         env:
           VITE_DATA_BASE_URL: ${{ vars.DATA_BASE_URL }}
-      - uses: azure/login@v2
+      - uses: azure/login@v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - name: Get Static Web App deployment token
-        id: swa
+      - name: Enable static website hosting
+        run: >
+          az storage blob service-properties update --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login
+          --static-website --index-document index.html --404-document index.html
+      # Hashed assets never change, so they can be cached for a year. Pages and icons are revalidated.
+      - name: Upload assets
+        run: >
+          az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite
+          -d '$web' --destination-path assets -s apps/web/dist/assets
+          --content-cache-control "public, max-age=31536000, immutable"
+      - name: Upload pages and icons
         run: |
-          token=$(az staticwebapp secrets list --name "$STATIC_WEB_APP_NAME" --resource-group "$RESOURCE_GROUP" --query "properties.apiKey" -o tsv)
-          echo "::add-mask::$token"
-          echo "token=$token" >> "$GITHUB_OUTPUT"
-      - uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ steps.swa.outputs.token }}
-          action: upload
-          app_location: apps/web/dist
-          skip_app_build: true
-          skip_api_build: true
+          for pattern in '*.html' '*.svg'; do
+            az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite \
+              -d '$web' -s apps/web/dist --pattern "$pattern" \
+              --content-cache-control "public, max-age=0, must-revalidate"
+          done

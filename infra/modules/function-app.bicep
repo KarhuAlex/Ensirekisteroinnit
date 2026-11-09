@@ -11,7 +11,7 @@ param ingestSchedule string
 var storageBlobDataOwner = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
 var storageBlobDataContributor = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 var storageQueueDataContributor = '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
-var storageTableDataContributor = '0a9a7e1f-b9d0-4642-a12a-27d3a11d8e9c'
+var storageTableDataContributor = '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 
 resource runtimeStorage 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: runtimeStorageAccountName

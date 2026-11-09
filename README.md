@@ -33,13 +33,13 @@ flowchart LR
     FN["Azure Functions<br/>timer + manual trigger"]
     RAW[("Blob: raw/<br/>source responses")]
     PUB[("Blob: published/<br/>immutable releases + latest.json")]
-    SWA[Static Web App<br/>React SPA]
+    SITE[Storage static website<br/>React SPA]
   end
   PX -->|"adapter: fetch + normalise"| FN
   FN --> RAW
   FN -->|"validate → release → pointer"| PUB
-  SWA -->|"fetch JSON"| PUB
-  U((Browser)) --> SWA
+  SITE -->|"fetch JSON"| PUB
+  U((Browser)) --> SITE
 ```
 
 Design decisions:
@@ -63,7 +63,7 @@ Design decisions:
 | Language       | TypeScript everywhere (shared types via `@regs/core`)                     |
 | Frontend       | React, React Router, ECharts, TanStack Table, hand-written CSS            |
 | Ingest         | Node.js, Azure Functions v4 (Flex Consumption), Azure Blob Storage        |
-| Infrastructure | Bicep (storage, Functions, Application Insights, Static Web App)          |
+| Infrastructure | Bicep (storage, Functions, Application Insights, static website)          |
 | Quality        | Vitest, ESLint, Prettier, strict `tsc`, GitHub Actions (CI + OIDC deploy) |
 
 ## Repository layout
@@ -101,8 +101,10 @@ from `VITE_DATA_BASE_URL`, which points at the public `published` blob container
 ## Deployment
 
 The infrastructure is defined in [`infra/`](infra) (Bicep) and deployed from GitHub Actions with
-OpenID Connect, so no credentials are stored. The templates have not been run against a live
-subscription yet, so review the first deployment with `what-if`.
+OpenID Connect, so no credentials are stored. The frontend is a static website on a storage account,
+not Azure Static Web Apps, because that service is only available in a few regions and some
+subscriptions restrict regions by policy. The templates have only been checked with `what-if` so
+far, so review the first deployment.
 
 1. Provision the resources. Sweden Central is the closest region to Finland.
 
@@ -110,15 +112,27 @@ subscription yet, so review the first deployment with `what-if`.
    az group create -n rg-regs-prod -l swedencentral
    az deployment group what-if -g rg-regs-prod -f infra/main.bicep -p infra/main.prod.bicepparam
    az deployment group create  -g rg-regs-prod -f infra/main.bicep -p infra/main.prod.bicepparam
+   az deployment group show -g rg-regs-prod -n main --query properties.outputs
    ```
 
-2. Connect GitHub to Azure. Create an app registration with a federated credential for the
-   repository's `production` environment and give it `Contributor` on the resource group. Then set
-   these repository variables: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`,
-   `RESOURCE_GROUP`, `FUNCTION_APP_NAME`, `STATIC_WEB_APP_NAME` (the last two come from the
-   deployment outputs) and `DATA_BASE_URL` (the `dataBaseUrl` output).
-3. Push to `main` or run the _Deploy_ workflow.
-4. Load the first data instead of waiting for the schedule:
+2. Create the deployment identity: an app registration with a federated credential for the
+   repository's `production` environment. The `subject` must match the repository and environment
+   exactly.
+
+   ```bash
+   az ad app create --display-name ensirekisteroinnit-deploy --query appId -o tsv
+   az ad sp create --id <appId>
+   az ad app federated-credential create --id <appId> --parameters '{"name":"github-production","issuer":"https://token.actions.githubusercontent.com","subject":"repo:<owner>/<repo>:environment:production","audiences":["api://AzureADTokenExchange"]}'
+   az role assignment create --assignee <appId> --role Contributor --scope /subscriptions/<subscriptionId>/resourceGroups/rg-regs-prod
+   az role assignment create --assignee <appId> --role "Storage Blob Data Contributor" --scope $(az storage account show -g rg-regs-prod -n <webStorageAccountName> --query id -o tsv)
+   ```
+
+3. Set these repository variables (Settings, Secrets and variables, Actions, Variables):
+   `AZURE_CLIENT_ID` (the app id), `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `FUNCTION_APP_NAME`
+   (output `functionAppName`), `WEB_STORAGE_ACCOUNT` (output `webStorageAccountName`) and
+   `DATA_BASE_URL` (output `dataBaseUrl`).
+4. Push to `main` or run the _Deploy_ workflow. The site is served at the `siteUrl` output.
+5. Load the first data instead of waiting for the schedule:
    `POST https://<functionAppName>.azurewebsites.net/api/ingest?force=true` with the function key in
    the `x-functions-key` header.
 
@@ -127,6 +141,9 @@ changing it needs no redeployment. To roll back, point `published/latest.json` a
 folder. The `published` container is public on purpose: the data is open, and CORS limits browser
 access to the site. The `raw` container is private. Releases are never expired by age, so the site
 keeps working if the source stops updating.
+
+The storage website has no custom response headers, so security headers such as
+`X-Frame-Options` need a CDN or Front Door in front of it if you want them.
 
 ## Data notes and limitations
 
