@@ -1,0 +1,120 @@
+/* Design tokens. Light is the default; dark follows the OS or the toggle. */
+:root {
+  --ground: #ffffff;
+  --ground-2: #f3f6f9;
+  --ground-3: #e6ecf2;
+  --ink: #0b1f33;
+  --ink-2: #3b4f64;
+  --ink-3: #566a7e;
+  --rule: #d6dfe8;
+  --rule-strong: #a3b3c3;
+
+  --rail: #0b1f33;
+  --rail-ink: #e6eef6;
+  --rail-ink-2: #a3b8cc;
+  --rail-line: #24425e;
+
+  --accent: #006f45;
+  --on-accent: #ffffff;
+  --focus: #1b64d4;
+  --pos: #006f45;
+  --neg: #b3311f;
+
+  --fuel-bev: #00a86b;
+  --fuel-phev: #2f7fd1;
+  --fuel-petrol: #e8a400;
+  --fuel-diesel: #3f4f61;
+  --fuel-other: #7f8fa0;
+  --hatch: rgba(8, 18, 29, 0.32);
+
+  --font: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.25rem;
+  --step-3: 1.75rem;
+  --step-4: clamp(1.6rem, 1.15rem + 1.9vw, 2.375rem);
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2.25rem;
+  --s-7: 3.5rem;
+
+  --r-1: 6px;
+  --r-2: 10px;
+  --r-3: 14px;
+
+  --rail-w: 252px;
+  --tabbar-h: 64px;
+  --gutter: clamp(16px, 3vw, 40px);
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --ground: #08121d;
+  --ground-2: #0e1b29;
+  --ground-3: #15283a;
+  --ink: #e8eff6;
+  --ink-2: #b3c3d3;
+  --ink-3: #8fa3b6;
+  --rule: #1d3145;
+  --rule-strong: #3a5570;
+
+  --rail: #0b1f33;
+  --rail-ink: #e6eef6;
+  --rail-ink-2: #98adc1;
+  --rail-line: #24425e;
+
+  --accent: #3fd39a;
+  --on-accent: #04281b;
+  --focus: #6aa8ff;
+  --pos: #3fd39a;
+  --neg: #f08670;
+
+  --fuel-bev: #2fd197;
+  --fuel-phev: #5ca6f2;
+  --fuel-petrol: #f2b42a;
+  --fuel-diesel: #9fb0c2;
+  --fuel-other: #627588;
+  --hatch: rgba(8, 18, 29, 0.4);
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ground: #08121d;
+    --ground-2: #0e1b29;
+    --ground-3: #15283a;
+    --ink: #e8eff6;
+    --ink-2: #b3c3d3;
+    --ink-3: #8fa3b6;
+    --rule: #1d3145;
+    --rule-strong: #3a5570;
+
+    --rail: #0b1f33;
+    --rail-ink: #e6eef6;
+    --rail-ink-2: #98adc1;
+    --rail-line: #24425e;
+
+    --accent: #3fd39a;
+    --on-accent: #04281b;
+    --focus: #6aa8ff;
+    --pos: #3fd39a;
+    --neg: #f08670;
+
+    --fuel-bev: #2fd197;
+    --fuel-phev: #5ca6f2;
+    --fuel-petrol: #f2b42a;
+    --fuel-diesel: #9fb0c2;
+    --fuel-other: #627588;
+    --hatch: rgba(8, 18, 29, 0.4);
+
+    color-scheme: dark;
+  }
+}

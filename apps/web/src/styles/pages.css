@@ -1,0 +1,25 @@
+.hero {
+  max-width: 940px;
+  margin-bottom: var(--s-5);
+}
+
+.page-head {
+  margin-top: 0;
+}
+
+.hero + .page-head {
+  margin-top: 0;
+}
+
+.prose {
+  max-width: 68ch;
+}
+.prose .block ul {
+  padding-left: 1.25rem;
+  display: grid;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+}
+.prose .block p {
+  margin-top: var(--s-3);
+}

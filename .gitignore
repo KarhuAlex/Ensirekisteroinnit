@@ -1,0 +1,21 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.data/
+coverage/
+.env
+.env.*
+!.env.example
+local.settings.json
+.vite/
+.DS_Store
+.deploy/
+
+# AI tooling: assistant guidance, product/design briefs and tool state stay local
+CLAUDE.md
+PRODUCT.md
+DESIGN.md
+.impeccable/
+
+# Internal documentation
+docs/

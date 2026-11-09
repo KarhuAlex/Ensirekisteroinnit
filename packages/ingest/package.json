@@ -1,0 +1,23 @@
+{
+  "name": "@regs/ingest",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Source adapters and the fetch → normalise → publish pipeline.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "regs-ingest": "./dist/cli.js"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.5.0",
+    "@azure/storage-blob": "^12.26.0",
+    "@regs/core": "*"
+  }
+}
