@@ -1,4 +1,3 @@
-import { FUEL_GROUP_IDS } from '@regs/core';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useDataState } from '../data/DataProvider';
@@ -30,11 +29,7 @@ function Brand({ className }: { className?: string }) {
   const { lang, t } = useI18n();
   return (
     <Link to={`/${lang}`} className={className ? `brand ${className}` : 'brand'}>
-      <span className="brand-plate" aria-hidden="true">
-        {FUEL_GROUP_IDS.map((g) => (
-          <FuelMark key={g} group={g} size={9} />
-        ))}
-      </span>
+      <img className="brand-mark" src="/favicon.svg" width={28} height={28} alt="" />
       <span className="brand-name">{t('app.title')}</span>
     </Link>
   );
