@@ -1,10 +1,12 @@
 import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
+import { useSiteConfig } from '../data/SiteConfigProvider';
 import { useI18n } from '../i18n';
 
 export function About() {
   const { t, fmt } = useI18n();
   const { manifest } = useCatalog();
+  const { config, ready } = useSiteConfig();
   usePageTitle(`${t('about.title')} – ${t('app.title')}`);
   const { source } = manifest;
 
@@ -39,6 +41,46 @@ export function About() {
           <li>{t('about.caveat5')}</li>
         </ul>
       </section>
+
+      <section className="block" aria-labelledby="about-privacy">
+        <h2 id="about-privacy">{t('about.privacyTitle')}</h2>
+        <p>{t('about.privacyText')}</p>
+        {ready && (
+          <p>
+            {config.operator && `${t('about.privacyOperator', { operator: config.operator })} `}
+            {config.hosting
+              ? t('about.privacyHosting', { hosting: config.hosting })
+              : t('about.privacyHostingGeneric')}
+          </p>
+        )}
+      </section>
+
+      <section className="block" aria-labelledby="about-disclaimer">
+        <h2 id="about-disclaimer">{t('about.disclaimerTitle')}</h2>
+        <p>{t('about.disclaimerText')}</p>
+      </section>
+
+      {ready && (config.contactUrl || config.repoUrl) && (
+        <section className="block" aria-labelledby="about-contact">
+          <h2 id="about-contact">{t('about.contactTitle')}</h2>
+          {config.contactUrl && (
+            <p>
+              {t('about.contactText')}{' '}
+              <a href={config.contactUrl} rel="noopener noreferrer" target="_blank">
+                {t('about.contactLink')}
+              </a>
+            </p>
+          )}
+          {config.repoUrl && (
+            <p>
+              {t('about.repoText')}{' '}
+              <a href={config.repoUrl} rel="noopener noreferrer" target="_blank">
+                {t('about.repoLink')}
+              </a>
+            </p>
+          )}
+        </section>
+      )}
 
       {manifest.notes.length > 0 && (
         <section className="block" aria-labelledby="about-notes">

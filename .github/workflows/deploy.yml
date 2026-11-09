@@ -3,7 +3,8 @@ name: Deploy
 # Called by ci.yml after every check has passed on main, and can be started by hand. It signs in to
 # Azure with OpenID Connect, so no Azure secrets are stored.
 # Needs these repository variables: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
-# FUNCTION_APP_NAME, WEB_STORAGE_ACCOUNT, DATA_BASE_URL.
+# FUNCTION_APP_NAME, WEB_STORAGE_ACCOUNT, DATA_BASE_URL. Optional, for the privacy and contact
+# sections: SITE_OPERATOR, SITE_CONTACT_URL, SITE_HOSTING, SITE_REPO_URL.
 on:
   workflow_call:
   workflow_dispatch:
@@ -64,6 +65,13 @@ jobs:
         run: npm run build -w @regs/web
         env:
           VITE_DATA_BASE_URL: ${{ vars.DATA_BASE_URL }}
+      - name: Write site details
+        run: node apps/web/scripts/write-site-config.mjs apps/web/dist/site.config.json
+        env:
+          SITE_OPERATOR: ${{ vars.SITE_OPERATOR }}
+          SITE_CONTACT_URL: ${{ vars.SITE_CONTACT_URL }}
+          SITE_HOSTING: ${{ vars.SITE_HOSTING }}
+          SITE_REPO_URL: ${{ vars.SITE_REPO_URL }}
       - uses: azure/login@v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
@@ -77,7 +85,7 @@ jobs:
           --content-cache-control "public, max-age=31536000, immutable"
       - name: Upload pages and icons
         run: |
-          for pattern in '*.html' '*.svg'; do
+          for pattern in '*.html' '*.svg' '*.json'; do
             az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite \
               -d '$web' -s apps/web/dist --pattern "$pattern" \
               --content-cache-control "public, max-age=0, must-revalidate"

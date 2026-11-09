@@ -228,4 +228,20 @@ export const en: Record<MessageKey, string> = {
     'Share is the part of all first registrations in the period (counting the same fuels) that the model or make accounts for. A percentage change is shown only when the comparison period has at least {min} registrations, because percentages from small numbers mislead.',
   'review.teaser': 'Which car was registered most in a given month or year?',
   'review.teaserLink': 'Open the review',
+  'about.privacyTitle': 'Privacy',
+  'about.privacyText':
+    'The service uses no cookies and no tracking, and it does not collect personal data. Your browser stores only the theme you choose (light or dark).',
+  'about.privacyOperator': 'The service is run by {operator}.',
+  'about.privacyHosting':
+    'The site runs on {hosting}, which may process IP addresses technically to deliver network traffic.',
+  'about.privacyHostingGeneric':
+    'The hosting service that delivers the site may process IP addresses technically to deliver network traffic.',
+  'about.disclaimerTitle': 'Disclaimer',
+  'about.disclaimerText':
+    'The figures are based on open data from Traficom. The service is not a Traficom product or an official statistic, and the accuracy, timeliness or fitness of the data for any particular use cannot be guaranteed. Use the data at your own risk.',
+  'about.contactTitle': 'Contact',
+  'about.contactText': 'Bug reports and suggestions can be sent through this link.',
+  'about.contactLink': 'Get in touch',
+  'about.repoText': 'The source code of the service is openly available.',
+  'about.repoLink': 'Open the source code',
 };

@@ -228,6 +228,22 @@ export const fi = {
     'Osuus kertoo, kuinka suuri osa valitun ajanjakson kaikista ensirekisteröinneistä (samoilla käyttövoimilla) on kyseinen malli tai merkki. Prosenttimuutos näytetään vain, jos vertailujaksolla on vähintään {min} ensirekisteröintiä, koska pienistä luvuista lasketut prosentit antavat harhaanjohtavan kuvan.',
   'review.teaser': 'Mikä auto ensirekisteröitiin eniten tietyssä kuussa tai vuodessa?',
   'review.teaserLink': 'Avaa katsaus',
+  'about.privacyTitle': 'Tietosuoja',
+  'about.privacyText':
+    'Palvelu ei käytä evästeitä eikä seurantaa, eikä se kerää henkilötietoja. Selain tallentaa vain valitsemasi teeman (vaalea tai tumma).',
+  'about.privacyOperator': 'Palvelun ylläpitäjä on {operator}.',
+  'about.privacyHosting':
+    'Sivusto toimii palvelussa {hosting}, joka voi käsitellä IP-osoitteita teknisesti verkkoliikenteen välittämiseksi.',
+  'about.privacyHostingGeneric':
+    'Sivuston tarjoava palvelinpalvelu voi käsitellä IP-osoitteita teknisesti verkkoliikenteen välittämiseksi.',
+  'about.disclaimerTitle': 'Vastuuvapaus',
+  'about.disclaimerText':
+    'Luvut perustuvat Traficomin avoimeen dataan. Palvelu ei ole Traficomin tuote eikä virallinen tilasto, eikä tietojen oikeellisuutta, ajantasaisuutta tai soveltuvuutta tiettyyn käyttöön voida taata. Käytä tietoja omalla vastuullasi.',
+  'about.contactTitle': 'Yhteydenotto',
+  'about.contactText': 'Virheilmoitukset ja ehdotukset voi lähettää tämän linkin kautta.',
+  'about.contactLink': 'Ota yhteyttä',
+  'about.repoText': 'Palvelun lähdekoodi on avoimesti saatavilla.',
+  'about.repoLink': 'Avaa lähdekoodi',
 } as const;
 
 export type MessageKey = keyof typeof fi;

@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { DataProvider } from './data/DataProvider';
+import { SiteConfigProvider } from './data/SiteConfigProvider';
 import { detectLang, I18nProvider, isLang } from './i18n';
 import { About } from './pages/About';
 import { ModelDetail } from './pages/ModelDetail';
@@ -23,22 +24,24 @@ function LangRoute() {
 export function App() {
   return (
     <BrowserRouter>
-      <DataProvider>
-        <Routes>
-          <Route path="/" element={<Navigate to={`/${detectLang()}`} replace />} />
-          <Route path="/:lang" element={<LangRoute />}>
-            <Route element={<Layout />}>
-              <Route index element={<Overview />} />
-              <Route path="review" element={<Review />} />
-              <Route path="models" element={<Models />} />
-              <Route path="models/:id" element={<ModelDetail />} />
-              <Route path="table" element={<TablePage />} />
-              <Route path="about" element={<About />} />
-              <Route path="*" element={<NotFound />} />
+      <SiteConfigProvider>
+        <DataProvider>
+          <Routes>
+            <Route path="/" element={<Navigate to={`/${detectLang()}`} replace />} />
+            <Route path="/:lang" element={<LangRoute />}>
+              <Route element={<Layout />}>
+                <Route index element={<Overview />} />
+                <Route path="review" element={<Review />} />
+                <Route path="models" element={<Models />} />
+                <Route path="models/:id" element={<ModelDetail />} />
+                <Route path="table" element={<TablePage />} />
+                <Route path="about" element={<About />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </DataProvider>
+          </Routes>
+        </DataProvider>
+      </SiteConfigProvider>
     </BrowserRouter>
   );
 }

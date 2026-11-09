@@ -160,6 +160,13 @@ repository. Pass it when deploying (`-p notifyEmail=you@example.com`), or set th
 app setting (comma-separated for several addresses). Without it no emails are sent. A failed send is
 logged and never fails the ingest.
 
+The About page has privacy and disclaimer sections, and an optional contact section. The details
+that differ between publishers are read at runtime from `site.config.json` next to the site, so a
+fork needs no code changes. The deploy workflow writes the file from the repository variables
+`SITE_OPERATOR`, `SITE_CONTACT_URL`, `SITE_HOSTING` and `SITE_REPO_URL`. All are optional, and
+anything left out falls back to neutral wording. The texts are general and are not legal advice, so
+check that they fit your own situation.
+
 The storage website has no custom response headers, so security headers such as
 `X-Frame-Options` need a CDN or Front Door in front of it if you want them.
 
