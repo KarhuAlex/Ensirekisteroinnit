@@ -18,7 +18,7 @@ export const en: Record<MessageKey, string> = {
   'status.loading': 'Loading…',
   'status.error': 'Failed to load the data.',
   'status.retry': 'Try again',
-  'status.partial': 'Data runs up to {month}.',
+  'status.partial': 'Latest data: {month}.',
 
   'fuel.group.bev': 'Battery electric',
   'fuel.group.phev': 'Plug-in hybrid',
@@ -43,7 +43,7 @@ export const en: Record<MessageKey, string> = {
   'entity.total': 'All passenger cars',
 
   'search.label': 'Search for a make or model',
-  'search.placeholder': 'Search a make or model',
+  'search.placeholder': 'Search for a make or model',
   'search.empty': 'No results',
 
   'kpi.registrations': 'Registrations, {month}',
@@ -51,7 +51,7 @@ export const en: Record<MessageKey, string> = {
   'kpi.bevShare12': 'Battery-electric share, 12 mo',
   'kpi.plugShare12': 'Battery-electric and plug-in hybrids, 12 mo',
   'unit.pp': 'pp',
-  'kpi.vsYear': 'Change over a year: {value}',
+  'kpi.vsYear': 'Change in a year: {value}',
 
   'chart.shareTitle': 'Share of first registrations by fuel type',
   'chart.annualTitle': 'First registrations per year',
@@ -60,14 +60,14 @@ export const en: Record<MessageKey, string> = {
   'chart.modeCount': 'Count',
   'chart.monthly': 'Monthly',
   'chart.yearly': 'Yearly',
-  'chart.partialYear': '* The current year is incomplete: data runs up to {month}.',
+  'chart.partialYear': '* The current year is not over. Latest data: {month}.',
   'chart.bevLine': 'Battery electric',
   'chart.plugLine': 'Battery electric and plug-in hybrid',
   'chart.aria.share': 'Share of first registrations by fuel type, monthly',
 
   'models.title': 'Makes and models',
   'models.subtitle':
-    'Search and compare makes and model series. Select a row to see its monthly development.',
+    'Search and compare makes and model series. Select a row to see its monthly figures.',
   'models.filter': 'Filter by name',
   'models.filterAll': 'All',
   'models.filterMakes': 'Makes',
@@ -93,13 +93,13 @@ export const en: Record<MessageKey, string> = {
   'model.modelsOfMake': 'Models of this make',
   'model.notFound': 'Make or model not found.',
   'model.allModels': 'All makes and models',
-  'model.since': 'Data covers {from}–{to}.',
+  'model.since': 'Data covers {from} to {to}.',
 
   'table.title': 'Fuel types as a table',
   'table.subtitle': 'All passenger cars, mainland Finland. Click a column header to sort.',
   'table.search': 'Search periods',
   'table.searchPlaceholder': 'For example 2025',
-  'table.granularity': 'Granularity',
+  'table.granularity': 'Interval',
   'table.period': 'Period',
   'table.total': 'Total',
   'table.bevShare': 'Electric, %',
@@ -109,10 +109,10 @@ export const en: Record<MessageKey, string> = {
 
   'about.title': 'About',
   'about.intro':
-    'This service presents Traficom statistics on first registrations of passenger cars. The data is fetched automatically from the statistics database and published here as ready-made datasets.',
+    "This service shows Traficom statistics on first registrations of passenger cars. The data is fetched automatically from Traficom's statistics database and published here as ready-made datasets.",
   'about.sourceTitle': 'Data source',
   'about.sourceText':
-    'Source: Traficom, {name}. The data is licensed under {licence}. Last updated by the source: {updated}. This service compiled the data on {generated}.',
+    'Source: {name}. The data is licensed under {licence}. Last updated by the source: {updated}. This service compiled the data on {generated}.',
   'about.sourceLink': 'Open the source in the Traficom statistics database',
   'about.caveatsTitle': 'Things to keep in mind',
   'about.caveat1': 'The data is monthly. Daily figures are not available.',
@@ -137,10 +137,10 @@ export const en: Record<MessageKey, string> = {
   'range.2y': '2 y',
   'range.1y': '12 mo',
   'chart.mode': 'View',
-  'chart.granularity': 'Granularity',
+  'chart.granularity': 'Interval',
   'legend.title': 'Fuel types',
   'legend.toggle': 'Show or hide: {name}',
-  'rail.fuelKey': 'Fuel type marks',
+  'rail.fuelKey': 'Fuel type symbols',
   'footer.limits': 'Data limitations',
   'status.errorHint': 'Check your connection and try again.',
   'search.popular': 'Most registered',
@@ -149,7 +149,7 @@ export const en: Record<MessageKey, string> = {
   'search.clear': 'Clear search',
   'search.results': 'Search results',
   'search.emptyHint': 'Try a shorter query, for example just the make.',
-  'search.placeholderHero': 'Search a car, e.g. {example}',
+  'search.placeholderHero': 'Search for a car, for example {example}',
   'story.bevDetail': 'Latest month: {month}. The 12-month share is {share12}.',
   'story.model.none': 'No first registrations in the last 12 months.',
   'story.model.all': 'First registrations in the last 12 months: {n}, all battery electric.',
@@ -158,7 +158,7 @@ export const en: Record<MessageKey, string> = {
   'models.caption': 'Makes and models by first registrations',
   'table.caption': 'First registrations by fuel type',
   'model.fuelCaption': 'First registrations of this model by fuel type',
-  'model.breadcrumb': 'Location',
+  'model.breadcrumb': 'You are here',
   'story.bevUp': 'Battery-electric cars are {share} of first registrations, up {delta} in a year',
   'story.bevDown':
     'Battery-electric cars are {share} of first registrations, down {delta} in a year',
@@ -172,7 +172,7 @@ export const en: Record<MessageKey, string> = {
   'review.headline.make': 'Most registered makes, {period}',
   'review.lede':
     'See which cars were registered most: in a single month, over several months, in a year or over several years. A first registration is the first time a car is registered in Finland, and cars imported used are included.',
-  'review.range.year': 'the year {year}',
+  'review.range.year': '{year}',
   'review.range.span': '{from} to {to}',
   'review.partialYear':
     'The year is not over, so the figures cover only the months published so far.',
@@ -207,7 +207,7 @@ export const en: Record<MessageKey, string> = {
 
   'review.kpi.total': 'Total first registrations',
   'review.kpi.leader': 'Most registered',
-  'review.kpi.leaderNote': '{n} cars, {share} share',
+  'review.kpi.leaderNote': '{n} cars, {share} of the total',
   'review.kpi.distinct.model': 'Different models',
   'review.kpi.distinct.make': 'Different makes',
   'review.kpi.versus.yearAgo': 'A year earlier: {n} ({change})',
@@ -225,7 +225,7 @@ export const en: Record<MessageKey, string> = {
   'review.unavailableHint':
     'The data moves to a new format with the next update. Please try again in a moment.',
   'review.note':
-    'Share is the part of all first registrations in the period (counting the same fuels) that the model or make accounts for. A percentage change is shown only when the comparison period has at least {min} registrations, because percentages from small numbers mislead.',
+    'Share is the proportion of all first registrations in the period (counting the same fuels) that the model or make accounts for. A percentage change appears only when the comparison period has at least {min} registrations, because percentages from small numbers mislead.',
   'review.teaser': 'Which car was registered most in a given month or year?',
   'review.teaserLink': 'Open the review',
   'about.privacyTitle': 'Privacy',
@@ -235,7 +235,7 @@ export const en: Record<MessageKey, string> = {
   'about.privacyHosting':
     'The site runs on {hosting}, which may process IP addresses technically to deliver network traffic.',
   'about.privacyHostingGeneric':
-    'The hosting service that delivers the site may process IP addresses technically to deliver network traffic.',
+    'The hosting provider may process IP addresses technically to deliver network traffic.',
   'about.disclaimerTitle': 'Disclaimer',
   'about.disclaimerText':
     'The figures are based on open data from Traficom. The service is not a Traficom product or an official statistic, and the accuracy, timeliness or fitness of the data for any particular use cannot be guaranteed. Use the data at your own risk.',
@@ -269,7 +269,7 @@ export const en: Record<MessageKey, string> = {
 
   'review.kpi.national': 'Whole country',
   'review.kpi.nationalNote': 'Share of all registrations: {share}',
-  'review.kpi.topArea': 'Highest: {metric}',
+  'review.kpi.topArea': 'Top area, {metric}',
   'review.kpi.areas': 'Areas with a reliable value',
 
   'review.map.title': 'Map: {metric}, {period}',
@@ -286,5 +286,5 @@ export const en: Record<MessageKey, string> = {
   'review.regional.clamped':
     'The regional data starts in {year}, so the period has been cut to match.',
   'review.area.narrow':
-    'Pick a fuel or narrow to a make or model, and the share, index and change become informative. For now only the count is shown.',
+    'Pick a fuel, or limit the list to a make or model, to see share, index and change. For now only the count is shown.',
 };

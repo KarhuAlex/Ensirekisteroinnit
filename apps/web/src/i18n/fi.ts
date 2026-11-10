@@ -16,7 +16,7 @@ export const fi = {
   'status.loading': 'Ladataan…',
   'status.error': 'Tietojen lataus epäonnistui.',
   'status.retry': 'Yritä uudelleen',
-  'status.partial': 'Tiedot ovat kuukauteen {month} asti.',
+  'status.partial': 'Viimeisin tieto: {month}.',
 
   'fuel.group.bev': 'Täyssähkö',
   'fuel.group.phev': 'Ladattava hybridi',
@@ -58,7 +58,7 @@ export const fi = {
   'chart.modeCount': 'Määrä',
   'chart.monthly': 'Kuukausittain',
   'chart.yearly': 'Vuosittain',
-  'chart.partialYear': '* Kuluva vuosi on kesken: tiedot ovat kuukauteen {month} asti.',
+  'chart.partialYear': '* Kuluva vuosi on kesken. Viimeisin tieto: {month}.',
   'chart.bevLine': 'Täyssähkö',
   'chart.plugLine': 'Täyssähkö ja ladattava hybridi',
   'chart.aria.share': 'Käyttövoimien osuudet ensirekisteröinneistä kuukausittain',
@@ -111,7 +111,7 @@ export const fi = {
     'Palvelu esittää Traficomin tilastoja henkilöautojen ensirekisteröinneistä. Tiedot haetaan tilastotietokannasta automaattisesti ja julkaistaan tälle sivulle valmiina aineistona.',
   'about.sourceTitle': 'Tietolähde',
   'about.sourceText':
-    'Lähde: Traficom, {name}. Aineisto on lisensoitu {licence}-lisenssillä. Lähteen viimeisin päivitys: {updated}. Palvelun aineisto on koottu {generated}.',
+    'Lähde: {name}. Aineisto on lisensoitu {licence} -lisenssillä. Lähteen viimeisin päivitys: {updated}. Palvelun aineisto on koottu {generated}.',
   'about.sourceLink': 'Avaa lähde Traficomin tilastotietokannassa',
   'about.caveatsTitle': 'Huomioitavaa',
   'about.caveat1': 'Tiedot ovat kuukausitasoisia. Päiväkohtaisia tietoja ei ole saatavilla.',
@@ -139,8 +139,8 @@ export const fi = {
   'chart.granularity': 'Tarkkuus',
   'legend.title': 'Käyttövoimat',
   'legend.toggle': 'Näytä tai piilota: {name}',
-  'rail.fuelKey': 'Käyttövoimien merkit',
-  'footer.limits': 'Datan rajoitteet',
+  'rail.fuelKey': 'Käyttövoimien tunnukset',
+  'footer.limits': 'Aineiston rajoitukset',
   'status.errorHint': 'Tarkista verkkoyhteys ja yritä uudelleen.',
   'search.popular': 'Eniten rekisteröidyt',
   'search.last12': 'Viimeiset 12 kk: {n}',
@@ -148,7 +148,7 @@ export const fi = {
   'search.clear': 'Tyhjennä haku',
   'search.results': 'Hakutulokset',
   'search.emptyHint': 'Kokeile lyhyempää hakua, esimerkiksi pelkkää merkkiä.',
-  'search.placeholderHero': 'Hae auto, esim. {example}',
+  'search.placeholderHero': 'Hae autoa, esimerkiksi {example}',
   'story.bevDetail': 'Tuorein kuukausi: {month}. 12 kuukauden osuus on {share12}.',
   'story.model.none': 'Ei ensirekisteröintejä viimeisen 12 kuukauden aikana.',
   'story.model.all': 'Viimeisen 12 kuukauden ensirekisteröinnit: {n}, kaikki täyssähköisiä.',
@@ -183,7 +183,7 @@ export const fi = {
   'review.preset.last12': 'Viim. 12 kk',
   'review.preset.thisYear': 'Tämä vuosi',
   'review.preset.lastYear': 'Edellinen vuosi',
-  'review.preset.all': 'Kaikki aika',
+  'review.preset.all': 'Koko ajanjakso',
   'review.from': 'Alkaa',
   'review.to': 'Päättyy',
   'review.month': 'Kuukausi',
@@ -235,7 +235,7 @@ export const fi = {
   'about.privacyHosting':
     'Sivusto toimii palvelussa {hosting}, joka voi käsitellä IP-osoitteita teknisesti verkkoliikenteen välittämiseksi.',
   'about.privacyHostingGeneric':
-    'Sivuston tarjoava palvelinpalvelu voi käsitellä IP-osoitteita teknisesti verkkoliikenteen välittämiseksi.',
+    'Sivustoa isännöivä palveluntarjoaja voi käsitellä IP-osoitteita teknisesti verkkoliikenteen välittämiseksi.',
   'about.disclaimerTitle': 'Vastuuvapaus',
   'about.disclaimerText':
     'Luvut perustuvat Traficomin avoimeen dataan. Palvelu ei ole Traficomin tuote eikä virallinen tilasto, eikä tietojen oikeellisuutta, ajantasaisuutta tai soveltuvuutta tiettyyn käyttöön voida taata. Käytä tietoja omalla vastuullasi.',
@@ -247,7 +247,7 @@ export const fi = {
   'review.level.area': 'Alueet',
   'review.headline.area': 'Ensirekisteröinnit alueittain, {period}',
   'review.headline.areaEntity': '{entity} alueittain, {period}',
-  'review.areaBy': 'Alueen taso',
+  'review.areaBy': 'Aluetaso',
   'review.by.region': 'Maakunnat',
   'review.by.municipality': 'Kunnat',
   'review.metric': 'Mittari',
@@ -269,7 +269,7 @@ export const fi = {
 
   'review.kpi.national': 'Koko maa',
   'review.kpi.nationalNote': 'Osuus kaikista rekisteröinneistä {share}',
-  'review.kpi.topArea': 'Suurin: {metric}',
+  'review.kpi.topArea': 'Johtava alue, {metric}',
   'review.kpi.areas': 'Alueita, joilla on luotettava arvo',
 
   'review.map.title': 'Kartta: {metric}, {period}',
