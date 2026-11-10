@@ -1,8 +1,12 @@
 import type { EntitySummary } from '@regs/core';
-import { useId, useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useI18n } from '../i18n';
 import { entityOptions } from '../lib/entityOptions';
+import { MAX_SUGGESTIONS, rankSuggestions, searchTokens } from '../lib/suggestions';
 import { Icon } from './Icon';
+import { ClearButton } from './suggest/ClearButton';
+import { SuggestionList } from './suggest/SuggestionList';
+import { useCombobox } from './suggest/useCombobox';
 
 interface Props {
   entities: readonly EntitySummary[];
@@ -16,13 +20,12 @@ interface Props {
 /** A text field with suggestions for one make or model. Empty means all cars. */
 export function EntityPicker({ entities, value, onChange, label, placeholder }: Props) {
   const { t } = useI18n();
-  const listId = useId();
-  const options = useMemo(
-    () => entityOptions(entities, (kind) => t(`kind.${kind}`)),
+  const inputRef = useRef<HTMLInputElement>(null);
+  const names = useMemo(
+    () => new Map(entityOptions(entities, (kind) => t(`kind.${kind}`)).map((o) => [o.id, o.name])),
     [entities, t],
   );
-  const idByName = useMemo(() => new Map(options.map((o) => [o.name, o.id])), [options]);
-  const nameOf = (id: string | null) => options.find((o) => o.id === id)?.name ?? '';
+  const nameOf = (id: string | null) => (id ? (names.get(id) ?? '') : '');
   const [text, setText] = useState(nameOf(value));
   const [shownFor, setShownFor] = useState(value);
   if (shownFor !== value) {
@@ -30,33 +33,67 @@ export function EntityPicker({ entities, value, onChange, label, placeholder }: 
     setText(nameOf(value));
   }
 
-  const change = (next: string) => {
+  const tokens = useMemo(() => searchTokens(text), [text]);
+  const results = useMemo(
+    () => rankSuggestions(entities, tokens, MAX_SUGGESTIONS),
+    [entities, tokens],
+  );
+
+  const combobox = useCombobox({
+    count: results.length,
+    // The name of the current selection is not an edit, so Enter leaves the selection alone.
+    typed: tokens.length > 0 && text !== nameOf(value),
+    onChoose: (index) => {
+      const hit = results[index];
+      if (!hit) return;
+      setText(nameOf(hit.id));
+      onChange(hit.id);
+    },
+  });
+
+  const edit = (next: string) => {
     setText(next);
+    combobox.textChanged();
     if (next === '') onChange(null);
-    else {
-      const id = idByName.get(next);
-      if (id) onChange(id);
-    }
   };
 
   return (
-    <label className="field">
-      <span>{label ?? t('review.entity')}</span>
-      <span className="field-input">
+    <div className="field">
+      <label htmlFor={combobox.inputId}>{label ?? t('review.entity')}</label>
+      <div className="field-input">
         <Icon name="search" size={18} />
         <input
-          type="search"
-          list={listId}
+          {...combobox.inputProps}
+          ref={inputRef}
+          type="text"
           value={text}
           placeholder={placeholder ?? t('review.entityPlaceholder')}
-          onChange={(e) => change(e.target.value)}
+          onChange={(e) => edit(e.target.value)}
+          // Text that was not chosen is dropped, so the field always shows what is selected.
+          onBlur={() => {
+            combobox.inputProps.onBlur();
+            setText(nameOf(value));
+          }}
         />
-        <datalist id={listId}>
-          {options.map((o) => (
-            <option key={o.id} value={o.name} />
-          ))}
-        </datalist>
-      </span>
-    </label>
+        {text && (
+          <ClearButton
+            onClick={() => {
+              edit('');
+              inputRef.current?.focus();
+            }}
+          />
+        )}
+        {combobox.open && (
+          <SuggestionList
+            id={combobox.listId}
+            entities={results}
+            tokens={tokens}
+            active={combobox.active}
+            onHover={combobox.hover}
+            onChoose={combobox.choose}
+          />
+        )}
+      </div>
+    </div>
   );
 }

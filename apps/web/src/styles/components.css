@@ -209,7 +209,7 @@
   color: var(--ink-2);
   font-size: var(--step--1);
 }
-.search-clear {
+.input-clear {
   display: grid;
   place-items: center;
   width: 40px;
@@ -221,11 +221,12 @@
   color: var(--ink-2);
   cursor: pointer;
 }
-.search-clear:hover {
+.input-clear:hover {
   background: var(--ground-2);
   color: var(--ink);
 }
-.search-pop {
+/* Suggestions under a text field: the search box and the entity picker */
+.suggest-pop {
   position: absolute;
   inset: calc(100% + 8px) 0 auto 0;
   z-index: 40;
@@ -235,20 +236,21 @@
   border: 1.5px solid var(--ink);
   border-radius: var(--r-3);
   background: var(--ground);
+  color: var(--ink);
   box-shadow: 0 14px 28px -10px rgb(11 31 51 / 0.35);
   font-size: var(--step-0);
 }
-.search-pop ul {
+.suggest-pop ul {
   list-style: none;
   padding: 0;
 }
-.search-head {
+.suggest-head {
   padding: 8px 12px 4px;
   color: var(--ink-3);
   font-size: var(--step--1);
   font-weight: 700;
 }
-.search-pop li {
+.suggest-pop li {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -257,7 +259,7 @@
   border-radius: var(--r-2);
   cursor: pointer;
 }
-.search-pop li[aria-selected='true'] {
+.suggest-pop li[aria-selected='true'] {
   background: var(--ground-3);
 }
 .result-main {
@@ -282,7 +284,7 @@
   color: var(--ink-3);
   font-weight: 400;
 }
-.search-empty {
+.suggest-empty {
   padding: 16px 12px;
 }
 mark {
@@ -437,6 +439,7 @@ mark {
   font-size: var(--step--1);
 }
 .field-input {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -460,6 +463,11 @@ mark {
   outline: none;
   background: transparent;
   color: var(--ink);
+}
+.field-input .input-clear {
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
 }
 .table-wrap {
   overflow-x: auto;
