@@ -2,7 +2,9 @@
 import { parseArgs } from 'node:util';
 import { TraficomPxWebAdapter } from './adapters/traficom-pxweb/adapter.js';
 import { TraficomRegionalAdapter } from './adapters/traficom-pxweb/regional-adapter.js';
+import { StatFinFuelPriceAdapter } from './adapters/statfin/fuel-prices-adapter.js';
 import { TraficomUsedImportAdapter } from './adapters/traficom-pxweb/used-adapter.js';
+import { pricesPipeline } from './pipeline/prices.js';
 import { regionalPipeline } from './pipeline/regional.js';
 import { usedImportsPipeline } from './pipeline/registrations.js';
 import { runIngest, runPipeline, type IngestResult } from './pipeline/run.js';
@@ -25,14 +27,14 @@ const { values } = parseArgs({
 });
 
 if (values.help) {
-  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used] [--force]
+  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used|prices] [--force]
 
 Fetches the latest data and writes a release to <dir>/published (raw responses go to <dir>/raw).
   --out          Output directory (default: .data)
   --azure        Write to the data storage account instead, for example
                  https://<account>.blob.core.windows.net (uses your az login)
-  --dataset      registrations (national, default), regional (per municipality) or used
-                 (cars imported used, by make)
+  --dataset      registrations (national, default), regional (per municipality),
+                 used (cars imported used, by make) or prices (pump prices of petrol and diesel)
   --from-year    First year of the regional data (default: 2021)
   --concurrency  Parallel requests for the regional data (default: 4)
   --force        Publish a new release even if the source has not changed
@@ -80,6 +82,12 @@ async function run(): Promise<IngestResult> {
   if (values.dataset === 'used') {
     return runPipeline(usedImportsPipeline(new TraficomUsedImportAdapter()), {
       ...underPrefix(stores, 'used/'),
+      force,
+    });
+  }
+  if (values.dataset === 'prices') {
+    return runPipeline(pricesPipeline(new StatFinFuelPriceAdapter()), {
+      ...underPrefix(stores, 'prices/'),
       force,
     });
   }

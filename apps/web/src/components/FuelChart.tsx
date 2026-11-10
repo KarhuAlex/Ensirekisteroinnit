@@ -3,11 +3,12 @@ import { useMemo, useState } from 'react';
 import { useI18n } from '../i18n';
 import { fuelBarsChart } from '../lib/charts';
 import { useNarrow, useReducedMotion } from '../lib/hooks';
-import { RANGE_IDS, STACK_ORDER, rangeStart, type RangeId } from '../lib/stats';
+import { STACK_ORDER, rangeStart, type RangeId } from '../lib/stats';
 import { useThemeColors } from '../lib/theme';
 import { ChartFocus } from './ChartFocus';
 import { EChart } from './EChart';
 import { FuelMark } from './FuelMark';
+import { RangeControl } from './RangeControl';
 import { Segmented } from './ui';
 
 type Mode = 'share' | 'count';
@@ -115,14 +116,7 @@ export function FuelChart({
           <span>{t('readout.total', { n: fmt.int(total) })}</span>
         </p>
         <div className="chart-controls">
-          {withRanges && monthly && (
-            <Segmented
-              label={t('range.label')}
-              value={range}
-              options={RANGE_IDS.map((r) => ({ value: r, label: t(`range.${r}`) }))}
-              onChange={setRange}
-            />
-          )}
+          {withRanges && monthly && <RangeControl value={range} onChange={setRange} />}
           {switchableMode && (
             <Segmented
               label={t('chart.mode')}

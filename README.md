@@ -28,6 +28,10 @@ the site stays fast and keeps working when the upstream service is slow or down.
   added together). The source has no such level, so the mapping is kept by hand in
   `packages/ingest/src/config/corporate-groups.ts`. It follows today's ownership and applies to the
   whole history. The ingest logs makes that sell cars but are missing from the mapping.
+- The overview ends with the monthly average pump prices of petrol and diesel above the share of
+  electric cars, on one time axis with a shared pointer. The prices come from Statistics Finland
+  (CC BY 4.0), are nominal, and are published apart from the registrations under `prices/`. The
+  charts are stacked rather than overlaid on two axes, so they do not suggest a cause.
 - The review page can also rank areas, by region or municipality, on a map and in a table. It shows
   the share of an area's registrations that a fuel, make or model accounts for, an index against the
   national level, the count and the change in share. Areas with few registrations are left uncoloured.

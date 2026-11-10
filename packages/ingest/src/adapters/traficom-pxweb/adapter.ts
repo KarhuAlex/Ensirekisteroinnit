@@ -1,17 +1,11 @@
 import type { Dataset, Observation } from '@regs/core';
 import { consoleLogger, type Logger } from '../../logger.js';
 import type { AdapterResult, RawFile, SourceAdapter } from '../types.js';
-import { PxWebClient, type PxQuery } from './client.js';
-import { collectObservations, planChunks, tableVersion, type PxApi } from './query.js';
+import { PxWebClient, type PxQuery } from '../pxweb/client.js';
+import { planChunks, requireVariable, tableVersion, type PxApi } from '../pxweb/api.js';
+import { collectObservations } from './query.js';
 import { ALL_CARS_CODE, buildEntities } from './mapping.js';
-import {
-  assertKnownFuels,
-  requireVariable,
-  VAR_AREA,
-  VAR_FUEL,
-  VAR_MODEL,
-  VAR_MONTH,
-} from './table-schema.js';
+import { assertKnownFuels, VAR_AREA, VAR_FUEL, VAR_MODEL, VAR_MONTH } from './table-schema.js';
 
 export interface TraficomPxWebOptions {
   client?: PxApi;

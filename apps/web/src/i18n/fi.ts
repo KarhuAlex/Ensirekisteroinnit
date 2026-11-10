@@ -127,6 +127,7 @@ export const fi = {
     'Mallikohtaiset luvut ovat mallisarjatasoisia: lähde on voinut yhdistää samaan sarjaan useita malleja.',
   'about.caveat6':
     'Käytettynä maahan tuodut autot eivät ole mukana ensirekisteröinneissä, koska lähde tilastoi ne erikseen. Katsauksessa ne näkyvät valinnalla Käytettynä tuodut, mutta vain merkeittäin.',
+  'about.priceSourceLink': 'Avaa hintojen lähde Tilastokeskuksen tietokannassa',
   'about.sourceNotesTitle': 'Lähteen omat huomautukset',
 
   'notfound.title': 'Sivua ei löytynyt',
@@ -134,6 +135,17 @@ export const fi = {
 
   'footer.text': 'Lähde: Traficom ({licence}). Aineisto päivitetty {updated}.',
   'readout.total': 'Yhteensä {n}',
+  'prices.legend': 'Keskihinta käyttövoimittain',
+  'prices.latest': 'Viimeisin tieto: {month}',
+  'prices.title': 'Polttoaineiden hinnat ja sähköautojen osuus',
+  'prices.panelPrice': 'Bensiinin ja dieselin keskihinta',
+  'prices.petrol': 'Bensiini 95 E10',
+  'prices.diesel': 'Diesel',
+  'prices.difference': 'Ero (diesel miinus bensiini)',
+  'prices.aria': 'Bensiinin ja dieselin keskihinta kuukausittain, euroa litralta',
+  'prices.note':
+    'Nimellishinnat. Ohut viiva on kuukauden keskihinta ja paksu viiva 12 kuukauden keskiarvo. Oikean reunan luvut ovat tuoreimman kuukauden arvoja. Kaaviot näyttävät kehityksen rinnakkain, eivät syy-yhteyttä: sähköautojen osuuteen vaikuttavat myös autovero, tuet, mallitarjonta ja sähkön hinta, jota ei ole mukana.',
+  'prices.source': 'Hinnat: {name}, {licence}. Aineiston versio: {updated}.',
   'range.label': 'Ajanjakso',
   'range.all': 'Kaikki',
   'range.5y': '5 v',

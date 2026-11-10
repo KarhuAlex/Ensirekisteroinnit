@@ -144,16 +144,15 @@ export function fuelBarsChart(o: BarsOptions): EChartsCoreOption {
   };
 }
 
-export interface LinesOptions {
+interface TimeAxisOptions {
   colors: ThemeColors;
-  fmt: Formatters;
   months: string[];
-  series: { name: string; color: string; values: (number | null)[] }[];
   startIndex: number;
   reducedMotion: boolean;
 }
 
-export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
+/** What the line charts over the months share: grid, pointer, month axis and zoom window. */
+function timeChartBase(o: TimeAxisOptions) {
   const n = o.months.length;
   return {
     animation: !o.reducedMotion,
@@ -178,16 +177,6 @@ export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
         formatter: monthTick(n - o.startIndex),
       },
     },
-    yAxis: {
-      type: 'value',
-      min: 0,
-      max: 100,
-      interval: 25,
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: { color: o.colors.faint, fontSize: 12, formatter: (v: number) => `${v} %` },
-      splitLine: { lineStyle: { color: o.colors.rule } },
-    },
     dataZoom: [
       {
         type: 'inside',
@@ -199,6 +188,42 @@ export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
         moveOnMouseMove: false,
       },
     ],
+  };
+}
+
+/** Both charts of a stacked pair give their value labels the same width, so their months line up. */
+const Y_LABEL_WIDTH = 44;
+
+const quietAxis = (colors: ThemeColors) => ({
+  axisLine: { show: false },
+  axisTick: { show: false },
+  splitLine: { lineStyle: { color: colors.rule } },
+});
+
+const yLabels = (colors: ThemeColors, formatter: (v: number) => string) => ({
+  color: colors.faint,
+  fontSize: 12,
+  width: Y_LABEL_WIDTH,
+  align: 'right',
+  formatter,
+});
+
+export interface LinesOptions extends TimeAxisOptions {
+  fmt: Formatters;
+  series: { name: string; color: string; values: (number | null)[] }[];
+}
+
+export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
+  return {
+    ...timeChartBase(o),
+    yAxis: {
+      type: 'value',
+      min: 0,
+      max: 100,
+      interval: 25,
+      ...quietAxis(o.colors),
+      axisLabel: yLabels(o.colors, (v) => `${v} %`),
+    },
     series: o.series.map((s) => ({
       name: s.name,
       type: 'line',
@@ -217,6 +242,59 @@ export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
       },
       emphasis: { disabled: true },
     })),
+  };
+}
+
+export interface PriceLinesOptions extends TimeAxisOptions {
+  fmt: Formatters;
+  series: {
+    name: string;
+    color: string;
+    monthly: (number | null)[];
+    average: (number | null)[];
+  }[];
+}
+
+/** Each price as a thin monthly line with its 12-month average on top. The axis starts at zero. */
+export function priceLinesChart(o: PriceLinesOptions): EChartsCoreOption {
+  return {
+    ...timeChartBase(o),
+    yAxis: {
+      type: 'value',
+      min: 0,
+      ...quietAxis(o.colors),
+      axisLabel: yLabels(o.colors, (v) => o.fmt.decimal(v)),
+    },
+    series: o.series.flatMap((s) => [
+      {
+        name: s.name,
+        type: 'line',
+        data: s.monthly,
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 1.25, color: s.color, opacity: 0.55 },
+        itemStyle: { color: s.color },
+        endLabel: {
+          show: true,
+          color: s.color,
+          fontWeight: 700,
+          fontSize: 13,
+          formatter: (p: { value: unknown }) =>
+            typeof p.value === 'number' ? o.fmt.decimal2(p.value) : '',
+        },
+        emphasis: { disabled: true },
+      },
+      {
+        name: `${s.name} (12)`,
+        type: 'line',
+        data: s.average,
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 2.75, color: s.color },
+        itemStyle: { color: s.color },
+        emphasis: { disabled: true },
+      },
+    ]),
   };
 }
 

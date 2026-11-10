@@ -955,3 +955,14 @@ mark {
     max-width: none;
   }
 }
+
+/* Fuel prices above the share of electric cars */
+.price-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-6);
+}
+.panel-title {
+  margin-bottom: var(--s-3);
+  font-size: var(--step-1);
+}

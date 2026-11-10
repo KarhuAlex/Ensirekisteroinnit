@@ -42,6 +42,17 @@ export function rollingShare(
   return out;
 }
 
+/** Mean of each full trailing window; `null` while a window is incomplete or has a gap. */
+export function rollingMean(values: readonly (number | null)[], window: number): (number | null)[] {
+  return values.map((_, i) => {
+    if (i < window - 1) return null;
+    const part = values.slice(i - window + 1, i + 1);
+    return part.every((v) => v !== null)
+      ? (part as number[]).reduce((a, b) => a + b, 0) / window
+      : null;
+  });
+}
+
 export function sumRange(values: readonly number[], from: number, to: number): number {
   let acc = 0;
   for (let i = Math.max(0, from); i < Math.min(values.length, to); i++) acc += values[i] ?? 0;

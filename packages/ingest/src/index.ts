@@ -5,6 +5,10 @@ export {
   type TraficomPxWebOptions,
 } from './adapters/traficom-pxweb/adapter.js';
 export {
+  StatFinFuelPriceAdapter,
+  type StatFinFuelPriceOptions,
+} from './adapters/statfin/fuel-prices-adapter.js';
+export {
   TraficomUsedImportAdapter,
   type TraficomUsedImportOptions,
 } from './adapters/traficom-pxweb/used-adapter.js';
@@ -12,10 +16,11 @@ export {
   TraficomRegionalAdapter,
   type TraficomRegionalOptions,
 } from './adapters/traficom-pxweb/regional-adapter.js';
-export { PxWebClient } from './adapters/traficom-pxweb/client.js';
+export { PxWebClient } from './adapters/pxweb/client.js';
 export * from './pipeline/pipeline.js';
 export * from './pipeline/registrations.js';
 export * from './pipeline/regional.js';
+export * from './pipeline/prices.js';
 export * from './pipeline/run.js';
 export * from './pipeline/release.js';
 export * from './pipeline/validate.js';

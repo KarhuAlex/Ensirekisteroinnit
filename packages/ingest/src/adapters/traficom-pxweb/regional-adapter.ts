@@ -11,8 +11,8 @@ import type { ObjectStore } from '../../storage/types.js';
 import { mapWithConcurrency } from '../../util/pool.js';
 import type { AdapterResult, SourceAdapter } from '../types.js';
 import { AreaCacheStore } from './area-cache.js';
-import { PxWebClient, type PxQuery, type PxTableMeta } from './client.js';
-import { iterateCells } from './jsonstat.js';
+import { PxWebClient, type PxQuery, type PxTableMeta } from '../pxweb/client.js';
+import { iterateCells } from '../pxweb/jsonstat.js';
 import {
   ALL_CARS_CODE,
   areaFromCode,
@@ -22,15 +22,9 @@ import {
   NATIONAL_AREA_CODE,
   periodFromCode,
 } from './mapping.js';
-import {
-  assertKnownFuels,
-  requireVariable,
-  VAR_AREA,
-  VAR_FUEL,
-  VAR_MODEL,
-  VAR_MONTH,
-} from './table-schema.js';
-import { collectObservations, planChunks, tableVersion, type PxApi } from './query.js';
+import { assertKnownFuels, VAR_AREA, VAR_FUEL, VAR_MODEL, VAR_MONTH } from './table-schema.js';
+import { planChunks, requireVariable, tableVersion, type PxApi } from '../pxweb/api.js';
+import { collectObservations } from './query.js';
 
 export interface TraficomRegionalOptions {
   /** Holds one file per area, so an interrupted run resumes and later runs fetch only new months. */

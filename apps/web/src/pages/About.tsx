@@ -1,5 +1,7 @@
+import { PriceSource } from '../components/PriceSource';
 import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
+import { usePrices } from '../data/prices';
 import { useSiteConfig } from '../data/SiteConfigProvider';
 import { useI18n } from '../i18n';
 
@@ -7,6 +9,7 @@ export function About() {
   const { t, fmt } = useI18n();
   const { manifest } = useCatalog();
   const { config, ready } = useSiteConfig();
+  const prices = usePrices();
   usePageTitle(`${t('about.title')} – ${t('app.title')}`);
   const { source } = manifest;
 
@@ -29,6 +32,18 @@ export function About() {
             {t('about.sourceLink')}
           </a>
         </p>
+        {prices.status === 'ready' && (
+          <>
+            <p>
+              <PriceSource source={prices.data.source} />
+            </p>
+            <p>
+              <a href={prices.data.source.url} rel="noopener noreferrer" target="_blank">
+                {t('about.priceSourceLink')}
+              </a>
+            </p>
+          </>
+        )}
       </section>
 
       <section className="block" aria-labelledby="about-caveats">

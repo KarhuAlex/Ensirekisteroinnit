@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PxWebClient, PxWebHttpError } from '../src/adapters/traficom-pxweb/client.js';
+import { PxWebClient, PxWebHttpError } from '../src/adapters/pxweb/client.js';
 
 type Reply = { status: number; body: string };
 

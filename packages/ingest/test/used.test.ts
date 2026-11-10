@@ -5,8 +5,8 @@ import {
   buildMakes,
   TraficomUsedImportAdapter,
 } from '../src/adapters/traficom-pxweb/used-adapter.js';
-import type { PxApi } from '../src/adapters/traficom-pxweb/query.js';
-import type { JsonStatDoc } from '../src/adapters/traficom-pxweb/jsonstat.js';
+import type { PxApi } from '../src/adapters/pxweb/api.js';
+import type { JsonStatDoc } from '../src/adapters/pxweb/jsonstat.js';
 import { silentLogger } from '../src/logger.js';
 import { usedImportsPipeline } from '../src/pipeline/registrations.js';
 import { LATEST_POINTER_PATH, runPipeline } from '../src/pipeline/run.js';

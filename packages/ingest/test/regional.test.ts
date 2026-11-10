@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { TraficomRegionalAdapter } from '../src/adapters/traficom-pxweb/regional-adapter.js';
 import type { PxApi } from '../src/adapters/traficom-pxweb/adapter.js';
 import { areaFromCode } from '../src/adapters/traficom-pxweb/mapping.js';
-import type { JsonStatDoc } from '../src/adapters/traficom-pxweb/jsonstat.js';
+import type { JsonStatDoc } from '../src/adapters/pxweb/jsonstat.js';
 import { silentLogger } from '../src/logger.js';
 import {
   buildRegionalRelease,

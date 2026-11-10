@@ -128,6 +128,7 @@ export const en: Record<MessageKey, string> = {
     'Model figures are at model-series level: the source may have combined several models into one series.',
   'about.caveat6':
     'Cars imported used are not part of the first registrations, because the source counts them separately. In the review they appear under Used imports, by make only.',
+  'about.priceSourceLink': "Open the price source in Statistics Finland's database",
   'about.sourceNotesTitle': 'Notes from the source (in Finnish)',
 
   'notfound.title': 'Page not found',
@@ -135,6 +136,17 @@ export const en: Record<MessageKey, string> = {
 
   'footer.text': 'Source: Traficom ({licence}). Data updated {updated}.',
   'readout.total': 'Total {n}',
+  'prices.legend': 'Average price by fuel',
+  'prices.latest': 'Latest data: {month}',
+  'prices.title': 'Fuel prices and the share of electric cars',
+  'prices.panelPrice': 'Average price of petrol and diesel',
+  'prices.petrol': 'Petrol 95 E10',
+  'prices.diesel': 'Diesel',
+  'prices.difference': 'Difference (diesel minus petrol)',
+  'prices.aria': 'Average price of petrol and diesel by month, euros per litre',
+  'prices.note':
+    'Nominal prices. The thin line is the monthly average price and the thick line the 12-month average. The numbers at the right edge are for the latest month. The charts show the two side by side, not a cause: the share of electric cars is also driven by car tax, subsidies, the choice of models and the price of electricity, which is not included.',
+  'prices.source': 'Prices: {name}, {licence}. Data version: {updated}.',
   'range.label': 'Period',
   'range.all': 'All',
   'range.5y': '5 y',

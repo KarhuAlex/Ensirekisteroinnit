@@ -5,12 +5,17 @@ export interface Formatters {
   /** `null` renders as a dash. */
   pct(value: number | null): string;
   decimal(value: number): string;
+  /** Two decimals, for prices. */
+  decimal2(value: number): string;
   signedInt(value: number): string;
   monthName(month: number): string;
   signed(value: number | null, unit: string): string;
   signedPct(value: number | null): string;
   month(period: string): string;
   date(iso: string): string;
+  /** Euros per litre with two decimals; `null` renders as a dash. */
+  price(value: number | null): string;
+  signedPrice(value: number): string;
 }
 
 export const NBSP = String.fromCharCode(0xa0); // non-breaking space keeps "50,3 %" on one line
@@ -21,6 +26,10 @@ export function makeFormatters(lang: Lang): Formatters {
   const dec1 = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
+  });
+  const dec2 = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
   const monthFmt = new Intl.DateTimeFormat(locale, {
     month: 'long',
@@ -43,6 +52,7 @@ export function makeFormatters(lang: Lang): Formatters {
   return {
     int: (v) => int.format(v),
     decimal: (v) => dec1.format(v),
+    decimal2: (v) => dec2.format(v),
     pct: (v) => (v === null || !Number.isFinite(v) ? '–' : `${dec1.format(v)}${percentSuffix}`),
     signedInt: (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${int.format(Math.abs(v))}`,
     monthName: (month) => monthNameFmt.format(new Date(Date.UTC(2000, month - 1, 1))),
@@ -50,5 +60,7 @@ export function makeFormatters(lang: Lang): Formatters {
     signed,
     month: (period) => monthFmt.format(new Date(`${period}-01T00:00:00Z`)),
     date: (iso) => dateFmt.format(new Date(iso)),
+    price: (v) => (v === null || !Number.isFinite(v) ? '–' : `${dec2.format(v)}${NBSP}€/l`),
+    signedPrice: (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${dec2.format(Math.abs(v))}${NBSP}€/l`,
   };
 }

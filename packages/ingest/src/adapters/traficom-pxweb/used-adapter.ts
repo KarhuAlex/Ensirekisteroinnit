@@ -1,10 +1,11 @@
 import { TOTAL_ENTITY_ID, type Dataset, type Entity, type Observation } from '@regs/core';
 import { consoleLogger, type Logger } from '../../logger.js';
 import type { AdapterResult, SourceAdapter } from '../types.js';
-import { PxWebClient, type PxQuery } from './client.js';
+import { PxWebClient, type PxQuery } from '../pxweb/client.js';
 import { FUEL_TOTAL_CODE, slugify, USED_FUEL_CODE_MAP } from './mapping.js';
-import { collectObservations, planChunks, tableVersion, type PxApi } from './query.js';
-import { requireVariable, VAR_FUEL, VAR_MONTH } from './table-schema.js';
+import { planChunks, requireVariable, tableVersion, type PxApi } from '../pxweb/api.js';
+import { collectObservations } from './query.js';
+import { VAR_FUEL, VAR_MONTH } from './table-schema.js';
 
 const VAR_MAKE = 'Merkki';
 const VAR_USE_YEAR = 'Käyttöönottovuosi';

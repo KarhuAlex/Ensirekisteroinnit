@@ -5,27 +5,14 @@ import {
   type InvocationContext,
   type Timer,
 } from '@azure/functions';
-import { runIngest, runPipeline, type Logger } from '@regs/ingest';
-import { getRegionalRuntime, getRuntime, getUsedImportsRuntime } from '../config.js';
-
-function contextLogger(context: InvocationContext): Logger {
-  return {
-    info: (m, ...meta) => context.log(m, ...meta),
-    warn: (m, ...meta) => context.warn(m, ...meta),
-    error: (m, ...meta) => context.error(m, ...meta),
-  };
-}
-
-/** A failure is logged, not thrown: the pipeline has already sent its failure notice. */
-async function ingestUsedImports(context: InvocationContext): Promise<void> {
-  const { pipeline, options } = getUsedImportsRuntime();
-  try {
-    const result = await runPipeline(pipeline, { ...options, logger: contextLogger(context) });
-    context.log('Used imports ingest finished', result);
-  } catch (err) {
-    context.error('Used imports ingest failed', err);
-  }
-}
+import { runIngest, runPipeline } from '@regs/ingest';
+import {
+  getPricesRuntime,
+  getRegionalRuntime,
+  getRuntime,
+  getUsedImportsRuntime,
+} from '../config.js';
+import { contextLogger, ingestSecondary } from '../secondary.js';
 
 /**
  * Checks for new source data on a schedule. The schedule is the INGEST_SCHEDULE app setting
@@ -38,9 +25,10 @@ app.timer('ingestTimer', {
   handler: async (_timer: Timer, context: InvocationContext): Promise<void> => {
     const result = await runIngest({ ...getRuntime(), logger: contextLogger(context) });
     context.log('Ingest finished', result);
-    // A small table from the same source. It runs after the main load, not on a timer of its
-    // own, so the source never gets both at the same moment.
-    await ingestUsedImports(context);
+    // Small tables, run one after another after the main load rather than on timers of their
+    // own, so the sources never get several requests at the same moment.
+    await ingestSecondary(context, 'Used imports', getUsedImportsRuntime());
+    await ingestSecondary(context, 'Fuel prices', getPricesRuntime());
   },
 });
 

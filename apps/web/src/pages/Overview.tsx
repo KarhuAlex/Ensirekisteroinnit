@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { BevHero } from '../components/BevHero';
 import { FuelChart } from '../components/FuelChart';
+import { FuelPriceSection } from '../components/FuelPriceSection';
 import { RollingChart } from '../components/RollingChart';
 import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
@@ -141,6 +142,12 @@ export function Overview() {
               />
             </Section>
           </div>
+
+          <FuelPriceSection
+            months={manifest.months}
+            bev={view.bevSeries}
+            plugIn={view.plugSeries}
+          />
         </>
       )}
     </>

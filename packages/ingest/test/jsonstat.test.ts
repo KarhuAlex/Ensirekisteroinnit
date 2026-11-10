@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { collectObservations } from '../src/adapters/traficom-pxweb/query.js';
-import { iterateCells, type JsonStatDoc } from '../src/adapters/traficom-pxweb/jsonstat.js';
+import { iterateCells, type JsonStatDoc } from '../src/adapters/pxweb/jsonstat.js';
 
 function doc(): JsonStatDoc {
   // 1 area × 2 models × 3 fuels (incl. total) × 2 months, row-major.

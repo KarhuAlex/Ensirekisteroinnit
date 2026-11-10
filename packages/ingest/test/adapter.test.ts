@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { TraficomPxWebAdapter } from '../src/adapters/traficom-pxweb/adapter.js';
-import type { PxQuery } from '../src/adapters/traficom-pxweb/client.js';
-import type { JsonStatDoc } from '../src/adapters/traficom-pxweb/jsonstat.js';
-import { planChunks } from '../src/adapters/traficom-pxweb/query.js';
+import type { PxQuery } from '../src/adapters/pxweb/client.js';
+import type { JsonStatDoc } from '../src/adapters/pxweb/jsonstat.js';
+import { planChunks } from '../src/adapters/pxweb/api.js';
 import { silentLogger } from '../src/logger.js';
 
 const MODELS = [

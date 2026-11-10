@@ -1,46 +1,13 @@
 import type { FuelId, Observation } from '@regs/core';
-import type { PxWebClient } from './client.js';
-import { iterateCells, type JsonStatDoc } from './jsonstat.js';
+import { iterateCells, type JsonStatDoc } from '../pxweb/jsonstat.js';
 import { FUEL_CODE_MAP, FUEL_TOTAL_CODE, periodFromCode } from './mapping.js';
 import { VAR_FUEL, VAR_MODEL, VAR_MONTH } from './table-schema.js';
-
-/** The part of the PxWeb client the adapters use, so tests can pass a fake. */
-export type PxApi = Pick<PxWebClient, 'listFolder' | 'getTableMeta' | 'query'>;
-
-/**
- * Splits items into requests within a cell budget. The API caps cells, not items, so the batch
- * size shrinks as the table gains months or fuel classes.
- */
-export function planChunks<T>(
-  items: readonly T[],
-  cellsPerItem: number,
-  maxCells: number,
-  fixedSize?: number,
-): T[][] {
-  const size = fixedSize ?? Math.max(1, Math.floor(maxCells / Math.max(1, cellsPerItem)));
-  const chunks: T[][] = [];
-  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
-  return chunks;
-}
 
 export interface CollectOptions {
   /** The variable that identifies the entities in the response; model series by default. */
   entityVariable?: string;
   /** The source's fuel codes mapped to canonical fuels. */
   fuelMap?: Readonly<Record<string, FuelId>>;
-}
-
-/** The source's update timestamp for a table, which is the version the pipeline compares. */
-export async function tableVersion(
-  client: PxApi,
-  databasePath: string,
-  tableId: string,
-): Promise<string> {
-  const items = await client.listFolder(databasePath);
-  const table = items.find((i) => i.id === tableId);
-  if (!table) throw new Error(`Table ${tableId} not found in ${databasePath}`);
-  if (!table.updated) throw new Error(`Table ${tableId} reports no update timestamp`);
-  return table.updated;
 }
 
 /**

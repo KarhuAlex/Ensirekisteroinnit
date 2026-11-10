@@ -36,13 +36,14 @@ export function UsedView({ state, periodLabel, partialYear, fileStem }: Props) {
   if (used.status === 'loading') return <ResultsSkeleton />;
 
   // This table is published separately and can be a month behind the registrations.
-  const latestUsed = used.matrix.months[used.matrix.months.length - 1];
+  const { matrix, byId } = used.data;
+  const latestUsed = matrix.months[matrix.months.length - 1];
   const lagging = latestUsed !== undefined && (manifest.months[state.range.to] ?? '') > latestUsed;
   const lagNote = lagging && (
     <p className="footnote">{t('review.used.lag', { month: fmt.month(latestUsed) })}</p>
   );
 
-  const range = translateRange(manifest.months, used.matrix.months, state.range);
+  const range = translateRange(manifest.months, matrix.months, state.range);
   if (!range) {
     return (
       <>
@@ -56,8 +57,8 @@ export function UsedView({ state, periodLabel, partialYear, fileStem }: Props) {
     <>
       {lagNote}
       <EntityResults
-        matrix={used.matrix}
-        byId={used.byId}
+        matrix={matrix}
+        byId={byId}
         source="used"
         level="make"
         range={range}

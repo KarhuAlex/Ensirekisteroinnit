@@ -1,6 +1,7 @@
 import type {
   EntitySeries,
   EntitySummary,
+  FuelPrices,
   LatestPointer,
   Manifest,
   Matrix,
@@ -59,6 +60,12 @@ export async function loadMatrix(
 ): Promise<Matrix> {
   const matrix = await getJson<Matrix>(`${folderUrl(folder)}/${release}/matrix.json`);
   return checkMatrixMonths(matrix, months);
+}
+
+/** The pump price series, published apart from the registrations under `prices/`. */
+export async function loadPrices(): Promise<FuelPrices> {
+  const latest = await getJson<LatestPointer>(`${folderUrl('prices')}/latest.json`);
+  return getJson<FuelPrices>(`${folderUrl('prices')}/${latest.release}/prices.json`);
 }
 
 export function loadSeries(release: string, id: string): Promise<EntitySeries> {

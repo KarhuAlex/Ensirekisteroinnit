@@ -1,13 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useI18n } from '../i18n';
 import { shareLinesChart } from '../lib/charts';
-import { useNarrow, useReducedMotion } from '../lib/hooks';
-import { RANGE_IDS, rangeStart, type RangeId } from '../lib/stats';
+import { focusIndex, useNarrow, useReducedMotion, useTimeline, type Timeline } from '../lib/hooks';
+import { rangeStart } from '../lib/stats';
 import { useThemeColors } from '../lib/theme';
 import { ChartFocus } from './ChartFocus';
 import { EChart } from './EChart';
 import { FuelMark } from './FuelMark';
-import { Segmented } from './ui';
+import { RangeControl } from './RangeControl';
 
 interface Props {
   months: string[];
@@ -15,17 +15,20 @@ interface Props {
   plugIn: (number | null)[];
   height: number;
   ariaLabel: string;
+  /** Set when other charts share the range and the pointer; its owner then shows the range control. */
+  timeline?: Timeline;
 }
 
-export function RollingChart({ months, bev, plugIn, height, ariaLabel }: Props) {
+export function RollingChart({ months, bev, plugIn, height, ariaLabel, timeline }: Props) {
   const { t, fmt } = useI18n();
   const colors = useThemeColors();
   const narrow = useNarrow();
   const reducedMotion = useReducedMotion();
-  const [range, setRange] = useState<RangeId>('all');
-  const [hover, setHover] = useState<number | null>(null);
+  const own = useTimeline();
+  const shared = timeline ?? own;
+  const { range, setRange, hover, setHover } = shared;
   const n = months.length;
-  const index = Math.min(hover ?? n - 1, n - 1);
+  const index = focusIndex(shared, n);
   const start = rangeStart(n, range);
 
   const option = useMemo(
@@ -46,17 +49,14 @@ export function RollingChart({ months, bev, plugIn, height, ariaLabel }: Props) 
 
   return (
     <div>
-      <div className="chart-bar">
-        <p className="readout-head">
-          <strong>{fmt.month(months[index] ?? '')}</strong>
-        </p>
-        <Segmented
-          label={t('range.label')}
-          value={range}
-          options={RANGE_IDS.map((r) => ({ value: r, label: t(`range.${r}`) }))}
-          onChange={setRange}
-        />
-      </div>
+      {!timeline && (
+        <div className="chart-bar">
+          <p className="readout-head">
+            <strong>{fmt.month(months[index] ?? '')}</strong>
+          </p>
+          <RangeControl value={range} onChange={setRange} />
+        </div>
+      )}
       <ul className="plates" aria-label={t('legend.title')}>
         <li>
           <span className="plate-button is-static">

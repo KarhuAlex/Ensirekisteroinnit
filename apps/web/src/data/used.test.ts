@@ -1,7 +1,7 @@
 import { SCHEMA_VERSION, type EntitySummary, type Manifest, type Matrix } from '@regs/core';
 import { describe, expect, it } from 'vitest';
-import { HttpError, type Catalog } from './api';
-import { loadUsedState, type UsedSource } from './used';
+import type { Catalog } from './api';
+import { loadUsed } from './used';
 
 const entity: EntitySummary = {
   id: 'audi',
@@ -18,34 +18,22 @@ const catalog: Catalog = {
 };
 const matrix: Matrix = { schemaVersion: SCHEMA_VERSION, months: ['2026-01'], groups: [], rows: [] };
 
-const source = (over: Partial<UsedSource> = {}): UsedSource => ({
-  catalog: async () => catalog,
-  matrix: async () => matrix,
-  ...over,
-});
-
-describe('loadUsedState', () => {
-  it('returns the catalog, the matrix and the entities by id', async () => {
-    const state = await loadUsedState(source());
-    expect(state.status).toBe('ready');
-    if (state.status === 'ready') expect(state.byId.get('audi')).toBe(entity);
+describe('loadUsed', () => {
+  it('returns the matrix and the entities by id', async () => {
+    const data = await loadUsed({ catalog: async () => catalog, matrix: async () => matrix });
+    expect(data.matrix).toBe(matrix);
+    expect(data.byId.get('audi')).toBe(entity);
   });
 
-  it('reports data that has not been published as unavailable', async () => {
-    const missing = source({
-      catalog: async () => {
-        throw new HttpError(404, 'https://example.org/used/latest.json');
+  it('asks for the matrix of the release the catalog names', async () => {
+    let asked: Catalog | undefined;
+    await loadUsed({
+      catalog: async () => catalog,
+      matrix: async (c) => {
+        asked = c;
+        return matrix;
       },
     });
-    expect(await loadUsedState(missing)).toEqual({ status: 'unavailable' });
-  });
-
-  it('reports other failures as errors', async () => {
-    const broken = source({
-      matrix: async () => {
-        throw new Error('network down');
-      },
-    });
-    expect((await loadUsedState(broken)).status).toBe('error');
+    expect(asked).toBe(catalog);
   });
 });
