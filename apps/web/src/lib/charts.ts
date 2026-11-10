@@ -27,6 +27,9 @@ function decalFor(group: FuelGroupId, colors: ThemeColors): object | undefined {
   }
 }
 
+/** Room under the axis labels, so their last pixel row is not cut off by the canvas edge. */
+const GRID_BOTTOM = 14;
+
 function monthTick(visibleMonths: number) {
   return (value: string): string => {
     if (visibleMonths <= 26) {
@@ -68,7 +71,7 @@ export function fuelBarsChart(o: BarsOptions): EChartsCoreOption {
     animation: !o.reducedMotion,
     animationDuration: 320,
     aria: { decal: { show: !o.monthly } },
-    grid: { left: 0, right: 4, top: 10, bottom: 4, containLabel: true },
+    grid: { left: 0, right: 4, top: 10, bottom: GRID_BOTTOM, containLabel: true },
     tooltip: {
       trigger: 'axis',
       showContent: false,
@@ -155,7 +158,7 @@ export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
   return {
     animation: !o.reducedMotion,
     animationDuration: 320,
-    grid: { left: 0, right: 48, top: 10, bottom: 4, containLabel: true },
+    grid: { left: 0, right: 48, top: 10, bottom: GRID_BOTTOM, containLabel: true },
     tooltip: {
       trigger: 'axis',
       showContent: false,
