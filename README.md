@@ -1,89 +1,60 @@
-# Ensirekisteröinnit: Finnish car registrations explorer
+# Ensirekisteröinnit
 
 A bilingual (Finnish and English) web app for exploring first registrations of passenger cars in
-Finland. It shows how fuel types are shifting towards electric and how individual makes and models
-develop month by month.
+Finland: how fuel types shift towards electric, and how makes, models and corporate groups develop
+month by month. I built it alone, from data pipeline to cloud infrastructure.
 
-The data comes from [Traficom](https://trafi2.stat.fi/PXWeb/pxweb/fi/TraFi/TraFi__Ensirekisteroinnit/)
-(CC BY 4.0). A scheduled job fetches it, validates it and publishes it as static, versioned JSON, so
-the site stays fast and keeps working when the upstream service is slow or down.
+A scheduled Azure Function fetches open data from [Traficom](https://trafi2.stat.fi/PXWeb/pxweb/fi/TraFi/TraFi__Ensirekisteroinnit/)
+and [Statistics Finland](https://stat.fi/en), validates it and publishes versioned JSON. A React
+single-page app reads those files. There is no database and no API server.
 
-## Features
+## What it does
 
-- Search by name: type a make or model and open its page. The suggestions list the most
-  registered models, and `/` focuses the search from anywhere.
-- The overview shows the share of each fuel type over time (stacked area, switch between share and
-  count, period presets), yearly totals, the rolling 12-month electric share and year-over-year key
-  figures. Its headline sentence is computed from the data.
-- The makes and models page lists 700+ makes and model series, searchable and sortable. Each model
-  has a page with monthly or yearly registrations by fuel type.
-- The review page ranks makes or models for any period: one month, several months, a year or
-  several years. It can filter by fuel, compare with the previous period or a year earlier, and
-  export CSV. Every choice is kept in the URL, so views can be shared.
-- The review page has a source switch: new cars, or cars imported used. Traficom counts used imports
-  separately from first registrations, and only by make (no model, no area), so that view ranks makes
-  with the same period, fuel and comparison choices. It is published apart from the national data,
-  under `used/`, and refreshed by its own small ingest.
-- The review page can also rank corporate groups (for example the makes of one parent company
-  added together). The source has no such level, so the mapping is kept by hand in
-  `packages/ingest/src/config/corporate-groups.ts`. It follows today's ownership and applies to the
-  whole history. The ingest logs makes that sell cars but are missing from the mapping.
-- The compare page shows two to four makes, models or corporate groups side by side: their
-  registrations, share of all new cars and battery-electric share over time, and a table of the
-  last 12 months. Everything compared is on one level, and the choices are in the URL, so a
-  comparison can be shared. It reads the same matrix as the review, so it needs no data of its own.
-- The overview ends with the monthly average pump prices of petrol and diesel above the share of
-  electric cars, on one time axis with a shared pointer. The prices come from Statistics Finland
-  (CC BY 4.0), are nominal, and are published apart from the registrations under `prices/`. The
-  charts are stacked rather than overlaid on two axes, so they do not suggest a cause.
-- The review page can also rank areas, by region or municipality, on a map and in a table. It shows
-  the share of an area's registrations that a fuel, make or model accounts for, an index against the
-  national level, the count and the change in share. Areas with few registrations are left uncoloured.
-  The regional data starts in 2021 and is published separately under `regional/`.
-- The table page shows all passenger cars by month or year, sortable and searchable, with CSV export.
-- Fuel types differ in shape as well as colour. Charts can be stepped through with the keyboard and
-  are read out by screen readers. There are light and dark themes.
-- The UI is in Finnish and English. On desktop it has a navy side rail, on phones a tab bar.
+- **Overview:** a ring of the latest month's fuel mix with the electric share in the middle, then
+  share-over-time charts, yearly totals and fuel prices on the same time axis.
+- **Makes and models:** more than 700 makes and model series, searchable and sortable, each with its
+  own page.
+- **Review:** ranks makes, models or corporate groups for any period, for new or used-imported
+  cars, with filters, period comparison and CSV export.
+- **Compare:** two to four makes, models or groups side by side, with the choices kept in the URL
+  so a comparison can be shared.
+- **Areas:** a map and table of registrations by region and municipality (data from 2021).
+- **Accessibility:** charts work with the keyboard and screen readers, fuel types differ in shape as
+  well as colour, and there are light and dark themes.
 
-## Architecture
+## How it works
 
 ```mermaid
 flowchart LR
-  subgraph Source
-    PX[Traficom PxWeb API]
-  end
+  PX[Traficom PxWeb] --> FN
+  SF[Statistics Finland PxWeb] --> FN
   subgraph Azure
     FN["Azure Functions<br/>timer + manual trigger"]
-    RAW[("Blob: raw/<br/>source responses")]
-    PUB[("Blob: published/<br/>immutable releases + latest.json")]
-    SITE[Storage static website<br/>React SPA]
+    PUB[("Blob storage<br/>immutable releases + latest.json")]
+    SITE[Static website<br/>React SPA]
   end
-  PX -->|"adapter: fetch + normalise"| FN
-  FN --> RAW
-  FN -->|"validate → release → pointer"| PUB
+  FN -->|"validate, build, publish"| PUB
   SITE -->|"fetch JSON"| PUB
   U((Browser)) --> SITE
 ```
 
-Design decisions:
-
-- Everything that knows about the data provider lives in a source adapter. Traficom has announced a
-  database migration, so replacing the source means writing one new adapter and changing nothing
-  else.
-- The web app depends only on a small, versioned JSON format (`manifest.json`, `entities.json`,
-  `entities/<id>.json`, `matrix.json`), never on the upstream API.
-- Each ingest writes a complete release folder and updates `latest.json` last. Readers see either
-  the old release or the new one, never a partial one. Release files are gzip-compressed.
-- A run first compares the source's version stamp and exits if nothing changed and the published release has the current format version (`RELEASE_FORMAT`), so a release that gains new files is rebuilt even when the source is unchanged. If validation fails,
-  the run aborts and the previous release keeps being served.
-- There is no database. A release is a few MB, and static JSON on blob storage is simpler, cheaper
-  and faster than a query layer.
+- **Source adapters:** all provider-specific code lives in one adapter per source. Traficom has
+  announced a database migration, so a new source means one new adapter and no other changes.
+- **Immutable releases:** each run writes a complete release folder and moves `latest.json` last,
+  so readers see the old release or the new one, never a half-written one. If validation fails, the
+  previous release keeps serving.
+- **Versioned contract:** the web app depends only on a small JSON format defined in
+  `packages/core`, never on the upstream API.
+- **Resumable ingest:** the regional dataset has 294 areas and a long first run. Progress is cached
+  per area, and later runs fetch only the latest months.
+- **Cheap to run:** static JSON on blob storage replaces a query layer. The timer exits after one
+  metadata call when the source has not changed.
 
 ## Tech stack
 
 | Area           | Choice                                                                    |
 | -------------- | ------------------------------------------------------------------------- |
-| Language       | TypeScript everywhere (shared types via `@regs/core`)                     |
+| Language       | TypeScript (strict), shared types in `@regs/core`                         |
 | Frontend       | React, React Router, ECharts, TanStack Table, hand-written CSS            |
 | Ingest         | Node.js, Azure Functions v4 (Flex Consumption), Azure Blob Storage        |
 | Infrastructure | Bicep (storage, Functions, Application Insights, static website)          |
@@ -92,44 +63,35 @@ Design decisions:
 ## Repository layout
 
 ```
-packages/core      Domain model, fuel taxonomy and pure series helpers (shared)
+packages/core      Domain model, fuel taxonomy, pure series helpers (shared)
 packages/ingest    Source adapters, validation, release builder, storage backends, CLI
-apps/functions     Azure Functions host (timer + manual HTTP trigger), bundling script
+apps/functions     Azure Functions host (timer + manual HTTP trigger)
 apps/web           React single-page app
 infra              Bicep templates
 ```
 
-## Getting started
+## Run it locally
 
 Requires Node.js 20+.
 
 ```bash
 npm ci
-npm run ingest      # fetch real data from Traficom into .data/published (takes ~10 s)
-npm run dev         # start the web app on http://localhost:5173 using that data
+npm run ingest      # fetch real data into .data/published (about 10 s)
+npm run dev         # web app on http://localhost:5173
 ```
 
-Other commands:
-
-```bash
-npm test            # unit tests
-npm run typecheck
-npm run lint
-npm run build       # production build of all packages
-```
-
-During development the Vite server serves `.data/published` at `/data`. In production the app reads
-from `VITE_DATA_BASE_URL`, which points at the public `published` blob container.
+`npm test`, `npm run typecheck`, `npm run lint` and `npm run build` run the quality checks. Other
+datasets load with `npm run ingest -- --dataset used|prices|regional`.
 
 ## Deployment
 
-The infrastructure is defined in [`infra/`](infra) (Bicep) and deployed from GitHub Actions with
-OpenID Connect, so no credentials are stored. The frontend is a static website on a storage account,
-not Azure Static Web Apps, because that service is only available in a few regions and some
-subscriptions restrict regions by policy. The templates have only been checked with `what-if` so
-far, so review the first deployment.
+The infrastructure is in [`infra/`](infra) (Bicep) and ships from GitHub Actions with OpenID
+Connect, so no credentials are stored. The frontend is a static website on a storage account rather
+than Azure Static Web Apps, because that service is available in few regions and some subscriptions
+restrict regions by policy. The templates have only been checked with `what-if`, so review the first
+deployment.
 
-1. Provision the resources. Sweden Central is the closest region to Finland.
+1. Provision the resources (Sweden Central is closest to Finland):
 
    ```bash
    az group create -n rg-regs-prod -l swedencentral
@@ -139,8 +101,8 @@ far, so review the first deployment.
    ```
 
 2. Create the deployment identity: an app registration with a federated credential for the
-   repository's `production` environment. The `subject` must match the repository and environment
-   exactly.
+   repository's `production` environment (the `subject` must match exactly), then grant it
+   `Contributor` on the resource group and `Storage Blob Data Contributor` on the web storage account.
 
    ```bash
    az ad app create --display-name ensirekisteroinnit-deploy --query appId -o tsv
@@ -150,72 +112,55 @@ far, so review the first deployment.
    az role assignment create --assignee <appId> --role "Storage Blob Data Contributor" --scope $(az storage account show -g rg-regs-prod -n <webStorageAccountName> --query id -o tsv)
    ```
 
-3. Enable static website hosting on the web storage account once. The deployment identity can write
-   files but not change the account's service settings, so do this with your own account:
+3. Enable static website hosting once, with your own account (the deployment identity cannot change
+   service settings):
 
    ```bash
    az role assignment create --assignee-object-id <your object id> --assignee-principal-type User --role "Storage Blob Data Owner" --scope <web storage account id>
    az storage blob service-properties update --account-name <webStorageAccountName> --auth-mode login --static-website --index-document index.html --404-document index.html
    ```
 
-4. Set these repository variables (Settings, Secrets and variables, Actions, Variables):
-   `AZURE_CLIENT_ID` (the app id), `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `FUNCTION_APP_NAME`
-   (output `functionAppName`), `WEB_STORAGE_ACCOUNT` (output `webStorageAccountName`) and
-   `DATA_BASE_URL` (output `dataBaseUrl`).
-5. Push to `main` or run the _Deploy_ workflow. The site is served at the `siteUrl` output.
-6. Load the first data instead of waiting for the schedule:
+4. Set the repository variables `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`,
+   `FUNCTION_APP_NAME`, `WEB_STORAGE_ACCOUNT` and `DATA_BASE_URL` (the last three are deployment
+   outputs), then push to `main` or run the _Deploy_ workflow.
+5. Load the first data without waiting for the schedule:
    `POST https://<functionAppName>.azurewebsites.net/api/ingest?force=true` with the function key in
-   the `x-functions-key` header.
+   the `x-functions-key` header. This loads the national data. The timer adds used imports and fuel
+   prices right after, and the regional data on its own timer. The first regional run can exceed the
+   function's 30 minute limit, so seed it from a workstation with
+   `npm run ingest -- --dataset regional --azure`; interrupted runs resume where they stopped.
 
-The schedule is the `INGEST_SCHEDULE` app setting (NCRONTAB, UTC, default `0 0 8,12 * * *`), and
-changing it needs no redeployment. To roll back, point `published/latest.json` at an earlier release
-folder. The `published` container is public on purpose: the data is open, and CORS limits browser
-access to the site. The `raw` container is private. Releases are never expired by age, so the site
-keeps working if the source stops updating.
+**Operations.** `INGEST_SCHEDULE` (NCRONTAB, UTC, default `0 0 8,12 * * *`) changes the schedule
+without a redeploy. To roll back, point `published/latest.json` at an earlier release folder.
+Releases never expire by age, so the site keeps working if the source stops updating. The `published`
+container is public on purpose (open data, CORS limited to the site); `raw` is private.
 
-When a release is published, whether because the source has new data or a refresh was forced, the
-ingest can email the developer a short English notice. It uses Azure Communication Services Email
-with the function app's managed identity, so there are no secrets. The recipient is not stored in the
-repository. Pass it when deploying (`-p notifyEmail=you@example.com`), or set the `NOTIFY_EMAIL_TO`
-app setting (comma-separated for several addresses). Without it no emails are sent. A failed send is
-logged and never fails the ingest.
+**Optional settings.**
 
-The About page has privacy and disclaimer sections, and an optional contact section. The details
-that differ between publishers are read at runtime from `site.config.json` next to the site, so a
-fork needs no code changes. The deploy workflow writes the file from the repository variables
-`SITE_OPERATOR`, `SITE_CONTACT_URL`, `SITE_HOSTING` and `SITE_REPO_URL`. All are optional, and
-anything left out falls back to neutral wording. The texts are general and are not legal advice, so
-check that they fit your own situation.
+- `NOTIFY_EMAIL_TO` (or `-p notifyEmail=...` at deploy time) sends a short English email on each
+  published release through Azure Communication Services, using the function's managed identity. A
+  failed send never fails the ingest.
+- The repository variables `SITE_OPERATOR`, `SITE_CONTACT_URL`, `SITE_HOSTING` and `SITE_REPO_URL`
+  fill the About page at runtime through `site.config.json`, so a fork needs no code changes. The
+  texts are general and are not legal advice.
+- `SITE_URL` turns on `sitemap.xml` (every page in both languages plus each make and model),
+  `robots.txt` and canonical links, so nothing in the repository names a specific domain. Submit the
+  sitemap in Google Search Console once.
+- The storage website cannot set response headers such as `X-Frame-Options`; that needs a CDN or
+  Front Door in front.
 
-Search engines get a `sitemap.xml` and a `robots.txt` that the deploy workflow generates for your own
-domain, so nothing in the repository names a specific address. Set the repository variable
-`SITE_URL` (for example `https://example.org`) to turn the sitemap on. It lists every page in both
-languages with links between the translations, plus a page for each make and model found in the latest
-published data. The same variable gives every page a canonical link, so the many views of the review page count as one. Without `SITE_URL` the `robots.txt` has no sitemap line and the sitemap is empty. Submit
-`<SITE_URL>/sitemap.xml` in Google Search Console once, after checking that it opens as XML and that
-deep links such as `/fi/about` answer with status 200.
+## Data notes
 
-The storage website has no custom response headers, so security headers such as
-`X-Frame-Options` need a CDN or Front Door in front of it if you want them.
+- Monthly data starts in January 2014; regional data starts in 2021.
+- The counts are first registrations, not cars in use. The current year is incomplete and the UI
+  marks it.
+- The source excludes Åland and has a separate fuel category only for plug-in hybrids.
+- Used imports are known by make only. Corporate groups follow today's ownership.
+- Fuel prices are nominal monthly averages.
 
-## Data notes and limitations
-
-- Monthly data starts in January 2014. The source has no daily figures.
-- The counts are first registrations, not the number of cars in use.
-- The source has a separate fuel category only for plug-in hybrids. Other hybrids are included in
-  its other categories.
-- The current year is incomplete, and the UI marks it.
-- The source excludes Åland.
-
-## Roadmap
-
-- Municipality-level views (the source table already has a municipality dimension).
-- Vehicle stock ("cars in use") by make and model, from Traficom's open vehicle register and
-  quarterly statistics files.
-- Side-by-side model comparison.
+Next on the list is vehicle stock ("cars in use") from Traficom's open vehicle register.
 
 ## Licence
 
-Code: [MIT](LICENSE). Data: © Traficom, licensed under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Area boundaries: © Statistics Finland,
-licensed under CC BY 4.0. Rebuild them with `node apps/web/scripts/build-geo.mjs`.
+Code: [MIT](LICENSE). Data: © Traficom and © Statistics Finland, both licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
