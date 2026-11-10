@@ -85,3 +85,12 @@ export function toneOf(change: number | null): Tone {
   if (change === null || change === 0) return 'neutral';
   return change > 0 ? 'positive' : 'negative';
 }
+
+export type ShareBand = 'none' | 'some' | 'most';
+
+/** None at all, up to half, or more than half; a missing share has no band. */
+export function shareBand(share: number | null): ShareBand | null {
+  if (share === null) return null;
+  if (share <= 0) return 'none';
+  return share <= 50 ? 'some' : 'most';
+}

@@ -863,3 +863,13 @@ mark {
 .review-controls .field-input {
   min-width: 240px;
 }
+
+.share--none {
+  color: var(--neg);
+}
+.share--some {
+  color: var(--warn);
+}
+.share--most {
+  color: var(--pos);
+}

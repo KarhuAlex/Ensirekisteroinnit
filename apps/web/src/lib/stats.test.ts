@@ -5,6 +5,7 @@ import {
   percent,
   rangeStart,
   rollingShare,
+  shareBand,
   sumRange,
   toneOf,
 } from './stats';
@@ -75,5 +76,19 @@ describe('toneOf', () => {
     expect(toneOf(-2)).toBe('negative');
     expect(toneOf(0)).toBe('neutral');
     expect(toneOf(null)).toBe('neutral');
+  });
+});
+
+describe('shareBand', () => {
+  it('separates none, up to half and more than half', () => {
+    expect(shareBand(0)).toBe('none');
+    expect(shareBand(0.1)).toBe('some');
+    expect(shareBand(50)).toBe('some');
+    expect(shareBand(50.1)).toBe('most');
+    expect(shareBand(100)).toBe('most');
+  });
+
+  it('has no band without a share', () => {
+    expect(shareBand(null)).toBeNull();
   });
 });

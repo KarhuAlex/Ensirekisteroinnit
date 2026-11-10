@@ -16,7 +16,7 @@ import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
 import { inLevel } from '../lib/entityLevel';
 import { displayName } from '../lib/names';
-import { percent } from '../lib/stats';
+import { percent, shareBand } from '../lib/stats';
 
 interface Row {
   id: string;
@@ -26,6 +26,12 @@ interface Row {
   last12: number;
   total: number;
   bevShare: number | null;
+}
+
+function ShareValue({ share }: { share: number | null }) {
+  const { fmt } = useI18n();
+  const band = shareBand(share);
+  return <span className={band ? `share share--${band}` : undefined}>{fmt.pct(share)}</span>;
 }
 
 type Filter = 'all' | 'make' | 'model';
@@ -92,7 +98,7 @@ export function Models() {
         accessorFn: (r) => r.bevShare ?? undefined,
         header: t('models.col.bevShare'),
         meta: { numeric: true },
-        cell: (c) => fmt.pct(c.row.original.bevShare),
+        cell: (c) => <ShareValue share={c.row.original.bevShare} />,
         enableGlobalFilter: false,
         sortUndefined: 'last',
         sortDescFirst: true,

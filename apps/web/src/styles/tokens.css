@@ -19,6 +19,7 @@
   --focus: #1b64d4;
   --pos: #006f45;
   --neg: #b3311f;
+  --warn: #8a5a00;
 
   --fuel-bev: #00a86b;
   --fuel-phev: #2f7fd1;
@@ -75,6 +76,7 @@
   --focus: #6aa8ff;
   --pos: #3fd39a;
   --neg: #f08670;
+  --warn: #f2b42a;
 
   --fuel-bev: #2fd197;
   --fuel-phev: #5ca6f2;
@@ -107,6 +109,7 @@
     --focus: #6aa8ff;
     --pos: #3fd39a;
     --neg: #f08670;
+    --warn: #f2b42a;
 
     --fuel-bev: #2fd197;
     --fuel-phev: #5ca6f2;
