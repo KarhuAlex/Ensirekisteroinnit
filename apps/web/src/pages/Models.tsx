@@ -10,13 +10,14 @@ import {
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTable } from '../components/DataTable';
+import { ShareValue } from '../components/ShareValue';
 import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
 import { inLevel } from '../lib/entityLevel';
 import { displayName } from '../lib/names';
-import { percent, shareBand } from '../lib/stats';
+import { percent } from '../lib/stats';
 
 interface Row {
   id: string;
@@ -26,12 +27,6 @@ interface Row {
   last12: number;
   total: number;
   bevShare: number | null;
-}
-
-function ShareValue({ share }: { share: number | null }) {
-  const { fmt } = useI18n();
-  const band = shareBand(share);
-  return <span className={band ? `share share--${band}` : undefined}>{fmt.pct(share)}</span>;
 }
 
 type Filter = 'all' | 'make' | 'model';

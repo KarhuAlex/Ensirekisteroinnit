@@ -86,11 +86,14 @@ export function toneOf(change: number | null): Tone {
   return change > 0 ? 'positive' : 'negative';
 }
 
-export type ShareBand = 'none' | 'some' | 'most';
+export type ShareBand = 'low' | 'some' | 'most';
 
-/** None at all, up to half, or more than half; a missing share has no band. */
+const LOW_SHARE_BELOW = 1;
+const HALF = 50;
+
+/** Under one percent, up to half, or more than half; a missing share has no band. */
 export function shareBand(share: number | null): ShareBand | null {
   if (share === null) return null;
-  if (share <= 0) return 'none';
-  return share <= 50 ? 'some' : 'most';
+  if (share < LOW_SHARE_BELOW) return 'low';
+  return share <= HALF ? 'some' : 'most';
 }

@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import { DataTable } from '../components/DataTable';
 import { FuelMark } from '../components/FuelMark';
 import { PeriodLink } from '../components/PeriodLink';
+import { ShareValue } from '../components/ShareValue';
 import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
@@ -58,7 +59,7 @@ export function TablePage() {
       accessorFn: (r) => r[key] ?? undefined,
       header,
       meta: { numeric: true },
-      cell: (c) => fmt.pct(c.row.original[key]),
+      cell: (c) => <ShareValue share={c.row.original[key]} />,
       enableGlobalFilter: false,
       sortUndefined: 'last',
       sortDescFirst: true,

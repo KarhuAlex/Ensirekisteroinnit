@@ -808,7 +808,7 @@ mark {
   min-width: 240px;
 }
 
-.share--none {
+.share--low {
   color: var(--neg);
 }
 .share--some {

@@ -80,9 +80,11 @@ describe('toneOf', () => {
 });
 
 describe('shareBand', () => {
-  it('separates none, up to half and more than half', () => {
-    expect(shareBand(0)).toBe('none');
-    expect(shareBand(0.1)).toBe('some');
+  it('separates under one percent, up to half and more than half', () => {
+    expect(shareBand(0)).toBe('low');
+    expect(shareBand(0.4)).toBe('low');
+    expect(shareBand(0.99)).toBe('low');
+    expect(shareBand(1)).toBe('some');
     expect(shareBand(50)).toBe('some');
     expect(shareBand(50.1)).toBe('most');
     expect(shareBand(100)).toBe('most');
