@@ -144,8 +144,8 @@ export function useEntitySeries(id: string | undefined): {
   return { series: result.series, error: result.error };
 }
 
-/** Loaded on demand because it is far larger than the catalog. */
-export function useMatrix(): { matrix: Matrix | null; error: Error | null } {
+/** Loaded on demand because it is far larger than the catalog; `enabled` holds the load back. */
+export function useMatrix(enabled = true): { matrix: Matrix | null; error: Error | null } {
   const { getMatrix } = useCatalog();
   const [result, setResult] = useState<{
     source: typeof getMatrix;
@@ -154,6 +154,7 @@ export function useMatrix(): { matrix: Matrix | null; error: Error | null } {
   }>();
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     getMatrix().then(
       (matrix) => !cancelled && setResult({ source: getMatrix, matrix, error: null }),
@@ -168,7 +169,7 @@ export function useMatrix(): { matrix: Matrix | null; error: Error | null } {
     return () => {
       cancelled = true;
     };
-  }, [getMatrix]);
+  }, [getMatrix, enabled]);
 
   if (result?.source !== getMatrix) return { matrix: null, error: null };
   return { matrix: result.matrix, error: result.error };

@@ -966,3 +966,60 @@ mark {
   margin-bottom: var(--s-3);
   font-size: var(--step-1);
 }
+
+/* Comparing makes, models or corporate groups */
+.series-mark {
+  display: inline-block;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-right: var(--s-2);
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+@media (max-width: 599px) {
+  /* Names of models are long, so one plate to a row. */
+  .compare-plates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.compare-controls {
+  display: grid;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+.compare-chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  list-style: none;
+  padding: 0;
+}
+.compare-chosen li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 40px;
+  padding: 0 var(--s-2) 0 var(--s-3);
+  border: 1.5px solid var(--rule-strong);
+  border-radius: var(--r-2);
+  font-weight: 700;
+}
+.compare-chosen .series-mark {
+  margin-right: 0;
+}
+.chip-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--r-1);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.chip-remove:hover {
+  background: var(--ground-3);
+  color: var(--ink);
+}

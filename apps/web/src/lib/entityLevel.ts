@@ -19,3 +19,20 @@ export const hasPage = (kind: EntityKind): boolean => kind !== 'corporategroup';
 
 /** What search, the makes and models list and the area picker offer: things with a page, not the total. */
 export const isListed = (kind: EntityKind): boolean => hasPage(kind) && kind !== 'total';
+
+/** The level a thing is compared at; model series count as models. The total is not compared. */
+export function levelOf(kind: EntityKind): EntityLevel | null {
+  switch (kind) {
+    case 'make':
+      return 'make';
+    case 'corporategroup':
+      return 'corporategroup';
+    case 'model':
+    case 'group':
+      return 'model';
+    case 'total':
+      return null;
+  }
+}
+
+export const isComparable = (kind: EntityKind): boolean => levelOf(kind) !== null;

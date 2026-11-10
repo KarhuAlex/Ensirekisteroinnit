@@ -53,6 +53,18 @@ export function rollingMean(values: readonly (number | null)[], window: number):
   });
 }
 
+/** The sum of each trailing window; a window cut off by the start of the series adds what exists. */
+export function rollingSum(values: readonly number[], window: number): number[] {
+  const out: number[] = [];
+  let sum = 0;
+  for (let i = 0; i < values.length; i++) {
+    sum += values[i] ?? 0;
+    if (i >= window) sum -= values[i - window] ?? 0;
+    out.push(sum);
+  }
+  return out;
+}
+
 export function sumRange(values: readonly number[], from: number, to: number): number {
   let acc = 0;
   for (let i = Math.max(0, from); i < Math.min(values.length, to); i++) acc += values[i] ?? 0;

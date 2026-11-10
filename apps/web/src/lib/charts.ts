@@ -245,6 +245,46 @@ export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
   };
 }
 
+export interface CompareLinesOptions extends TimeAxisOptions {
+  fmt: Formatters;
+  unit: 'count' | 'pct';
+  /** `slot` picks the line's colour and dash, and stays with the thing when others are removed. */
+  series: { name: string; slot: number; values: (number | null)[] }[];
+}
+
+/** How each line is drawn besides its colour, so the lines also differ without colour vision. */
+const LINE_DASHES: (number[] | 'solid')[] = ['solid', [10, 5], [2, 4], [10, 4, 2, 4]];
+
+/**
+ * The things being compared as lines; a line has no value before the thing's first month. Lines
+ * carry no end labels, because those collide when lines end close together; the readout above
+ * the chart gives the values instead.
+ */
+export function compareLinesChart(o: CompareLinesOptions): EChartsCoreOption {
+  return {
+    ...timeChartBase(o),
+    yAxis: {
+      type: 'value',
+      min: 0,
+      ...quietAxis(o.colors),
+      axisLabel: yLabels(o.colors, (v) => (o.unit === 'pct' ? `${v} %` : o.fmt.int(v))),
+    },
+    series: o.series.map((s) => {
+      const color = o.colors.series[s.slot % o.colors.series.length] ?? o.colors.ink;
+      return {
+        name: s.name,
+        type: 'line',
+        data: s.values,
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 2.5, color, type: LINE_DASHES[s.slot % LINE_DASHES.length] },
+        itemStyle: { color },
+        emphasis: { disabled: true },
+      };
+    }),
+  };
+}
+
 export interface PriceLinesOptions extends TimeAxisOptions {
   fmt: Formatters;
   series: {

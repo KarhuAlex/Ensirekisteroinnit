@@ -28,6 +28,10 @@ the site stays fast and keeps working when the upstream service is slow or down.
   added together). The source has no such level, so the mapping is kept by hand in
   `packages/ingest/src/config/corporate-groups.ts`. It follows today's ownership and applies to the
   whole history. The ingest logs makes that sell cars but are missing from the mapping.
+- The compare page shows two to four makes, models or corporate groups side by side: their
+  registrations, share of all new cars and battery-electric share over time, and a table of the
+  last 12 months. Everything compared is on one level, and the choices are in the URL, so a
+  comparison can be shared. It reads the same matrix as the review, so it needs no data of its own.
 - The overview ends with the monthly average pump prices of petrol and diesel above the share of
   electric cars, on one time axis with a shared pointer. The prices come from Statistics Finland
   (CC BY 4.0), are nominal, and are published apart from the registrations under `prices/`. The

@@ -5,6 +5,7 @@ import {
   percent,
   rangeStart,
   rollingShare,
+  rollingSum,
   shareBand,
   sumRange,
   toneOf,
@@ -92,5 +93,11 @@ describe('shareBand', () => {
 
   it('has no band without a share', () => {
     expect(shareBand(null)).toBeNull();
+  });
+});
+
+describe('rollingSum', () => {
+  it('adds the trailing window, and what exists while the window is cut off', () => {
+    expect(rollingSum([1, 2, 3, 4], 3)).toEqual([1, 3, 6, 9]);
   });
 });

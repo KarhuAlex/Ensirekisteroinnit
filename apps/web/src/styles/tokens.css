@@ -27,6 +27,10 @@
   --fuel-diesel: #3f4f61;
   --fuel-other: #7f8fa0;
   --hatch: rgba(8, 18, 29, 0.32);
+  --series-1: #c2410c;
+  --series-2: #7c3aed;
+  --series-3: #0e7490;
+  --series-4: #be185d;
 
   --font: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
@@ -84,6 +88,10 @@
   --fuel-diesel: #9fb0c2;
   --fuel-other: #627588;
   --hatch: rgba(8, 18, 29, 0.4);
+  --series-1: #fb923c;
+  --series-2: #a78bfa;
+  --series-3: #22d3ee;
+  --series-4: #f472b6;
 
   color-scheme: dark;
 }
@@ -117,6 +125,10 @@
     --fuel-diesel: #9fb0c2;
     --fuel-other: #627588;
     --hatch: rgba(8, 18, 29, 0.4);
+    --series-1: #fb923c;
+    --series-2: #a78bfa;
+    --series-3: #22d3ee;
+    --series-4: #f472b6;
 
     color-scheme: dark;
   }

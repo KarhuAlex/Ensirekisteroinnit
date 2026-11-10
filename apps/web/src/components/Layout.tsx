@@ -22,7 +22,8 @@ interface NavItem {
 const NAV: NavItem[] = [
   { path: '', label: 'nav.overview', icon: 'overview', end: true },
   { path: '/review', label: 'nav.review', icon: 'review', end: false },
-  { path: '/models', label: 'nav.models', icon: 'models', end: false },
+  { path: '/models', label: 'nav.models', short: 'nav.modelsShort', icon: 'models', end: false },
+  { path: '/compare', label: 'nav.compare', icon: 'compare', end: false },
   { path: '/table', label: 'nav.table', icon: 'table', end: false },
   { path: '/about', label: 'nav.about', short: 'nav.aboutShort', icon: 'info', end: false },
 ];

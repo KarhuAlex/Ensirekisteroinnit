@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { priceLinesChart, shareLinesChart } from './charts';
+import { compareLinesChart, priceLinesChart, shareLinesChart } from './charts';
 import { makeFormatters } from './format';
 import type { ThemeColors } from './theme';
 
@@ -11,6 +11,7 @@ const colors: ThemeColors = {
   ground: '#fff',
   fuel: { bev: '#0a0', phev: '#00a', petrol: '#fa0', diesel: '#444', other: '#888' },
   hatch: '#fff',
+  series: ['#a00', '#0a0', '#00a', '#aa0'],
 };
 const fmt = makeFormatters('fi');
 const months = ['2026-08', '2026-09', '2026-10'];
@@ -67,5 +68,44 @@ describe('stacked line charts', () => {
       series: [{ name: 'bev', color: '#0a0', values: [50, 51, 52] }],
     }) as unknown as Built;
     expect(share.yAxis.axisLabel.width).toBe(price().yAxis.axisLabel.width);
+  });
+});
+
+describe('compareLinesChart', () => {
+  const build = (unit: 'count' | 'pct') =>
+    compareLinesChart({
+      ...base,
+      unit,
+      series: [
+        { name: 'A', slot: 2, values: [null, 10, 1234] },
+        { name: 'B', slot: 0, values: [5, 6, 7] },
+      ],
+    }) as unknown as Built & {
+      series: (LineSeries & { lineStyle: { color: string; type: unknown } })[];
+    };
+
+  it('starts the axis at zero and keeps the label width shared with the other line charts', () => {
+    expect(build('count').yAxis.min).toBe(0);
+    expect(build('count').yAxis.axisLabel.width).toBe(price().yAxis.axisLabel.width);
+  });
+
+  it('gives each line its own colour and its own dash', () => {
+    const [a, b] = build('count').series;
+    expect(a!.lineStyle.color).not.toBe(b!.lineStyle.color);
+    expect(a!.lineStyle.type).not.toEqual(b!.lineStyle.type);
+  });
+
+  it('leaves the months before a line starts empty, not zero', () => {
+    expect(build('count').series[0]!.data[0]).toBeNull();
+  });
+
+  it('leaves the values to the readout instead of labelling the line ends', () => {
+    expect(build('count').series[0]).not.toHaveProperty('endLabel');
+  });
+
+  it("keeps a line's colour with its slot, whatever its place in the list", () => {
+    const [a, b] = build('count').series;
+    expect(a!.lineStyle.color).toBe('#00a');
+    expect(b!.lineStyle.color).toBe('#a00');
   });
 });

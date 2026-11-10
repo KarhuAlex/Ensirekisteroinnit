@@ -2,7 +2,7 @@ export const LANGS = ['fi', 'en'];
 export const DEFAULT_LANG = 'fi';
 
 /** Public pages under each language prefix. A test keeps this list in step with the router. */
-export const PAGES = ['', '/review', '/models', '/table', '/about'];
+export const PAGES = ['', '/review', '/models', '/compare', '/table', '/about'];
 
 const escapeXml = (text) => text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 

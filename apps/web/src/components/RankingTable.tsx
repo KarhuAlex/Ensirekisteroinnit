@@ -10,32 +10,16 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n';
 import { downloadCsv } from '../lib/download';
-import { toneOf } from '../lib/stats';
-import { changeOf, type NamedRow } from '../lib/ranking';
+import type { NamedRow } from '../lib/ranking';
 import { rankingToCsv } from '../lib/rankingCsv';
+import { ChangeCell } from './ChangeCell';
 import { DataTable } from './DataTable';
 import { FuelMix } from './FuelMix';
-import { Icon } from './Icon';
 import { TableToolbar } from './TableToolbar';
 
 const PAGE_SIZE = 25;
 /** A stable default, so the column definitions are not rebuilt on every render. */
 const LINK_ALL = () => true;
-
-function ChangeCell({ count, previous }: { count: number; previous: number | null }) {
-  const { fmt } = useI18n();
-  const change = changeOf(count, previous);
-  if (!change) return <span className="muted">–</span>;
-  const tone = toneOf(change.delta);
-  const text =
-    change.percent !== null ? fmt.signedPct(change.percent) : fmt.signedInt(change.delta);
-  return (
-    <span className={`change change--${tone}`}>
-      {change.delta !== 0 && <Icon name={change.delta > 0 ? 'arrowUp' : 'arrowDown'} size={14} />}
-      {text}
-    </span>
-  );
-}
 
 export function RankingTable({
   rows,

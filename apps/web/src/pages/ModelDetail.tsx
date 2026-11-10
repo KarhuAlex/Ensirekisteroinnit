@@ -19,6 +19,7 @@ import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
 import { hasPage } from '../lib/entityLevel';
+import { comparePath } from '../lib/compareState';
 import { displayName } from '../lib/names';
 import { buildSeriesView } from '../lib/seriesView';
 import { MONTHS_PER_YEAR, modelStory, percent, sumRange } from '../lib/stats';
@@ -123,6 +124,11 @@ export function ModelDetail() {
       <PageHeader title={name} lede={storyText || undefined}>
         <p className="plate-row">
           <span className="plate">{t(`kind.${entity.kind}`)}</span>
+          {entity.kind !== 'total' && (
+            <Link className="button" to={comparePath(lang, [entity.id])}>
+              {t('compare.compareWith')}
+            </Link>
+          )}
           {view?.first && (
             <span className="muted">
               {t('model.since', {

@@ -4,6 +4,7 @@ import { DataProvider } from './data/DataProvider';
 import { SiteConfigProvider } from './data/SiteConfigProvider';
 import { detectLang, I18nProvider, isLang } from './i18n';
 import { About } from './pages/About';
+import { Compare } from './pages/Compare';
 import { ModelDetail } from './pages/ModelDetail';
 import { Models } from './pages/Models';
 import { NotFound } from './pages/NotFound';
@@ -34,6 +35,7 @@ export function App() {
                 <Route path="review" element={<Review />} />
                 <Route path="models" element={<Models />} />
                 <Route path="models/:id" element={<ModelDetail />} />
+                <Route path="compare" element={<Compare />} />
                 <Route path="table" element={<TablePage />} />
                 <Route path="about" element={<About />} />
                 <Route path="*" element={<NotFound />} />

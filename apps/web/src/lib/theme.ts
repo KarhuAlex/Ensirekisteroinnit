@@ -10,6 +10,8 @@ export interface ThemeColors {
   /** Fill colour per fuel group, read from the CSS tokens so both themes stay in sync. */
   fuel: Record<FuelGroupId, string>;
   hatch: string;
+  /** One colour for each line of a comparison, in order. */
+  series: string[];
 }
 
 const FALLBACK: ThemeColors = {
@@ -20,6 +22,7 @@ const FALLBACK: ThemeColors = {
   ground: '#ffffff',
   fuel: { bev: '#00a86b', phev: '#2f7fd1', petrol: '#e8a400', diesel: '#3f4f61', other: '#7f8fa0' },
   hatch: 'rgba(255,255,255,0.55)',
+  series: ['#c2410c', '#7c3aed', '#0e7490', '#be185d'],
 };
 
 function read(): ThemeColors {
@@ -39,6 +42,7 @@ function read(): ThemeColors {
       other: get('--fuel-other', FALLBACK.fuel.other),
     },
     hatch: get('--hatch', FALLBACK.hatch),
+    series: FALLBACK.series.map((fallback, i) => get(`--series-${i + 1}`, fallback)),
   };
 }
 
