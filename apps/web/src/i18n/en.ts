@@ -152,7 +152,12 @@ export const en: Record<MessageKey, string> = {
   'search.results': 'Search results',
   'search.emptyHint': 'Try a shorter query, for example just the make.',
   'search.placeholderHero': 'Search for a car, for example {example}',
-  'story.bevDetail': 'Latest month: {month}. The 12-month share is {share12}.',
+  'hero.eyebrow': 'Battery-electric share of first registrations, {month}',
+  'hero.donutLabel': 'electric',
+  'hero.noData': 'There are no first registrations for the latest month ({month}).',
+  'hero.perYear': 'in a year',
+  'hero.share12': 'Last 12 months: {share12}',
+  'hero.aria': 'First registrations by fuel, {month}: {items}',
   'story.model.none': 'No first registrations in the last 12 months.',
   'story.model.all': 'First registrations in the last 12 months: {n}, all battery electric.',
   'story.model.mixed':
@@ -161,10 +166,6 @@ export const en: Record<MessageKey, string> = {
   'table.caption': 'First registrations by fuel type',
   'model.fuelCaption': 'First registrations of this model by fuel type',
   'model.breadcrumb': 'You are here',
-  'story.bevUp': 'Battery-electric cars are {share} of first registrations, up {delta} in a year',
-  'story.bevDown':
-    'Battery-electric cars are {share} of first registrations, down {delta} in a year',
-  'story.bevFlat': 'Battery-electric cars are {share} of first registrations, unchanged in a year',
   'chart.asTable': 'View as table',
   'chart.keyboardHint': 'Use the arrow keys to step through months.',
   'nav.review': 'Review',
@@ -228,8 +229,6 @@ export const en: Record<MessageKey, string> = {
     'The data moves to a new format with the next update. Please try again in a moment.',
   'review.note':
     'Share is the proportion of all first registrations in the period (counting the same fuels) that the model or make accounts for. A percentage change appears only when the comparison period has at least {min} registrations, because percentages from small numbers mislead.',
-  'review.teaser': 'Which car was registered most in a given month or year?',
-  'review.teaserLink': 'Open the review',
   'about.privacyTitle': 'Privacy',
   'about.privacyText':
     'The service uses no cookies and no tracking, and it does not collect personal data. Your browser stores only the theme you choose (light or dark).',

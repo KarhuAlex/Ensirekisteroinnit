@@ -1,22 +1,18 @@
 import { TOTAL_ENTITY_ID } from '@regs/core';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { BevHero } from '../components/BevHero';
 import { FuelChart } from '../components/FuelChart';
 import { RollingChart } from '../components/RollingChart';
-import { PopularModels, SearchBox } from '../components/SearchBox';
+import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
-import { Facts, PageHeader, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
+import { Facts, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
 import { summarizeElectrification } from '../lib/electrification';
 import { buildSeriesView } from '../lib/seriesView';
 import { toneOf } from '../lib/stats';
-
-function bevStoryKey(delta: number | null): 'story.bevUp' | 'story.bevDown' | 'story.bevFlat' {
-  if (delta === null || Math.abs(delta) < 0.05) return 'story.bevFlat';
-  return delta > 0 ? 'story.bevUp' : 'story.bevDown';
-}
 
 export function Overview() {
   const { lang, t, fmt } = useI18n();
@@ -47,12 +43,9 @@ export function Overview() {
     <>
       <div className="hero">
         <SearchBox variant="hero" />
-        <PopularModels />
-        <p className="hero-link">
-          {t('review.teaser')} <Link to={`/${lang}/review`}>{t('review.teaserLink')}</Link>
-        </p>
       </div>
 
+      {(error || !view) && <h1 className="sr-only">{t('app.title')}</h1>}
       {error ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !view ? (
@@ -63,16 +56,7 @@ export function Overview() {
         </div>
       ) : (
         <>
-          <PageHeader
-            title={t(bevStoryKey(view.bevDelta), {
-              share: fmt.pct(view.bevNow),
-              delta: `${fmt.decimal(Math.abs(view.bevDelta ?? 0))} ${t('unit.pp')}`,
-            })}
-            lede={t('story.bevDetail', {
-              month: monthLabel,
-              share12: fmt.pct(view.bev12),
-            })}
-          />
+          <BevHero summary={view} month={monthLabel} />
 
           <Section
             id="share-title"

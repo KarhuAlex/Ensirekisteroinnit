@@ -30,6 +30,10 @@ describe('summarizeElectrification', () => {
     expect(summary.bevDelta).toBe(12);
   });
 
+  it('splits the latest month between the fuel groups', () => {
+    expect(summary.mixNow).toEqual({ bev: 25, phev: 0, petrol: 75, diesel: 0, other: 0 });
+  });
+
   it('compares the last 12 months with the 12 before', () => {
     // months 14..25 average 19.5 electric, months 2..13 average 7.5
     expect(summary.bev12).toBeCloseTo(19.5);

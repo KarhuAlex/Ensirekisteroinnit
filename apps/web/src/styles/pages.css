@@ -7,10 +7,6 @@
   margin-top: 0;
 }
 
-.hero + .page-head {
-  margin-top: 0;
-}
-
 .prose {
   max-width: 68ch;
 }

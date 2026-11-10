@@ -1,6 +1,6 @@
 import type { EntitySummary } from '@regs/core';
 import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
 import { displayName } from '../lib/names';
@@ -31,29 +31,6 @@ function Highlight({ text, tokens }: { text: string; tokens: string[] }) {
         <Fragment key={i}>{i % 2 === 1 ? <mark>{part}</mark> : part}</Fragment>
       ))}
     </>
-  );
-}
-
-export function PopularModels() {
-  const { lang, t, fmt } = useI18n();
-  const popular = usePopularModels(5);
-  if (popular.length === 0) return null;
-  return (
-    <div className="popular">
-      <span className="popular-label">{t('search.popular')}</span>
-      <ul>
-        {popular.map((e) => (
-          <li key={e.id}>
-            <Link
-              to={`/${lang}/models/${e.id}`}
-              title={t('search.last12', { n: fmt.int(e.last12) })}
-            >
-              {displayName(e.label)}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
 

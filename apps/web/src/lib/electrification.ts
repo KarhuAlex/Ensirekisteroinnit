@@ -1,4 +1,4 @@
-import type { GroupedSeries } from '@regs/core';
+import type { FuelGroupId, GroupedSeries } from '@regs/core';
 import { MONTHS_PER_YEAR, percent, rollingShare, sumRange } from './stats';
 
 /**
@@ -10,6 +10,8 @@ export interface ElectrificationSummary {
   regsNow: number;
   regsDelta: number | null;
   bevNow: number | null;
+  /** The latest month's share of each fuel group, in percent; they add up to 100. */
+  mixNow: Record<FuelGroupId, number>;
   bevDelta: number | null;
   bev12: number | null;
   bev12Delta: number | null;
@@ -37,6 +39,7 @@ export function summarizeElectrification(
   const windowShare = (part: readonly number[], from: number, to: number) =>
     percent(sumRange(part, from, to), sumRange(totals, from, to));
 
+  const latestShare = (group: FuelGroupId) => monthShare(grouped[group], last) ?? 0;
   const bevNow = monthShare(grouped.bev, last);
   const bev12 = windowShare(grouped.bev, n - MONTHS_PER_YEAR, n);
   const plug12 = windowShare(plug, n - MONTHS_PER_YEAR, n);
@@ -49,6 +52,13 @@ export function summarizeElectrification(
     regsNow,
     regsDelta: regsThen > 0 ? (regsNow / regsThen - 1) * 100 : null,
     bevNow,
+    mixNow: {
+      bev: latestShare('bev'),
+      phev: latestShare('phev'),
+      petrol: latestShare('petrol'),
+      diesel: latestShare('diesel'),
+      other: latestShare('other'),
+    },
     bevDelta: difference(bevNow, monthShare(grouped.bev, yearAgo)),
     bev12,
     bev12Delta: difference(bev12, windowShare(grouped.bev, earlier.from, earlier.to)),

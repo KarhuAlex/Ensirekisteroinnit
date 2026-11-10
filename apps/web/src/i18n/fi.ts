@@ -151,7 +151,12 @@ export const fi = {
   'search.results': 'Hakutulokset',
   'search.emptyHint': 'Kokeile lyhyempää hakua, esimerkiksi pelkkää merkkiä.',
   'search.placeholderHero': 'Hae autoa, esimerkiksi {example}',
-  'story.bevDetail': 'Tuorein kuukausi: {month}. 12 kuukauden osuus on {share12}.',
+  'hero.eyebrow': 'Täyssähköautojen osuus ensirekisteröinneistä, {month}',
+  'hero.donutLabel': 'täyssähköä',
+  'hero.noData': 'Viimeisimmältä kuukaudelta ({month}) ei ole ensirekisteröintejä.',
+  'hero.perYear': 'vuodessa',
+  'hero.share12': 'Viimeisten 12 kuukauden osuus: {share12}',
+  'hero.aria': 'Ensirekisteröinnit käyttövoimittain, {month}: {items}',
   'story.model.none': 'Ei ensirekisteröintejä viimeisen 12 kuukauden aikana.',
   'story.model.all': 'Viimeisen 12 kuukauden ensirekisteröinnit: {n}, kaikki täyssähköisiä.',
   'story.model.mixed':
@@ -160,12 +165,6 @@ export const fi = {
   'table.caption': 'Ensirekisteröinnit käyttövoimittain',
   'model.fuelCaption': 'Mallin ensirekisteröinnit käyttövoimittain',
   'model.breadcrumb': 'Sijainti',
-  'story.bevUp':
-    'Täyssähköautojen osuus ensirekisteröinneistä on {share}, ja osuus on noussut {delta} vuodessa',
-  'story.bevDown':
-    'Täyssähköautojen osuus ensirekisteröinneistä on {share}, ja osuus on laskenut {delta} vuodessa',
-  'story.bevFlat':
-    'Täyssähköautojen osuus ensirekisteröinneistä on {share}, ja osuus on pysynyt ennallaan vuodessa',
   'chart.asTable': 'Näytä taulukkona',
   'chart.keyboardHint': 'Selaa kuukausia nuolinäppäimillä.',
   'nav.review': 'Katsaus',
@@ -228,8 +227,6 @@ export const fi = {
     'Aineisto siirtyy uuteen muotoon seuraavan päivityksen yhteydessä. Yritä hetken kuluttua uudelleen.',
   'review.note':
     'Osuus kertoo, kuinka suuri osa valitun ajanjakson kaikista ensirekisteröinneistä (samoilla käyttövoimilla) on kyseinen malli tai merkki. Prosenttimuutos näytetään vain, jos vertailujaksolla on vähintään {min} ensirekisteröintiä, koska pienistä luvuista lasketut prosentit antavat harhaanjohtavan kuvan.',
-  'review.teaser': 'Mikä auto ensirekisteröitiin eniten tietyssä kuussa tai vuodessa?',
-  'review.teaserLink': 'Avaa katsaus',
   'about.privacyTitle': 'Tietosuoja',
   'about.privacyText':
     'Palvelu ei käytä evästeitä eikä seurantaa, eikä se kerää henkilötietoja. Selain tallentaa vain valitsemasi teeman (vaalea tai tumma).',

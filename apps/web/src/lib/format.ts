@@ -13,7 +13,7 @@ export interface Formatters {
   date(iso: string): string;
 }
 
-const NBSP = String.fromCharCode(0xa0); // non-breaking space keeps "50,3 %" on one line
+export const NBSP = String.fromCharCode(0xa0); // non-breaking space keeps "50,3 %" on one line
 
 export function makeFormatters(lang: Lang): Formatters {
   const locale = lang === 'fi' ? 'fi-FI' : 'en-GB';
