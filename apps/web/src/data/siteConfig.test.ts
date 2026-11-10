@@ -18,6 +18,12 @@ describe('parseSiteConfig', () => {
     });
   });
 
+  it('keeps only the origin of the site address', () => {
+    expect(parseSiteConfig({ siteUrl: 'https://example.org/path/?x=1' })).toEqual({
+      siteUrl: 'https://example.org',
+    });
+  });
+
   it('drops empty, oversized and non-string values', () => {
     expect(parseSiteConfig({ operator: '   ', hosting: 42, repoUrl: '' })).toEqual({});
     expect(parseSiteConfig({ operator: 'x'.repeat(101) })).toEqual({});

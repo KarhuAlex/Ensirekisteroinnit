@@ -4,6 +4,8 @@ export interface SiteConfig {
   contactUrl?: string;
   hosting?: string;
   repoUrl?: string;
+  /** The public address of the site, used for canonical links. */
+  siteUrl?: string;
 }
 
 const MAX_TEXT_LENGTH = 100;
@@ -34,10 +36,12 @@ export function parseSiteConfig(input: unknown): SiteConfig {
   const hosting = text(raw['hosting']);
   const contactUrl = link(raw['contactUrl']);
   const repoUrl = link(raw['repoUrl']);
+  const siteUrl = link(raw['siteUrl']);
   if (operator) config.operator = operator;
   if (hosting) config.hosting = hosting;
   if (contactUrl) config.contactUrl = contactUrl;
   if (repoUrl) config.repoUrl = repoUrl;
+  if (siteUrl) config.siteUrl = new URL(siteUrl).origin;
   return config;
 }
 

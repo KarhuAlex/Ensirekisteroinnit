@@ -171,6 +171,14 @@ fork needs no code changes. The deploy workflow writes the file from the reposit
 anything left out falls back to neutral wording. The texts are general and are not legal advice, so
 check that they fit your own situation.
 
+Search engines get a `sitemap.xml` and a `robots.txt` that the deploy workflow generates for your own
+domain, so nothing in the repository names a specific address. Set the repository variable
+`SITE_URL` (for example `https://example.org`) to turn the sitemap on. It lists every page in both
+languages with links between the translations, plus a page for each make and model found in the latest
+published data. The same variable gives every page a canonical link, so the many views of the review page count as one. Without `SITE_URL` the `robots.txt` has no sitemap line and the sitemap is empty. Submit
+`<SITE_URL>/sitemap.xml` in Google Search Console once, after checking that it opens as XML and that
+deep links such as `/fi/about` answer with status 200.
+
 The storage website has no custom response headers, so security headers such as
 `X-Frame-Options` need a CDN or Front Door in front of it if you want them.
 

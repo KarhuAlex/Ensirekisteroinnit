@@ -4,7 +4,8 @@ name: Deploy
 # Azure with OpenID Connect, so no Azure secrets are stored.
 # Needs these repository variables: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
 # FUNCTION_APP_NAME, WEB_STORAGE_ACCOUNT, DATA_BASE_URL. Optional, for the privacy and contact
-# sections: SITE_OPERATOR, SITE_CONTACT_URL, SITE_HOSTING, SITE_REPO_URL.
+# sections: SITE_OPERATOR, SITE_CONTACT_URL, SITE_HOSTING, SITE_REPO_URL. Optional, for the sitemap:
+# SITE_URL (the public address of the site, for example https://example.org).
 on:
   workflow_call:
   workflow_dispatch:
@@ -72,6 +73,12 @@ jobs:
           SITE_CONTACT_URL: ${{ vars.SITE_CONTACT_URL }}
           SITE_HOSTING: ${{ vars.SITE_HOSTING }}
           SITE_REPO_URL: ${{ vars.SITE_REPO_URL }}
+          SITE_URL: ${{ vars.SITE_URL }}
+      - name: Write sitemap and robots.txt
+        run: node apps/web/scripts/write-seo-files.mjs apps/web/dist
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          DATA_BASE_URL: ${{ vars.DATA_BASE_URL }}
       - uses: azure/login@v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
@@ -91,7 +98,7 @@ jobs:
           --content-cache-control "public, max-age=86400"
       - name: Upload pages and icons
         run: |
-          for pattern in '*.html' '*.svg' 'site.config.json'; do
+          for pattern in '*.html' '*.svg' 'site.config.json' 'robots.txt' 'sitemap.xml'; do
             az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite \
               -d '$web' -s apps/web/dist --pattern "$pattern" \
               --content-cache-control "public, max-age=0, must-revalidate"

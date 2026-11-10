@@ -7,6 +7,7 @@ const fields = {
   contactUrl: process.env.SITE_CONTACT_URL,
   hosting: process.env.SITE_HOSTING,
   repoUrl: process.env.SITE_REPO_URL,
+  siteUrl: process.env.SITE_URL,
 };
 const config = Object.fromEntries(Object.entries(fields).filter(([, value]) => value));
 const target = process.argv[2] ?? 'dist/site.config.json';

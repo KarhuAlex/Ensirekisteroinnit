@@ -5,6 +5,7 @@ import { useI18n, type Lang, type MessageKey } from '../i18n';
 import { STACK_ORDER } from '../lib/stats';
 import { currentTheme, setTheme } from '../lib/theme';
 import { FuelMark } from './FuelMark';
+import { CanonicalLink } from './CanonicalLink';
 import { Icon, type IconName } from './Icon';
 import { SearchBox } from './SearchBox';
 import { Skeleton, StatusPanel } from './ui';
@@ -143,6 +144,7 @@ export function Layout() {
 
   return (
     <div className="app">
+      <CanonicalLink />
       <a className="skip-link" href="#content">
         {t('skip.content')}
       </a>
