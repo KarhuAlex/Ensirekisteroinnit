@@ -3,6 +3,7 @@ import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEve
 import { useNavigate } from 'react-router-dom';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
+import { isListed } from '../lib/entityLevel';
 import { displayName } from '../lib/names';
 import { Icon } from './Icon';
 
@@ -53,9 +54,7 @@ export function SearchBox({ variant }: { variant: 'hero' | 'compact' }) {
   const results = useMemo(() => {
     if (tokens.length === 0) return popular;
     return entities
-      .filter(
-        (e) => e.kind !== 'total' && tokens.every((tok) => e.label.toLowerCase().includes(tok)),
-      )
+      .filter((e) => isListed(e.kind) && tokens.every((tok) => e.label.toLowerCase().includes(tok)))
       .sort((a, b) => b.last12 - a.last12 || b.total - a.total)
       .slice(0, MAX_RESULTS);
   }, [entities, popular, tokens]);

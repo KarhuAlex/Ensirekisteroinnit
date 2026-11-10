@@ -17,7 +17,9 @@ export function normalizeBase(address) {
 
 /** Only entities with registrations in the last 12 months get a page worth listing. */
 export function sitemapEntityIds(entities) {
-  return entities.filter((e) => e.kind !== 'total' && e.last12 > 0).map((e) => e.id);
+  return entities
+    .filter((e) => e.kind !== 'total' && e.kind !== 'corporategroup' && e.last12 > 0)
+    .map((e) => e.id);
 }
 
 /** A valid sitemap with no pages, which replaces an old one when the site address is not set. */

@@ -38,6 +38,7 @@ export const fi = {
   'kind.make': 'Merkki',
   'kind.group': 'Mallisarjat',
   'kind.model': 'Malli',
+  'kind.corporategroup': 'Konserni',
   'entity.total': 'Kaikki henkilöautot',
 
   'search.label': 'Hae merkkiä tai mallia',
@@ -173,6 +174,7 @@ export const fi = {
   'review.title': 'Katsaus',
   'review.headline.model': 'Eniten ensirekisteröidyt mallit, {period}',
   'review.headline.make': 'Eniten ensirekisteröidyt merkit, {period}',
+  'review.headline.corporategroup': 'Eniten ensirekisteröidyt konsernit, {period}',
   'review.lede':
     'Katso, mitä autoja ensirekisteröitiin eniten: yhtenä kuukautena, usean kuukauden aikana, vuonna tai usean vuoden aikana. Ensirekisteröinti on uuden auton ensimmäinen rekisteröinti Suomessa. Käytettynä maahan tuodut autot tilastoidaan erikseen. Ne näkyvät, kun valitset Käytettynä tuodut.',
   'review.range.year': 'vuosi {year}',
@@ -198,6 +200,7 @@ export const fi = {
   'review.level': 'Näytä',
   'review.level.model': 'Mallit',
   'review.level.make': 'Merkit',
+  'review.level.corporategroup': 'Konsernit',
   'review.fuels': 'Käyttövoima',
   'review.fuelsHint': 'Valitse käyttövoima rajataksesi listaa. Voit valita useita.',
   'review.fuelsAll': 'Kaikki käyttövoimat',
@@ -212,6 +215,7 @@ export const fi = {
   'review.kpi.leaderNote': '{n} kpl, osuus {share}',
   'review.kpi.distinct.model': 'Eri malleja',
   'review.kpi.distinct.make': 'Eri merkkejä',
+  'review.kpi.distinct.corporategroup': 'Eri konserneja',
   'review.kpi.versus.yearAgo': 'Vuotta aiemmin: {n} ({change})',
   'review.kpi.versus.previous': 'Edellinen jakso: {n} ({change})',
 
@@ -220,6 +224,7 @@ export const fi = {
   'review.col.change': 'Muutos',
   'review.caption.model': 'Ensirekisteröidyt mallit, {period}',
   'review.caption.make': 'Ensirekisteröidyt merkit, {period}',
+  'review.caption.corporategroup': 'Ensirekisteröidyt konsernit, {period}',
   'review.mixLabel': 'Käyttövoimajakauma: {items}',
   'review.empty': 'Valituilla rajauksilla ei ole ensirekisteröintejä.',
   'review.emptyHint': 'Kokeile pidempää ajanjaksoa tai useampaa käyttövoimaa.',
@@ -228,6 +233,8 @@ export const fi = {
     'Aineisto siirtyy uuteen muotoon seuraavan päivityksen yhteydessä. Yritä hetken kuluttua uudelleen.',
   'review.note':
     'Osuus kertoo, kuinka suuri osa valitun ajanjakson kaikista ensirekisteröinneistä (samoilla käyttövoimilla) on kyseinen malli tai merkki. Prosenttimuutos näytetään vain, jos vertailujaksolla on vähintään {min} ensirekisteröintiä, koska pienistä luvuista lasketut prosentit antavat harhaanjohtavan kuvan.',
+  'review.note.corporategroup':
+    'Konsernijako perustuu merkkien nykyiseen omistukseen, ja sitä sovelletaan koko aikasarjaan. Mukana ovat vain konserniin liitetyt merkit, joten kaikki ensirekisteröinnit eivät kuulu mihinkään konserniin. Osuus on konsernin osuus kaikista valitun ajanjakson ensirekisteröinnistä.',
   'about.privacyTitle': 'Tietosuoja',
   'about.privacyText':
     'Palvelu ei käytä evästeitä eikä seurantaa, eikä se kerää henkilötietoja. Selain tallentaa vain valitsemasi teeman (vaalea tai tumma).',

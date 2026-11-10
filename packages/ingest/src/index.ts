@@ -19,6 +19,8 @@ export * from './pipeline/regional.js';
 export * from './pipeline/run.js';
 export * from './pipeline/release.js';
 export * from './pipeline/validate.js';
+export * from './pipeline/corporate-groups.js';
+export * from './config/corporate-groups.js';
 export type { ObjectStore, PutOptions } from './storage/types.js';
 export { PrefixedStore } from './storage/prefixed-store.js';
 export { FsStore } from './storage/fs-store.js';

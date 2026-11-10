@@ -4,11 +4,18 @@ import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
 import { displayName } from '../lib/names';
-import { effectiveLevel, parseState, toSearchParams, type ReviewState } from '../lib/reviewState';
+import {
+  effectiveLevel,
+  parseState,
+  toSearchParams,
+  withAvailableLevel,
+  type ReviewState,
+} from '../lib/reviewState';
 import { AreaView } from './review/AreaView';
 import { EntityView } from './review/EntityView';
 import { ReviewControls } from './review/ReviewControls';
 import { UsedView } from './review/UsedView';
+import { useHasCorporateGroups } from './review/useHasCorporateGroups';
 import { useRangeLabel } from './review/useRangeLabel';
 
 type Translate = ReturnType<typeof useI18n>['t'];
@@ -32,7 +39,11 @@ export function Review() {
   const { manifest, byId } = useCatalog();
   const [params, setParams] = useSearchParams();
   const months = manifest.months;
-  const state = useMemo(() => parseState(params, months), [params, months]);
+  const hasGroups = useHasCorporateGroups();
+  const state = useMemo(
+    () => withAvailableLevel(parseState(params, months), hasGroups),
+    [params, months, hasGroups],
+  );
   const update = (patch: Partial<ReviewState>) =>
     setParams(toSearchParams({ ...state, ...patch }, months), { replace: true });
 

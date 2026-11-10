@@ -15,7 +15,7 @@ import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
-import { inLevel } from '../lib/entityLevel';
+import { isListed, inLevel } from '../lib/entityLevel';
 import { displayName } from '../lib/names';
 import { percent } from '../lib/stats';
 
@@ -44,7 +44,7 @@ export function Models() {
   const data = useMemo<Row[]>(
     () =>
       entities
-        .filter((e) => e.kind !== 'total')
+        .filter((e) => isListed(e.kind))
         .filter((e) => filter === 'all' || inLevel(e.kind, filter))
         .map((e) => ({
           id: e.id,

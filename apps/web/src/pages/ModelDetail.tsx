@@ -18,6 +18,7 @@ import { SourceNote } from '../components/SourceNote';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
+import { hasPage } from '../lib/entityLevel';
 import { displayName } from '../lib/names';
 import { buildSeriesView } from '../lib/seriesView';
 import { MONTHS_PER_YEAR, modelStory, percent, sumRange } from '../lib/stats';
@@ -29,7 +30,8 @@ export function ModelDetail() {
   const { lang, t, fmt } = useI18n();
   const { manifest, byId, entities } = useCatalog();
   const [granularity, setGranularity] = useState<Granularity>('monthly');
-  const entity = id ? byId.get(id) : undefined;
+  const found = id ? byId.get(id) : undefined;
+  const entity = found && hasPage(found.kind) ? found : undefined;
   const { series, error } = useEntitySeries(id);
 
   const name = entity

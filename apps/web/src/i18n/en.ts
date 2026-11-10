@@ -40,6 +40,7 @@ export const en: Record<MessageKey, string> = {
   'kind.make': 'Make',
   'kind.group': 'Model groups',
   'kind.model': 'Model',
+  'kind.corporategroup': 'Corporate group',
   'entity.total': 'All passenger cars',
 
   'search.label': 'Search for a make or model',
@@ -174,6 +175,7 @@ export const en: Record<MessageKey, string> = {
   'review.title': 'Review',
   'review.headline.model': 'Most registered models, {period}',
   'review.headline.make': 'Most registered makes, {period}',
+  'review.headline.corporategroup': 'Most registered corporate groups, {period}',
   'review.lede':
     'See which cars were registered most: in a single month, over several months, in a year or over several years. A first registration is the first time a new car is registered in Finland. Cars imported used are counted separately. Choose Used imports to see them.',
   'review.range.year': '{year}',
@@ -200,6 +202,7 @@ export const en: Record<MessageKey, string> = {
   'review.level': 'Show',
   'review.level.model': 'Models',
   'review.level.make': 'Makes',
+  'review.level.corporategroup': 'Corporate groups',
   'review.fuels': 'Fuel',
   'review.fuelsHint': 'Pick a fuel to narrow the list. You can pick several.',
   'review.fuelsAll': 'All fuels',
@@ -214,6 +217,7 @@ export const en: Record<MessageKey, string> = {
   'review.kpi.leaderNote': '{n} cars, {share} of the total',
   'review.kpi.distinct.model': 'Different models',
   'review.kpi.distinct.make': 'Different makes',
+  'review.kpi.distinct.corporategroup': 'Different groups',
   'review.kpi.versus.yearAgo': 'A year earlier: {n} ({change})',
   'review.kpi.versus.previous': 'Previous period: {n} ({change})',
 
@@ -222,6 +226,7 @@ export const en: Record<MessageKey, string> = {
   'review.col.change': 'Change',
   'review.caption.model': 'Models by first registrations, {period}',
   'review.caption.make': 'Makes by first registrations, {period}',
+  'review.caption.corporategroup': 'Corporate groups by first registrations, {period}',
   'review.mixLabel': 'Fuel mix: {items}',
   'review.empty': 'There are no first registrations for these selections.',
   'review.emptyHint': 'Try a longer period or more fuels.',
@@ -230,6 +235,8 @@ export const en: Record<MessageKey, string> = {
     'The data moves to a new format with the next update. Please try again in a moment.',
   'review.note':
     'Share is the proportion of all first registrations in the period (counting the same fuels) that the model or make accounts for. A percentage change appears only when the comparison period has at least {min} registrations, because percentages from small numbers mislead.',
+  'review.note.corporategroup':
+    'Corporate groups follow the current ownership of each make and apply to the whole time series. Only makes assigned to a group are included, so not every first registration belongs to a group. Share is the part of all first registrations in the period that belongs to the group.',
   'about.privacyTitle': 'Privacy',
   'about.privacyText':
     'The service uses no cookies and no tracking, and it does not collect personal data. Your browser stores only the theme you choose (light or dark).',

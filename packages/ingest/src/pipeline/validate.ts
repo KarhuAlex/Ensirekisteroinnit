@@ -4,12 +4,15 @@ export interface ValidationLimits {
   minEntities: number;
   minMonths: number;
   minObservations: number;
+  /** Share (0 to 1) of the last 12 months that corporate groups must cover; unset skips it. */
+  minGroupCoverage?: number;
 }
 
 export const DEFAULT_LIMITS: ValidationLimits = {
   minEntities: 100,
   minMonths: 60,
   minObservations: 10_000,
+  minGroupCoverage: 0.97,
 };
 
 /**

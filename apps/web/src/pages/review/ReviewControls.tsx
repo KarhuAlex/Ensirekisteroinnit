@@ -5,6 +5,7 @@ import { PeriodPicker } from '../../components/PeriodPicker';
 import { Segmented } from '../../components/ui';
 import { useCatalog } from '../../data/DataProvider';
 import { useI18n } from '../../i18n';
+import { isListed } from '../../lib/entityLevel';
 import { effectiveMetric, isUnnarrowed } from '../../lib/areaMetrics';
 import { comparisonRange, type CompareMode } from '../../lib/ranking';
 import {
@@ -16,10 +17,11 @@ import {
   type ReviewState,
   type Source,
 } from '../../lib/reviewState';
+import { useHasCorporateGroups } from './useHasCorporateGroups';
 
 const SOURCES: readonly Source[] = ['new', 'used'];
 const COMPARE_MODES: readonly CompareMode[] = ['none', 'previous', 'yearAgo'];
-const LEVELS: readonly Level[] = ['model', 'make', 'area'];
+const LEVELS: readonly Level[] = ['model', 'make', 'corporategroup', 'area'];
 const AREA_LEVELS: readonly AreaLevel[] = ['region', 'municipality'];
 const AREA_METRICS: readonly AreaMetric[] = ['share', 'index', 'count', 'change'];
 
@@ -33,7 +35,9 @@ interface Props {
 export function ReviewControls({ state, months, onChange }: Props) {
   const { t } = useI18n();
   const { entities } = useCatalog();
-  const pickable = useMemo(() => entities.filter((e) => e.kind !== 'total'), [entities]);
+  const hasGroups = useHasCorporateGroups();
+  const levels = LEVELS.filter((option) => option !== 'corporategroup' || hasGroups);
+  const pickable = useMemo(() => entities.filter((e) => isListed(e.kind)), [entities]);
 
   const compareOptions = COMPARE_MODES.map((mode) => ({
     value: mode,
@@ -60,7 +64,7 @@ export function ReviewControls({ state, months, onChange }: Props) {
         <Segmented<Level>
           label={t('review.level')}
           value={level}
-          options={LEVELS.map((option) => ({
+          options={levels.map((option) => ({
             value: option,
             label: t(`review.level.${option}`),
             disabled: !levelAvailable(state.source, option),

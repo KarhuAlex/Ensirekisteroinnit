@@ -6,9 +6,10 @@ export type Period = string;
 /** Id of the entity that counts all passenger cars. */
 export const TOTAL_ENTITY_ID = 'total';
 
-export type EntityKind = 'total' | 'make' | 'group' | 'model';
+/** `group` is a model series; `corporategroup` is the parent company of several makes. */
+export type EntityKind = 'total' | 'make' | 'group' | 'model' | 'corporategroup';
 
-/** Something registrations can be counted for: all cars, a make, a model group or a model. */
+/** Something registrations can be counted for: all cars, a make, a model group, a model or a corporate group. */
 export interface Entity {
   id: string;
   label: string;
@@ -42,7 +43,10 @@ export interface Dataset {
 export const SCHEMA_VERSION = 1;
 
 /** Bumped when a release gains or changes files. Ingest rebuilds an older-format release even if the source is unchanged. */
-export const RELEASE_FORMAT = 2;
+export const RELEASE_FORMAT = 3;
+
+/** Cars imported used are a release of their own, so a change to the national one leaves it alone. */
+export const USED_RELEASE_FORMAT = 2;
 
 /** Short-cached pointer to the current immutable release. */
 export interface LatestPointer {

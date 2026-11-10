@@ -51,7 +51,7 @@ export function RankingTable({
   countHeader: string;
   period: string;
   /** Which rows link to their page; a row without a page is plain text. */
-  isLinked?: (id: string) => boolean;
+  isLinked?: ((id: string) => boolean) | undefined;
 }) {
   const { lang, t, fmt } = useI18n();
   const [query, setQuery] = useState('');

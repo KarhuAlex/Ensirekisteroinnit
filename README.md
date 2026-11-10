@@ -24,6 +24,10 @@ the site stays fast and keeps working when the upstream service is slow or down.
   separately from first registrations, and only by make (no model, no area), so that view ranks makes
   with the same period, fuel and comparison choices. It is published apart from the national data,
   under `used/`, and refreshed by its own small ingest.
+- The review page can also rank corporate groups (for example the makes of one parent company
+  added together). The source has no such level, so the mapping is kept by hand in
+  `packages/ingest/src/config/corporate-groups.ts`. It follows today's ownership and applies to the
+  whole history. The ingest logs makes that sell cars but are missing from the mapping.
 - The review page can also rank areas, by region or municipality, on a map and in a table. It shows
   the share of an area's registrations that a fuel, make or model accounts for, an index against the
   national level, the count and the change in share. Areas with few registrations are left uncoloured.

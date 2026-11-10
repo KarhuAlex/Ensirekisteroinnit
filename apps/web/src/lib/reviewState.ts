@@ -31,7 +31,7 @@ const COMPARE_PARAM: Record<CompareMode, string> = {
 const DEFAULT_COMPARE: CompareMode = 'yearAgo';
 const AREA_LEVELS: readonly AreaLevel[] = ['region', 'municipality'];
 const AREA_METRICS: readonly AreaMetric[] = ['share', 'index', 'count', 'change'];
-const LEVELS: readonly Level[] = ['model', 'make', 'area'];
+const LEVELS: readonly Level[] = ['model', 'make', 'corporategroup', 'area'];
 const SOURCES: readonly Source[] = ['new', 'used'];
 
 const oneOf = <T extends string>(options: readonly T[], value: string | null): T =>
@@ -119,4 +119,11 @@ export function reviewSearch(months: readonly string[], range: MonthRange): stri
 export function reviewPath(lang: Lang, months: readonly string[], period: string): string | null {
   const range = rangeOfPeriod(months, period);
   return range ? `/${lang}/review${reviewSearch(months, range)}` : null;
+}
+
+/** The corporate group level does nothing when the data has no groups; fall back to models. */
+export function withAvailableLevel(state: ReviewState, hasCorporateGroups: boolean): ReviewState {
+  return state.level === 'corporategroup' && !hasCorporateGroups
+    ? { ...state, level: 'model' }
+    : state;
 }

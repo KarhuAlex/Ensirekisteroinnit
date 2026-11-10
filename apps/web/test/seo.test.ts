@@ -74,9 +74,10 @@ describe('sitemapEntityIds', () => {
     { id: 'total', kind: 'total', last12: 900 },
     { id: 'audi', kind: 'make', last12: 50 },
     { id: 'old-model', kind: 'model', last12: 0 },
+    { id: 'cg-vag', kind: 'corporategroup', last12: 80 },
   ];
 
-  it('lists makes and models with recent registrations only', () => {
+  it('lists makes and models with recent registrations only, never corporate groups', () => {
     expect(sitemapEntityIds(entities)).toEqual(['audi']);
   });
 });

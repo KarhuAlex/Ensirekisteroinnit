@@ -13,7 +13,10 @@ interface Props {
   fileStem: string;
 }
 
-/** The ranking of new cars: models or makes. */
+/** Corporate groups have no page of their own, so their rows are plain text. */
+const NO_LINKS = () => false;
+
+/** The ranking of new cars: models, makes or corporate groups. */
 export function EntityView({ state, periodLabel, partialYear, fileStem }: Props) {
   const { t } = useI18n();
   const { byId } = useCatalog();
@@ -43,6 +46,7 @@ export function EntityView({ state, periodLabel, partialYear, fileStem }: Props)
       periodLabel={periodLabel}
       partialYear={partialYear}
       fileStem={fileStem}
+      isLinked={state.level === 'corporategroup' ? NO_LINKS : undefined}
     />
   );
 }

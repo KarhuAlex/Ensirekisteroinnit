@@ -8,6 +8,7 @@ import {
   reviewPath,
   reviewSearch,
   toSearchParams,
+  withAvailableLevel,
 } from './reviewState';
 import { rankingToCsv } from './rankingCsv';
 
@@ -85,6 +86,20 @@ describe('review state in the URL', () => {
     expect(params.get('from')).toBe('2025-12');
     expect(params.get('cmp')).toBe('prev');
     expect(parseState(params, months)).toEqual(state);
+  });
+});
+
+describe('withAvailableLevel', () => {
+  const groups = parseState(new URLSearchParams('level=corporategroup'), months);
+
+  it('keeps the corporate group level when the data has groups', () => {
+    expect(withAvailableLevel(groups, true).level).toBe('corporategroup');
+  });
+
+  it('falls back to models when it has none, and leaves other levels alone', () => {
+    expect(withAvailableLevel(groups, false).level).toBe('model');
+    const make = parseState(new URLSearchParams('level=make'), months);
+    expect(withAvailableLevel(make, false)).toBe(make);
   });
 });
 

@@ -72,7 +72,7 @@ async function publishIfChanged<T>(
   log.info(`New source version ${version} (previous: ${current?.sourceVersion ?? 'none'}).`);
 
   const { dataset, rawFiles } = await pipeline.adapter.fetch();
-  pipeline.validate(dataset);
+  pipeline.validate(dataset, log);
   await archiveRaw(opts.rawStore, rawFiles);
 
   const release = pipeline.build(dataset, (opts.now ?? (() => new Date()))());

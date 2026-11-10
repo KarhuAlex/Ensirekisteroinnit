@@ -1,4 +1,4 @@
-import type { Dataset } from '@regs/core';
+import { RELEASE_FORMAT, type Dataset } from '@regs/core';
 import { describe, expect, it } from 'vitest';
 import type { SourceAdapter } from '../src/adapters/types.js';
 import { silentLogger } from '../src/logger.js';
@@ -60,7 +60,7 @@ const current = {
   release: 'old',
   sourceVersion: 'v2',
   generatedAt: 'x',
-  format: 2,
+  format: RELEASE_FORMAT,
 };
 
 describe('update notification', () => {

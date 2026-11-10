@@ -26,26 +26,44 @@ interface Wording {
   note: MessageKey;
 }
 
-function wordingFor(source: Source, level: EntityLevel): Wording {
-  if (source === 'used') {
-    return {
-      caption: 'review.caption.used',
-      total: 'review.used.kpi.total',
-      leader: 'review.used.kpi.leader',
-      count: 'review.used.col.count',
-      distinct: 'review.kpi.distinct.make',
-      note: 'review.used.note',
-    };
-  }
-  return {
-    caption: level === 'make' ? 'review.caption.make' : 'review.caption.model',
-    total: 'review.kpi.total',
-    leader: 'review.kpi.leader',
-    count: 'review.col.count',
-    distinct: level === 'make' ? 'review.kpi.distinct.make' : 'review.kpi.distinct.model',
+const USED_WORDING: Wording = {
+  caption: 'review.caption.used',
+  total: 'review.used.kpi.total',
+  leader: 'review.used.kpi.leader',
+  count: 'review.used.col.count',
+  distinct: 'review.kpi.distinct.make',
+  note: 'review.used.note',
+};
+
+const NEW_BASE = {
+  total: 'review.kpi.total',
+  leader: 'review.kpi.leader',
+  count: 'review.col.count',
+} as const;
+
+const NEW_WORDING: Record<EntityLevel, Wording> = {
+  model: {
+    ...NEW_BASE,
+    caption: 'review.caption.model',
+    distinct: 'review.kpi.distinct.model',
     note: 'review.note',
-  };
-}
+  },
+  make: {
+    ...NEW_BASE,
+    caption: 'review.caption.make',
+    distinct: 'review.kpi.distinct.make',
+    note: 'review.note',
+  },
+  corporategroup: {
+    ...NEW_BASE,
+    caption: 'review.caption.corporategroup',
+    distinct: 'review.kpi.distinct.corporategroup',
+    note: 'review.note.corporategroup',
+  },
+};
+
+const wordingFor = (source: Source, level: EntityLevel): Wording =>
+  source === 'used' ? USED_WORDING : NEW_WORDING[level];
 
 export function ResultsSkeleton() {
   const { t } = useI18n();
@@ -70,7 +88,7 @@ interface Props {
   partialYear: boolean;
   fileStem: string;
   /** Which rows get a link to their page; every row does by default. */
-  isLinked?: (id: string) => boolean;
+  isLinked?: ((id: string) => boolean) | undefined;
 }
 
 /** The ranking of makes or models in one matrix for the chosen period. */
@@ -171,7 +189,7 @@ export function EntityResults({
         caption={t(words.caption, { period: periodLabel })}
         countHeader={t(words.count)}
         period={fileStem}
-        {...(isLinked ? { isLinked } : {})}
+        isLinked={isLinked}
       />
       <p className="footnote">{t(words.note, { min: MIN_BASE })}</p>
     </>

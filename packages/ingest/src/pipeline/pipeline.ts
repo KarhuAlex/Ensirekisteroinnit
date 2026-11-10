@@ -1,4 +1,5 @@
 import type { SourceAdapter } from '../adapters/types.js';
+import type { Logger } from '../logger.js';
 import type { ReleaseFile } from './release.js';
 
 export interface PublishableRelease {
@@ -16,7 +17,7 @@ export interface Pipeline<T> {
   /** Bumped when the pipeline's release gains or changes files, which forces a rebuild. */
   format: number;
   adapter: SourceAdapter<T>;
-  validate(data: T): void;
+  validate(data: T, log: Logger): void;
   build(data: T, now: Date): PublishableRelease;
   sourceVersionOf(data: T): string;
 }
