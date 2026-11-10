@@ -123,6 +123,8 @@ export const fi = {
     'Luvut ovat ensirekisteröintejä, eivät liikennekäytössä olevien autojen määriä. Autokannasta ei tässä versiossa ole tietoja.',
   'about.caveat5':
     'Mallikohtaiset luvut ovat mallisarjatasoisia: lähde on voinut yhdistää samaan sarjaan useita malleja.',
+  'about.caveat6':
+    'Käytettynä maahan tuodut autot eivät ole mukana ensirekisteröinneissä, koska lähde tilastoi ne erikseen. Katsauksessa ne näkyvät valinnalla Käytettynä tuodut, mutta vain merkeittäin.',
   'about.sourceNotesTitle': 'Lähteen omat huomautukset',
 
   'notfound.title': 'Sivua ei löytynyt',
@@ -172,7 +174,7 @@ export const fi = {
   'review.headline.model': 'Eniten ensirekisteröidyt mallit, {period}',
   'review.headline.make': 'Eniten ensirekisteröidyt merkit, {period}',
   'review.lede':
-    'Katso, mitä autoja ensirekisteröitiin eniten: yhtenä kuukautena, usean kuukauden aikana, vuonna tai usean vuoden aikana. Ensirekisteröinti on auton ensimmäinen rekisteröinti Suomessa, ja mukana ovat myös käytettynä maahan tuodut autot.',
+    'Katso, mitä autoja ensirekisteröitiin eniten: yhtenä kuukautena, usean kuukauden aikana, vuonna tai usean vuoden aikana. Ensirekisteröinti on uuden auton ensimmäinen rekisteröinti Suomessa. Käytettynä maahan tuodut autot tilastoidaan erikseen. Ne näkyvät, kun valitset Käytettynä tuodut.',
   'review.range.year': 'vuosi {year}',
   'review.range.span': '{from}–{to}',
   'review.partialYear': 'Vuosi on kesken, joten luvut kattavat vain jo julkaistut kuukaudet.',
@@ -288,6 +290,25 @@ export const fi = {
     'Aluetiedot alkavat vuodesta {year}, joten ajanjakso on rajattu sen mukaan.',
   'review.area.narrow':
     'Valitse käyttövoima tai rajaa merkkiin tai malliin, niin osuus, indeksi ja muutos kertovat enemmän. Nyt näytetään vain määrä.',
+  'review.source': 'Autot',
+  'review.source.new': 'Uudet autot',
+  'review.source.used': 'Käytettynä tuodut',
+  'review.headline.used': 'Käytettynä tuodut merkeittäin, {period}',
+  'review.used.lede':
+    'Käytettynä maahan tuodut henkilöautot ovat ulkomailla jo käytettyjä autoja, jotka rekisteröidään Suomessa ensimmäistä kertaa. Traficom tilastoi ne erillään uusien autojen ensirekisteröinneistä.',
+  'review.used.limits':
+    'Käytettynä tuoduista on tietoa vain merkeittäin, ei malleittain eikä alueittain.',
+  'review.used.kpi.total': 'Käytettynä tuodut yhteensä',
+  'review.used.kpi.leader': 'Eniten tuotu',
+  'review.used.col.count': 'Tuodut autot',
+  'review.caption.used': 'Käytettynä tuodut merkeittäin, {period}',
+  'review.used.note':
+    'Osuus kertoo, kuinka suuri osa valitun ajanjakson käytettynä tuoduista autoista (samoilla käyttövoimilla) on kyseinen merkki. Luvut kertovat maahantuonnista, eivät kotimaisista omistajanvaihdoksista tai liikennekäytössä olevista autoista. Prosenttimuutos näytetään vain, jos vertailujaksolla on vähintään {min} autoa, koska pienistä luvuista lasketut prosentit antavat harhaanjohtavan kuvan. Merkin nimi on linkki vain, jos merkillä on myös ensirekisteröintejä.',
+  'review.used.lag':
+    'Käytettynä tuotujen viimeisin tieto on kuukaudelta {month}, joten luvut kattavat vain osan valitusta ajanjaksosta.',
+  'review.used.unavailable': 'Käytettynä tuotujen tiedot eivät ole vielä käytettävissä.',
+  'review.used.unavailableHint':
+    'Aineiston julkaisu on vielä kesken. Yritä hetken kuluttua uudelleen.',
 } as const;
 
 export type MessageKey = keyof typeof fi;

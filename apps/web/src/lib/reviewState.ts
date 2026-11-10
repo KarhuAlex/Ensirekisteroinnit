@@ -5,10 +5,13 @@ import { sameRange, type CompareMode, type MonthRange } from './ranking';
 export type Level = EntityLevel | 'area';
 export type AreaLevel = 'municipality' | 'region';
 export type AreaMetric = 'share' | 'index' | 'count' | 'change';
+/** New cars, or cars imported used. */
+export type Source = 'new' | 'used';
 
 /** The review page is a function of this, and all of it lives in the URL. */
 export interface ReviewState {
   range: MonthRange;
+  source: Source;
   level: Level;
   fuels: FuelGroupId[];
   compare: CompareMode;
@@ -27,6 +30,7 @@ const DEFAULT_COMPARE: CompareMode = 'yearAgo';
 const AREA_LEVELS: readonly AreaLevel[] = ['region', 'municipality'];
 const AREA_METRICS: readonly AreaMetric[] = ['share', 'index', 'count', 'change'];
 const LEVELS: readonly Level[] = ['model', 'make', 'area'];
+const SOURCES: readonly Source[] = ['new', 'used'];
 
 const oneOf = <T extends string>(options: readonly T[], value: string | null): T =>
   options.find((option) => option === value) ?? (options[0] as T);
@@ -35,6 +39,7 @@ export function defaultState(monthCount: number): ReviewState {
   const last = Math.max(0, monthCount - 1);
   return {
     range: { from: last, to: last },
+    source: 'new',
     level: 'model',
     fuels: [...FUEL_GROUP_IDS],
     compare: DEFAULT_COMPARE,
@@ -65,6 +70,7 @@ export function parseState(params: URLSearchParams, months: readonly string[]): 
 
   return {
     range,
+    source: oneOf(SOURCES, params.get('source')),
     level: oneOf(LEVELS, params.get('level')),
     fuels: fuels.length > 0 ? [...fuels] : base.fuels,
     compare,
@@ -82,6 +88,7 @@ export function toSearchParams(state: ReviewState, months: readonly string[]): U
     params.set('from', months[state.range.from] ?? '');
     params.set('to', months[state.range.to] ?? '');
   }
+  if (state.source !== base.source) params.set('source', state.source);
   if (state.level !== base.level) params.set('level', state.level);
   if (state.fuels.length < FUEL_GROUP_IDS.length) params.set('fuels', state.fuels.join(','));
   if (state.compare !== base.compare) params.set('cmp', COMPARE_PARAM[state.compare]);
@@ -89,4 +96,13 @@ export function toSearchParams(state: ReviewState, months: readonly string[]): U
   if (state.areaMetric !== base.areaMetric) params.set('metric', state.areaMetric);
   if (state.entity) params.set('entity', state.entity);
   return params;
+}
+
+/** Cars imported used are known by make only, so that is the one level that applies to them. */
+export function levelAvailable(source: Source, level: Level): boolean {
+  return source === 'new' || level === 'make';
+}
+
+export function effectiveLevel(state: Pick<ReviewState, 'source' | 'level'>): Level {
+  return levelAvailable(state.source, state.level) ? state.level : 'make';
 }

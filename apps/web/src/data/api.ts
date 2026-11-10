@@ -32,9 +32,12 @@ export interface Catalog {
   entities: EntitySummary[];
 }
 
-export async function loadCatalog(): Promise<Catalog> {
-  const latest = await getJson<LatestPointer>(`${DATA_BASE}/latest.json`);
-  const base = `${DATA_BASE}/${latest.release}`;
+/** A dataset published beside the national one lives in a folder of its own, such as `used`. */
+const folderUrl = (folder: string): string => (folder ? `${DATA_BASE}/${folder}` : DATA_BASE);
+
+export async function loadCatalog(folder = ''): Promise<Catalog> {
+  const latest = await getJson<LatestPointer>(`${folderUrl(folder)}/latest.json`);
+  const base = `${folderUrl(folder)}/${latest.release}`;
   const [manifest, entities] = await Promise.all([
     getJson<Manifest>(`${base}/manifest.json`),
     getJson<EntitySummary[]>(`${base}/entities.json`),
@@ -49,8 +52,13 @@ export function checkMatrixMonths(matrix: Matrix, months: readonly string[]): Ma
   return matrix;
 }
 
-export async function loadMatrix(release: string, months: readonly string[]): Promise<Matrix> {
-  return checkMatrixMonths(await getJson<Matrix>(`${DATA_BASE}/${release}/matrix.json`), months);
+export async function loadMatrix(
+  release: string,
+  months: readonly string[],
+  folder = '',
+): Promise<Matrix> {
+  const matrix = await getJson<Matrix>(`${folderUrl(folder)}/${release}/matrix.json`);
+  return checkMatrixMonths(matrix, months);
 }
 
 export function loadSeries(release: string, id: string): Promise<EntitySeries> {

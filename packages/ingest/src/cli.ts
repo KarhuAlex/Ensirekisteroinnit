@@ -2,7 +2,9 @@
 import { parseArgs } from 'node:util';
 import { TraficomPxWebAdapter } from './adapters/traficom-pxweb/adapter.js';
 import { TraficomRegionalAdapter } from './adapters/traficom-pxweb/regional-adapter.js';
+import { TraficomUsedImportAdapter } from './adapters/traficom-pxweb/used-adapter.js';
 import { regionalPipeline } from './pipeline/regional.js';
+import { usedImportsPipeline } from './pipeline/registrations.js';
 import { runIngest, runPipeline, type IngestResult } from './pipeline/run.js';
 import { BlobStore } from './storage/blob-store.js';
 import { FsStore } from './storage/fs-store.js';
@@ -23,13 +25,14 @@ const { values } = parseArgs({
 });
 
 if (values.help) {
-  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional] [--force]
+  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used] [--force]
 
 Fetches the latest data and writes a release to <dir>/published (raw responses go to <dir>/raw).
   --out          Output directory (default: .data)
   --azure        Write to the data storage account instead, for example
                  https://<account>.blob.core.windows.net (uses your az login)
-  --dataset      registrations (national, default) or regional (per municipality)
+  --dataset      registrations (national, default), regional (per municipality) or used
+                 (cars imported used, by make)
   --from-year    First year of the regional data (default: 2021)
   --concurrency  Parallel requests for the regional data (default: 4)
   --force        Publish a new release even if the source has not changed
@@ -48,8 +51,20 @@ function createStores(): { rawStore: ObjectStore; publishedStore: ObjectStore } 
   return { rawStore: new FsStore(`${out}/raw`), publishedStore: new FsStore(`${out}/published`) };
 }
 
+/** A dataset published beside the national one keeps its files under a prefix of its own. */
+function underPrefix(
+  stores: { rawStore: ObjectStore; publishedStore: ObjectStore },
+  prefix: string,
+): { rawStore: ObjectStore; publishedStore: ObjectStore } {
+  return {
+    rawStore: new PrefixedStore(stores.rawStore, prefix),
+    publishedStore: new PrefixedStore(stores.publishedStore, prefix),
+  };
+}
+
 async function run(): Promise<IngestResult> {
-  const { rawStore, publishedStore } = createStores();
+  const stores = createStores();
+  const { rawStore, publishedStore } = stores;
   const force = values.force ?? false;
   if (values.dataset === 'regional') {
     const adapter = new TraficomRegionalAdapter({
@@ -58,8 +73,13 @@ async function run(): Promise<IngestResult> {
       concurrency: positiveInteger('concurrency', values.concurrency),
     });
     return runPipeline(regionalPipeline(adapter), {
-      rawStore: new PrefixedStore(rawStore, 'regional/'),
-      publishedStore: new PrefixedStore(publishedStore, 'regional/'),
+      ...underPrefix(stores, 'regional/'),
+      force,
+    });
+  }
+  if (values.dataset === 'used') {
+    return runPipeline(usedImportsPipeline(new TraficomUsedImportAdapter()), {
+      ...underPrefix(stores, 'used/'),
       force,
     });
   }

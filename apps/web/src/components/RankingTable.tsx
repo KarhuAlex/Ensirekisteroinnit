@@ -19,6 +19,8 @@ import { Icon } from './Icon';
 import { TableToolbar } from './TableToolbar';
 
 const PAGE_SIZE = 25;
+/** A stable default, so the column definitions are not rebuilt on every render. */
+const LINK_ALL = () => true;
 
 function ChangeCell({ count, previous }: { count: number; previous: number | null }) {
   const { fmt } = useI18n();
@@ -39,12 +41,17 @@ export function RankingTable({
   rows,
   showChange,
   caption,
+  countHeader,
   period,
+  isLinked = LINK_ALL,
 }: {
   rows: NamedRow[];
   showChange: boolean;
   caption: string;
+  countHeader: string;
   period: string;
+  /** Which rows link to their page; a row without a page is plain text. */
+  isLinked?: (id: string) => boolean;
 }) {
   const { lang, t, fmt } = useI18n();
   const [query, setQuery] = useState('');
@@ -73,7 +80,7 @@ export function RankingTable({
             <span className="rank-name">
               <span className="rank">{r.rank}</span>
               <span>
-                <Link to={`/${lang}/models/${r.id}`}>{r.name}</Link>
+                {isLinked(r.id) ? <Link to={`/${lang}/models/${r.id}`}>{r.name}</Link> : r.name}
                 {r.make && <span className="muted make">{r.make}</span>}
               </span>
             </span>
@@ -81,7 +88,7 @@ export function RankingTable({
         },
       },
       {
-        ...numeric('count', t('review.col.count'), (c) => fmt.int(c.row.original.count)),
+        ...numeric('count', countHeader, (c) => fmt.int(c.row.original.count)),
         accessorFn: (r) => r.count,
       },
       {
@@ -106,7 +113,7 @@ export function RankingTable({
         enableGlobalFilter: false,
       },
     ];
-  }, [t, fmt, lang, showChange]);
+  }, [t, fmt, lang, showChange, countHeader, isLinked]);
 
   const table = useReactTable({
     data: rows,

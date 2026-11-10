@@ -1,4 +1,4 @@
-import type { Observation } from '@regs/core';
+import type { FuelId, Observation } from '@regs/core';
 import type { PxWebClient } from './client.js';
 import { iterateCells, type JsonStatDoc } from './jsonstat.js';
 import { FUEL_CODE_MAP, FUEL_TOTAL_CODE, periodFromCode } from './mapping.js';
@@ -23,6 +23,26 @@ export function planChunks<T>(
   return chunks;
 }
 
+export interface CollectOptions {
+  /** The variable that identifies the entities in the response; model series by default. */
+  entityVariable?: string;
+  /** The source's fuel codes mapped to canonical fuels. */
+  fuelMap?: Readonly<Record<string, FuelId>>;
+}
+
+/** The source's update timestamp for a table, which is the version the pipeline compares. */
+export async function tableVersion(
+  client: PxApi,
+  databasePath: string,
+  tableId: string,
+): Promise<string> {
+  const items = await client.listFolder(databasePath);
+  const table = items.find((i) => i.id === tableId);
+  if (!table) throw new Error(`Table ${tableId} not found in ${databasePath}`);
+  if (!table.updated) throw new Error(`Table ${tableId} reports no update timestamp`);
+  return table.updated;
+}
+
 /**
  * Turns one JSON-stat response into canonical observations, dropping zero and missing cells. It
  * also checks that the per-fuel rows add up to the source's own all-fuels row.
@@ -30,21 +50,22 @@ export function planChunks<T>(
 export function collectObservations(
   doc: JsonStatDoc,
   idByCode: ReadonlyMap<string, string>,
+  { entityVariable = VAR_MODEL, fuelMap = FUEL_CODE_MAP }: CollectOptions = {},
 ): { observations: Observation[]; mismatches: number } {
   const observations: Observation[] = [];
   const fuelSums = new Map<string, number>();
   const reportedTotals = new Map<string, number>();
 
   for (const { coords, value } of iterateCells(doc)) {
-    const modelCode = coords[VAR_MODEL];
+    const entityCode = coords[entityVariable];
     const fuelCode = coords[VAR_FUEL];
     const monthCode = coords[VAR_MONTH];
-    if (modelCode === undefined || fuelCode === undefined || monthCode === undefined) {
+    if (entityCode === undefined || fuelCode === undefined || monthCode === undefined) {
       throw new Error('JSON-stat response is missing an expected dimension');
     }
-    const entityId = idByCode.get(modelCode);
-    if (!entityId) throw new Error(`Unknown model series code in response: ${modelCode}`);
-    const key = `${modelCode}|${monthCode}`;
+    const entityId = idByCode.get(entityCode);
+    if (!entityId) throw new Error(`Unknown ${entityVariable} code in response: ${entityCode}`);
+    const key = `${entityCode}|${monthCode}`;
     const count = value ?? 0;
 
     if (fuelCode === FUEL_TOTAL_CODE) {
@@ -52,7 +73,7 @@ export function collectObservations(
       continue;
     }
     fuelSums.set(key, (fuelSums.get(key) ?? 0) + count);
-    const fuel = FUEL_CODE_MAP[fuelCode];
+    const fuel = fuelMap[fuelCode];
     if (!fuel) throw new Error(`Unmapped fuel code in response: ${fuelCode}`);
     if (count !== 0)
       observations.push({ entityId, period: periodFromCode(monthCode), fuel, count });

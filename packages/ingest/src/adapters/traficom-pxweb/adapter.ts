@@ -2,7 +2,7 @@ import type { Dataset, Observation } from '@regs/core';
 import { consoleLogger, type Logger } from '../../logger.js';
 import type { AdapterResult, RawFile, SourceAdapter } from '../types.js';
 import { PxWebClient, type PxQuery } from './client.js';
-import { collectObservations, planChunks, type PxApi } from './query.js';
+import { collectObservations, planChunks, tableVersion, type PxApi } from './query.js';
 import { ALL_CARS_CODE, buildEntities } from './mapping.js';
 import {
   assertKnownFuels,
@@ -67,12 +67,8 @@ export class TraficomPxWebAdapter implements SourceAdapter {
     return `${this.databasePath}/${this.tableId}`;
   }
 
-  async getVersion(): Promise<string> {
-    const items = await this.client.listFolder(this.databasePath);
-    const table = items.find((i) => i.id === this.tableId);
-    if (!table) throw new Error(`Table ${this.tableId} not found in ${this.databasePath}`);
-    if (!table.updated) throw new Error(`Table ${this.tableId} reports no update timestamp`);
-    return table.updated;
+  getVersion(): Promise<string> {
+    return tableVersion(this.client, this.databasePath, this.tableId);
   }
 
   async fetch(): Promise<AdapterResult> {

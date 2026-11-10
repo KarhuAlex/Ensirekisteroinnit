@@ -7,8 +7,17 @@ import { useCatalog } from '../../data/DataProvider';
 import { useI18n } from '../../i18n';
 import { effectiveMetric, isUnnarrowed } from '../../lib/areaMetrics';
 import { comparisonRange, type CompareMode } from '../../lib/ranking';
-import type { AreaLevel, AreaMetric, Level, ReviewState } from '../../lib/reviewState';
+import {
+  effectiveLevel,
+  levelAvailable,
+  type AreaLevel,
+  type AreaMetric,
+  type Level,
+  type ReviewState,
+  type Source,
+} from '../../lib/reviewState';
 
+const SOURCES: readonly Source[] = ['new', 'used'];
 const COMPARE_MODES: readonly CompareMode[] = ['none', 'previous', 'yearAgo'];
 const LEVELS: readonly Level[] = ['model', 'make', 'area'];
 const AREA_LEVELS: readonly AreaLevel[] = ['region', 'municipality'];
@@ -29,19 +38,34 @@ export function ReviewControls({ state, months, onChange }: Props) {
   const compareOptions = COMPARE_MODES.map((mode) => ({
     value: mode,
     label: t(`review.compare.${mode}`),
-    disabled: comparisonRange(state.range, mode, months.length) === null,
+    disabled: mode !== 'none' && comparisonRange(state.range, mode, months.length) === null,
   }));
+  const level = effectiveLevel(state);
+  const used = state.source === 'used';
   const compareAvailable = comparisonRange(state.range, state.compare, months.length) !== null;
 
   return (
     <div className="review-controls">
       <PeriodPicker months={months} range={state.range} onChange={(range) => onChange({ range })} />
       <div className="review-row">
+        <Segmented<Source>
+          label={t('review.source')}
+          value={state.source}
+          options={SOURCES.map((source) => ({
+            value: source,
+            label: t(`review.source.${source}`),
+          }))}
+          onChange={(source) => onChange({ source })}
+        />
         <Segmented<Level>
           label={t('review.level')}
-          value={state.level}
-          options={LEVELS.map((level) => ({ value: level, label: t(`review.level.${level}`) }))}
-          onChange={(level) => onChange({ level })}
+          value={level}
+          options={LEVELS.map((option) => ({
+            value: option,
+            label: t(`review.level.${option}`),
+            disabled: !levelAvailable(state.source, option),
+          }))}
+          onChange={(next) => onChange({ level: next })}
         />
         <Segmented<CompareMode>
           label={t('review.compare')}
@@ -50,7 +74,7 @@ export function ReviewControls({ state, months, onChange }: Props) {
           onChange={(compare) => onChange({ compare })}
         />
       </div>
-      {state.level === 'area' && (
+      {level === 'area' && (
         <div className="review-row">
           <Segmented<AreaLevel>
             label={t('review.areaBy')}
@@ -77,6 +101,7 @@ export function ReviewControls({ state, months, onChange }: Props) {
           />
         </div>
       )}
+      {used && <p className="muted hint">{t('review.used.limits')}</p>}
       <FuelFilter fuels={state.fuels} onChange={(fuels) => onChange({ fuels })} />
     </div>
   );

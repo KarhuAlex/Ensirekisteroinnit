@@ -5,6 +5,10 @@ export {
   type TraficomPxWebOptions,
 } from './adapters/traficom-pxweb/adapter.js';
 export {
+  TraficomUsedImportAdapter,
+  type TraficomUsedImportOptions,
+} from './adapters/traficom-pxweb/used-adapter.js';
+export {
   TraficomRegionalAdapter,
   type TraficomRegionalOptions,
 } from './adapters/traficom-pxweb/regional-adapter.js';

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { describeRange, presetRange, stepRange, yearRange, yearsOf } from './period';
+import {
+  describeRange,
+  presetRange,
+  translateRange,
+  stepRange,
+  yearRange,
+  yearsOf,
+} from './period';
 
 const months = [
   ...Array.from({ length: 12 }, (_, i) => `2025-${String(i + 1).padStart(2, '0')}`),
@@ -62,5 +69,29 @@ describe('stepRange', () => {
     expect(stepRange({ from: 0, to: 2 }, -1, 24)).toBeNull();
     expect(stepRange({ from: 20, to: 22 }, 1, 24)).toEqual({ from: 21, to: 23 });
     expect(stepRange({ from: 21, to: 23 }, 1, 24)).toBeNull();
+  });
+});
+
+describe('translateRange', () => {
+  const national = ['2025-12', '2026-01', '2026-02', '2026-03'];
+
+  it('finds the same months in another list', () => {
+    expect(translateRange(national, ['2026-01', '2026-02', '2026-03'], { from: 1, to: 2 })).toEqual(
+      {
+        from: 0,
+        to: 1,
+      },
+    );
+  });
+
+  it('keeps the part of the range that the other list has', () => {
+    expect(translateRange(national, ['2025-12', '2026-01'], { from: 1, to: 3 })).toEqual({
+      from: 1,
+      to: 1,
+    });
+  });
+
+  it('has no range when none of the months exist there', () => {
+    expect(translateRange(national, ['2020-01'], { from: 0, to: 3 })).toBeNull();
   });
 });

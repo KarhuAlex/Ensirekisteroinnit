@@ -124,6 +124,8 @@ export const en: Record<MessageKey, string> = {
     'The figures are first registrations, not the number of cars in use. This version has no vehicle stock data.',
   'about.caveat5':
     'Model figures are at model-series level: the source may have combined several models into one series.',
+  'about.caveat6':
+    'Cars imported used are not part of the first registrations, because the source counts them separately. In the review they appear under Used imports, by make only.',
   'about.sourceNotesTitle': 'Notes from the source (in Finnish)',
 
   'notfound.title': 'Page not found',
@@ -171,7 +173,7 @@ export const en: Record<MessageKey, string> = {
   'review.headline.model': 'Most registered models, {period}',
   'review.headline.make': 'Most registered makes, {period}',
   'review.lede':
-    'See which cars were registered most: in a single month, over several months, in a year or over several years. A first registration is the first time a car is registered in Finland, and cars imported used are included.',
+    'See which cars were registered most: in a single month, over several months, in a year or over several years. A first registration is the first time a new car is registered in Finland. Cars imported used are counted separately. Choose Used imports to see them.',
   'review.range.year': '{year}',
   'review.range.span': '{from} to {to}',
   'review.partialYear':
@@ -287,4 +289,21 @@ export const en: Record<MessageKey, string> = {
     'The regional data starts in {year}, so the period has been cut to match.',
   'review.area.narrow':
     'Pick a fuel, or limit the list to a make or model, to see share, index and change. For now only the count is shown.',
+  'review.source': 'Cars',
+  'review.source.new': 'New cars',
+  'review.source.used': 'Used imports',
+  'review.headline.used': 'Used imports by make, {period}',
+  'review.used.lede':
+    'Cars imported used were already in use abroad and are registered in Finland for the first time. Traficom counts them separately from first registrations of new cars.',
+  'review.used.limits': 'Cars imported used are known by make only, not by model or area.',
+  'review.used.kpi.total': 'Total used imports',
+  'review.used.kpi.leader': 'Most imported',
+  'review.used.col.count': 'Used imports',
+  'review.caption.used': 'Used imports by make, {period}',
+  'review.used.note':
+    'Share is the proportion of the cars imported used in the period (with the same fuels) that the make accounts for. The figures count imports, not domestic changes of owner or the cars on the road. A percentage change appears only when the comparison period has at least {min} cars, because percentages from small numbers mislead. A make name is a link only when the make also has first registrations.',
+  'review.used.lag':
+    'The latest data on cars imported used is for {month}, so the figures cover only part of the selected period.',
+  'review.used.unavailable': 'The data on cars imported used is not available yet.',
+  'review.used.unavailableHint': 'The data is still being published. Please try again in a moment.',
 };

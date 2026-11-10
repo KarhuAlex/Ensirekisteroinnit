@@ -68,3 +68,18 @@ export function presetRange(months: readonly string[], id: PresetId): MonthRange
       return { from: 0, to: last };
   }
 }
+
+/**
+ * The same months in another list of months, or `null` when none of them is there. The review
+ * picks its range from the national months; datasets that start or end at other months follow it.
+ */
+export function translateRange(
+  from: readonly string[],
+  to: readonly string[],
+  range: MonthRange,
+): MonthRange | null {
+  const wanted = from.slice(range.from, range.to + 1);
+  const found = wanted.map((month) => to.indexOf(month)).filter((index) => index >= 0);
+  if (found.length === 0) return null;
+  return { from: Math.min(...found), to: Math.max(...found) };
+}

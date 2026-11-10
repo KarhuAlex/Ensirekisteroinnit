@@ -4,11 +4,28 @@ import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
 import { displayName } from '../lib/names';
-import { parseState, toSearchParams, type ReviewState } from '../lib/reviewState';
+import { effectiveLevel, parseState, toSearchParams, type ReviewState } from '../lib/reviewState';
 import { AreaView } from './review/AreaView';
 import { EntityView } from './review/EntityView';
 import { ReviewControls } from './review/ReviewControls';
+import { UsedView } from './review/UsedView';
 import { useRangeLabel } from './review/useRangeLabel';
+
+type Translate = ReturnType<typeof useI18n>['t'];
+
+function reviewHeadline(
+  t: Translate,
+  state: ReviewState,
+  entity: { label: string } | undefined,
+  period: string,
+): string {
+  const level = effectiveLevel(state);
+  if (state.source === 'used') return t('review.headline.used', { period });
+  if (level !== 'area') return t(`review.headline.${level}`, { period });
+  return entity
+    ? t('review.headline.areaEntity', { entity: displayName(entity.label), period })
+    : t('review.headline.area', { period });
+}
 
 export function Review() {
   const { t } = useI18n();
@@ -23,28 +40,33 @@ export function Review() {
   const fileStem = `${months[state.range.from]}_${months[state.range.to]}`;
   usePageTitle(`${t('review.title')} – ${t('app.title')}`);
 
-  const entity = state.entity ? byId.get(state.entity) : undefined;
-  const headline =
-    state.level === 'area'
-      ? entity
-        ? t('review.headline.areaEntity', {
-            entity: displayName(entity.label),
-            period: periodLabel,
-          })
-        : t('review.headline.area', { period: periodLabel })
-      : t(`review.headline.${state.level}`, { period: periodLabel });
+  const used = state.source === 'used';
+  const headline = reviewHeadline(
+    t,
+    state,
+    state.entity ? byId.get(state.entity) : undefined,
+    periodLabel,
+  );
+  const partialYear = kind.kind === 'year' && kind.partial;
 
   return (
     <>
-      <PageHeader title={headline} lede={t('review.lede')} />
+      <PageHeader title={headline} lede={t(used ? 'review.used.lede' : 'review.lede')} />
       <ReviewControls state={state} months={months} onChange={update} />
-      {state.level === 'area' ? (
+      {used ? (
+        <UsedView
+          state={state}
+          periodLabel={periodLabel}
+          partialYear={partialYear}
+          fileStem={fileStem}
+        />
+      ) : state.level === 'area' ? (
         <AreaView state={state} months={months} periodLabel={periodLabel} fileStem={fileStem} />
       ) : (
         <EntityView
           state={{ ...state, level: state.level }}
           periodLabel={periodLabel}
-          partialYear={kind.kind === 'year' && kind.partial}
+          partialYear={partialYear}
           fileStem={fileStem}
         />
       )}

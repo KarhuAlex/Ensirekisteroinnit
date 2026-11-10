@@ -6,7 +6,7 @@ import {
   type Timer,
 } from '@azure/functions';
 import { runIngest, runPipeline, type Logger } from '@regs/ingest';
-import { getRegionalRuntime, getRuntime } from '../config.js';
+import { getRegionalRuntime, getRuntime, getUsedImportsRuntime } from '../config.js';
 
 function contextLogger(context: InvocationContext): Logger {
   return {
@@ -14,6 +14,17 @@ function contextLogger(context: InvocationContext): Logger {
     warn: (m, ...meta) => context.warn(m, ...meta),
     error: (m, ...meta) => context.error(m, ...meta),
   };
+}
+
+/** A failure is logged, not thrown: the pipeline has already sent its failure notice. */
+async function ingestUsedImports(context: InvocationContext): Promise<void> {
+  const { pipeline, options } = getUsedImportsRuntime();
+  try {
+    const result = await runPipeline(pipeline, { ...options, logger: contextLogger(context) });
+    context.log('Used imports ingest finished', result);
+  } catch (err) {
+    context.error('Used imports ingest failed', err);
+  }
 }
 
 /**
@@ -27,6 +38,9 @@ app.timer('ingestTimer', {
   handler: async (_timer: Timer, context: InvocationContext): Promise<void> => {
     const result = await runIngest({ ...getRuntime(), logger: contextLogger(context) });
     context.log('Ingest finished', result);
+    // A small table from the same source. It runs after the main load, not on a timer of its
+    // own, so the source never gets both at the same moment.
+    await ingestUsedImports(context);
   },
 });
 

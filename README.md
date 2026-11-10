@@ -20,6 +20,10 @@ the site stays fast and keeps working when the upstream service is slow or down.
 - The review page ranks makes or models for any period: one month, several months, a year or
   several years. It can filter by fuel, compare with the previous period or a year earlier, and
   export CSV. Every choice is kept in the URL, so views can be shared.
+- The review page has a source switch: new cars, or cars imported used. Traficom counts used imports
+  separately from first registrations, and only by make (no model, no area), so that view ranks makes
+  with the same period, fuel and comparison choices. It is published apart from the national data,
+  under `used/`, and refreshed by its own small ingest.
 - The review page can also rank areas, by region or municipality, on a map and in a table. It shows
   the share of an area's registrations that a fuel, make or model accounts for, an index against the
   national level, the count and the change in share. Areas with few registrations are left uncoloured.

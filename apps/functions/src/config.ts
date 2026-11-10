@@ -5,13 +5,15 @@ import {
   regionalPipeline,
   TraficomPxWebAdapter,
   TraficomRegionalAdapter,
+  TraficomUsedImportAdapter,
+  usedImportsPipeline,
   type Notifier,
   type ObjectStore,
   type Pipeline,
   type PipelineOptions,
   type SourceAdapter,
 } from '@regs/ingest';
-import type { RegionalDataset } from '@regs/core';
+import type { Dataset, RegionalDataset } from '@regs/core';
 
 export interface Runtime {
   adapter: SourceAdapter;
@@ -86,6 +88,24 @@ export function getRegionalRuntime(): RegionalRuntime {
     options: {
       rawStore: new PrefixedStore(rawStore, 'regional/'),
       publishedStore: new PrefixedStore(publishedStore, 'regional/'),
+      ...(notifier ? { notifier } : {}),
+    },
+  };
+}
+
+export interface UsedImportsRuntime {
+  pipeline: Pipeline<Dataset>;
+  options: PipelineOptions;
+}
+
+/** Cars imported used are published beside the national data, under their own prefix. */
+export function getUsedImportsRuntime(): UsedImportsRuntime {
+  const { rawStore, publishedStore, notifier } = getRuntime();
+  return {
+    pipeline: usedImportsPipeline(new TraficomUsedImportAdapter()),
+    options: {
+      rawStore: new PrefixedStore(rawStore, 'used/'),
+      publishedStore: new PrefixedStore(publishedStore, 'used/'),
       ...(notifier ? { notifier } : {}),
     },
   };

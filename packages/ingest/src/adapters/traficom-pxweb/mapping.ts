@@ -13,6 +13,28 @@ export const FUEL_CODE_MAP: Readonly<Record<string, FuelId>> = {
   Y: 'other',
 };
 
+/**
+ * Fuel codes of the table of cars imported used. It has more classes than the registrations table;
+ * those without a canonical fuel of their own go under `other`.
+ */
+export const USED_FUEL_CODE_MAP: Readonly<Record<string, FuelId>> = {
+  '01': 'petrol',
+  '02': 'diesel',
+  '03': 'other',
+  '04': 'bev',
+  '05': 'other',
+  '06': 'other',
+  '11': 'other',
+  '13': 'cng',
+  '37': 'other',
+  '38': 'petrol_cng',
+  '39': 'phev_petrol',
+  '40': 'petrol_ethanol',
+  '42': 'other',
+  '44': 'phev_diesel',
+  Y: 'other',
+};
+
 /** Code of the "all fuels" row; used for cross-checking, never published. */
 export const FUEL_TOTAL_CODE = 'YH';
 

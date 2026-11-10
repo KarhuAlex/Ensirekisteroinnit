@@ -30,7 +30,7 @@ import {
   VAR_MODEL,
   VAR_MONTH,
 } from './table-schema.js';
-import { collectObservations, planChunks, type PxApi } from './query.js';
+import { collectObservations, planChunks, tableVersion, type PxApi } from './query.js';
 
 export interface TraficomRegionalOptions {
   /** Holds one file per area, so an interrupted run resumes and later runs fetch only new months. */
@@ -114,11 +114,8 @@ export class TraficomRegionalAdapter implements SourceAdapter<RegionalDataset> {
     return `${this.databasePath}/${this.tableId}`;
   }
 
-  async getVersion(): Promise<string> {
-    const items = await this.client.listFolder(this.databasePath);
-    const table = items.find((i) => i.id === this.tableId);
-    if (!table?.updated) throw new Error(`Table ${this.tableId} has no update timestamp`);
-    return table.updated;
+  getVersion(): Promise<string> {
+    return tableVersion(this.client, this.databasePath, this.tableId);
   }
 
   async fetch(): Promise<AdapterResult<RegionalDataset>> {

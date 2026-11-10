@@ -1,6 +1,12 @@
 import { FUEL_GROUP_IDS } from '@regs/core';
 import { describe, expect, it } from 'vitest';
-import { defaultState, parseState, toSearchParams } from './reviewState';
+import {
+  defaultState,
+  effectiveLevel,
+  levelAvailable,
+  parseState,
+  toSearchParams,
+} from './reviewState';
 import { rankingToCsv } from './rankingCsv';
 
 const months = ['2025-11', '2025-12', '2026-01', '2026-02', '2026-03'];
@@ -10,6 +16,7 @@ describe('review state in the URL', () => {
   it('starts from the latest month, all fuels and a year-ago comparison', () => {
     expect(parse('')).toEqual({
       range: { from: 4, to: 4 },
+      source: 'new',
       level: 'model',
       fuels: [...FUEL_GROUP_IDS],
       compare: 'yearAgo',
@@ -50,10 +57,27 @@ describe('review state in the URL', () => {
     });
   });
 
+  it('reads the source and falls back to new cars', () => {
+    expect(parse('source=used').source).toBe('used');
+    expect(parse('source=nope').source).toBe('new');
+  });
+
+  it('offers only the make level for cars imported used', () => {
+    expect(levelAvailable('used', 'make')).toBe(true);
+    expect(levelAvailable('used', 'model')).toBe(false);
+    expect(levelAvailable('used', 'area')).toBe(false);
+    expect(levelAvailable('new', 'area')).toBe(true);
+  });
+
+  it('shows make level only for cars imported used', () => {
+    expect(effectiveLevel({ source: 'used', level: 'area' })).toBe('make');
+    expect(effectiveLevel({ source: 'new', level: 'area' })).toBe('area');
+  });
+
   it('round-trips and leaves defaults out of the URL', () => {
     expect(toSearchParams(defaultState(months.length), months).toString()).toBe('');
     const state = parse(
-      'from=2025-12&to=2026-02&level=area&fuels=bev,phev&cmp=prev&by=municipality&metric=change&entity=x',
+      'from=2025-12&to=2026-02&source=used&level=area&fuels=bev,phev&cmp=prev&by=municipality&metric=change&entity=x',
     );
     const params = toSearchParams(state, months);
     expect(params.get('from')).toBe('2025-12');
