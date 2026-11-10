@@ -253,7 +253,7 @@ export const en: Record<MessageKey, string> = {
   'nav.compare': 'Compare',
   'compare.title': 'Compare',
   'compare.lede':
-    'Compare makes, models or corporate groups side by side. Everything compared is on the same level, and there can be up to {max}.',
+    'Compare makes, models or corporate groups side by side. By default everything compared is on the same level, and there can be up to {max}.',
   'compare.compareWith': 'Compare with another',
   'compare.add': 'Add to the comparison',
   'compare.addPlaceholder': 'Search by name',
@@ -263,7 +263,7 @@ export const en: Record<MessageKey, string> = {
   'compare.remove': 'Remove from the comparison: {name}',
   'compare.empty': 'Nothing to compare yet',
   'compare.emptyHint':
-    'Search for a make, a model or a corporate group and add it. Once you have chosen the first, you can add only things on the same level.',
+    'Search for a make, a model or a corporate group and add it. Once you have chosen the first, the list shows only things on the same level by default.',
   'compare.one': 'Add a second one to see them side by side.',
   'compare.dropped':
     'Some of the things in the address ({n}) were left out, because they were not found or are not on the same level.',
@@ -281,6 +281,11 @@ export const en: Record<MessageKey, string> = {
   'compare.col.share': 'Share of all',
   'compare.col.change': 'Change in a year',
   'compare.col.bev': 'Battery-electric share',
+  'compare.mixed': 'Allow different levels',
+  'compare.mixedHint':
+    'You can compare a model with a whole make, for example. The figures of a make include its models.',
+  'compare.note.mixed':
+    'The comparison has different levels: the figures of a make include its models, so the things partly overlap.',
   'compare.new': 'New',
   'compare.note':
     'The figures are first registrations, not sales. A line starts at the first registration of the thing it shows. The battery-electric share is left out when there are fewer than {min} registrations in 12 months. When a model series changes or merges, a figure can break or jump.',

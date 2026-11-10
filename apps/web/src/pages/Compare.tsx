@@ -7,7 +7,7 @@ import { CompareResults } from './compare/CompareResults';
 import { CompareSelection } from './compare/CompareSelection';
 import { useCompare } from './compare/useCompare';
 
-/** Makes, models or corporate groups side by side: their registrations over time and the last year. */
+/** The compare page: chosen makes, models or corporate groups side by side, over time and for the last 12 months. */
 export function Compare() {
   const { t } = useI18n();
   const { manifest } = useCatalog();
@@ -23,6 +23,8 @@ export function Compare() {
         chosen={chosen}
         candidates={compare.candidates}
         level={compare.level}
+        allowMixedLevels={state.allowMixedLevels}
+        onAllowMixedLevelsChange={compare.setAllowMixedLevels}
         slots={compare.slots}
         onAdd={(id) => compare.update({ items: [...state.items, id] })}
         onRemove={(id) => compare.update({ items: state.items.filter((item) => item !== id) })}
@@ -44,7 +46,12 @@ export function Compare() {
           onMetric={(metric) => compare.update({ metric })}
         />
       )}
-      <CompareNotes dropped={compare.dropped} chosen={chosen.length} level={compare.level} />
+      <CompareNotes
+        dropped={compare.dropped}
+        chosen={chosen.length}
+        mixedLevels={compare.mixedLevels}
+        hasCorporateGroup={compare.hasCorporateGroup}
+      />
     </>
   );
 }

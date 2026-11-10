@@ -978,7 +978,7 @@ mark {
   vertical-align: -1px;
 }
 @media (max-width: 599px) {
-  /* Names of models are long, so one plate to a row. */
+  /* Model names are long, so each plate gets its own row. */
   .compare-plates {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1022,4 +1022,17 @@ mark {
 .chip-remove:hover {
   background: var(--ground-3);
   color: var(--ink);
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
 }

@@ -251,7 +251,7 @@ export const fi = {
   'nav.compare': 'Vertailu',
   'compare.title': 'Vertailu',
   'compare.lede':
-    'Vertaa merkkejä, malleja tai konserneja rinnakkain. Kaikki vertailtavat ovat samalta tasolta, ja niitä voi olla enintään {max}.',
+    'Vertaa merkkejä, malleja tai konserneja rinnakkain. Oletuksena kaikki vertailtavat ovat samalta tasolta, ja niitä voi olla enintään {max}.',
   'compare.compareWith': 'Vertaa toiseen',
   'compare.add': 'Lisää vertailuun',
   'compare.addPlaceholder': 'Hae nimellä',
@@ -261,7 +261,7 @@ export const fi = {
   'compare.remove': 'Poista vertailusta: {name}',
   'compare.empty': 'Ei vertailtavia kohteita',
   'compare.emptyHint':
-    'Hae merkkiä, mallia tai konsernia ja lisää se vertailuun. Kun olet valinnut ensimmäisen, voit lisätä siihen vain saman tason kohteita.',
+    'Hae merkkiä, mallia tai konsernia ja lisää se vertailuun. Kun olet valinnut ensimmäisen, lista näyttää oletuksena vain saman tason kohteet.',
   'compare.one': 'Lisää vielä toinen kohde, niin näet niiden kehityksen rinnakkain.',
   'compare.dropped':
     'Osa osoitteen kohteista ({n}) jätettiin pois, koska niitä ei löytynyt tai ne eivät ole samalta tasolta.',
@@ -279,6 +279,11 @@ export const fi = {
   'compare.col.share': 'Osuus kaikista',
   'compare.col.change': 'Muutos vuodessa',
   'compare.col.bev': 'Täyssähköosuus',
+  'compare.mixed': 'Salli eri tasot',
+  'compare.mixedHint':
+    'Voit verrata esimerkiksi mallia koko merkkiin. Merkin luvuissa ovat mukana sen mallit.',
+  'compare.note.mixed':
+    'Vertailussa on eri tasoja: merkin luvuissa ovat mukana sen mallit, joten kohteet menevät osin päällekkäin.',
   'compare.new': 'Uusi',
   'compare.note':
     'Luvut ovat ensirekisteröintejä, eivät myyntiä. Viiva alkaa kohteen ensimmäisestä rekisteröinnistä. Täyssähköosuutta ei näytetä, jos kohteella on alle {min} rekisteröintiä 12 kuukaudessa. Kun mallisarja vaihtuu tai yhdistyy, luku voi katketa tai hypätä.',
