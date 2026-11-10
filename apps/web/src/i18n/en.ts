@@ -74,6 +74,7 @@ export const en: Record<MessageKey, string> = {
   'models.filterAll': 'All',
   'models.filterMakes': 'Makes',
   'models.filterModels': 'Models',
+  'models.filterGroups': 'Corporate groups',
   'models.showMore': 'Show more',
   'models.count': 'Results: {n}',
   'models.col.name': 'Name',
@@ -178,6 +179,7 @@ export const en: Record<MessageKey, string> = {
   'story.model.mixed':
     'First registrations in the last 12 months: {n}, of which {share} battery electric.',
   'models.caption': 'Makes and models by first registrations',
+  'models.captionGroups': 'Corporate groups by first registrations',
   'table.caption': 'First registrations by fuel type',
   'model.fuelCaption': 'First registrations of this model by fuel type',
   'model.breadcrumb': 'You are here',

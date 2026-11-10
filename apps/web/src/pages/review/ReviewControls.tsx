@@ -4,6 +4,7 @@ import { FuelFilter } from '../../components/FuelFilter';
 import { PeriodPicker } from '../../components/PeriodPicker';
 import { Segmented } from '../../components/ui';
 import { useCatalog } from '../../data/DataProvider';
+import { useHasCorporateGroups } from '../../data/useHasCorporateGroups';
 import { useI18n } from '../../i18n';
 import { isListed } from '../../lib/entityLevel';
 import { effectiveMetric, isUnnarrowed } from '../../lib/areaMetrics';
@@ -17,7 +18,6 @@ import {
   type ReviewState,
   type Source,
 } from '../../lib/reviewState';
-import { useHasCorporateGroups } from './useHasCorporateGroups';
 
 const SOURCES: readonly Source[] = ['new', 'used'];
 const COMPARE_MODES: readonly CompareMode[] = ['none', 'previous', 'yearAgo'];

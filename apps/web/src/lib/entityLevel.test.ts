@@ -1,5 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { inLevel, isComparable, levelOf } from './entityLevel';
+import { inLevel, inList, isComparable, levelOf } from './entityLevel';
+
+describe('inList', () => {
+  it('lists makes and models under all, but not groups or the total', () => {
+    expect(inList('make', 'all')).toBe(true);
+    expect(inList('model', 'all')).toBe(true);
+    expect(inList('group', 'all')).toBe(true);
+    expect(inList('corporategroup', 'all')).toBe(false);
+    expect(inList('total', 'all')).toBe(false);
+  });
+
+  it('lists corporate groups only on their own tab', () => {
+    expect(inList('corporategroup', 'corporategroup')).toBe(true);
+    expect(inList('make', 'corporategroup')).toBe(false);
+    expect(inList('total', 'corporategroup')).toBe(false);
+  });
+});
 
 describe('inLevel', () => {
   it('counts models and model series as models', () => {

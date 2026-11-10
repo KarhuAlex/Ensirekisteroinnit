@@ -20,6 +20,13 @@ export const hasPage = (kind: EntityKind): boolean => kind !== 'corporategroup';
 /** What search, the makes and models list and the area picker offer: things with a page, not the total. */
 export const isListed = (kind: EntityKind): boolean => hasPage(kind) && kind !== 'total';
 
+/** A tab of the makes and models list: everything with a page, or one level. */
+export type ListFilter = 'all' | EntityLevel;
+
+/** `all` leaves corporate groups out; they are only shown on their own tab. */
+export const inList = (kind: EntityKind, filter: ListFilter): boolean =>
+  filter === 'all' ? isListed(kind) : inLevel(kind, filter);
+
 /** The level a thing is compared at; model series count as models. The total is not compared. */
 export function levelOf(kind: EntityKind): EntityLevel | null {
   switch (kind) {

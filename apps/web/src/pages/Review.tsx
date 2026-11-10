@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
+import { useHasCorporateGroups } from '../data/useHasCorporateGroups';
 import { useI18n } from '../i18n';
 import { displayName } from '../lib/names';
 import {
@@ -15,7 +16,6 @@ import { AreaView } from './review/AreaView';
 import { EntityView } from './review/EntityView';
 import { ReviewControls } from './review/ReviewControls';
 import { UsedView } from './review/UsedView';
-import { useHasCorporateGroups } from './review/useHasCorporateGroups';
 import { useRangeLabel } from './review/useRangeLabel';
 
 type Translate = ReturnType<typeof useI18n>['t'];

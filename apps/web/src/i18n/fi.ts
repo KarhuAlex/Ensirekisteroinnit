@@ -72,6 +72,7 @@ export const fi = {
   'models.filterAll': 'Kaikki',
   'models.filterMakes': 'Merkit',
   'models.filterModels': 'Mallit',
+  'models.filterGroups': 'Konsernit',
   'models.showMore': 'Näytä lisää',
   'models.count': 'Tuloksia: {n}',
   'models.col.name': 'Nimi',
@@ -177,6 +178,7 @@ export const fi = {
   'story.model.mixed':
     'Viimeisen 12 kuukauden ensirekisteröinnit: {n}, joista täyssähköisiä {share}.',
   'models.caption': 'Merkit ja mallit ensirekisteröintien mukaan',
+  'models.captionGroups': 'Konsernit ensirekisteröintien mukaan',
   'table.caption': 'Ensirekisteröinnit käyttövoimittain',
   'model.fuelCaption': 'Mallin ensirekisteröinnit käyttövoimittain',
   'model.breadcrumb': 'Sijainti',

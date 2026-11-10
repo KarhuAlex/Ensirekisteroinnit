@@ -14,8 +14,10 @@ import { ShareValue } from '../components/ShareValue';
 import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
+import { useHasCorporateGroups } from '../data/useHasCorporateGroups';
 import { useI18n } from '../i18n';
-import { isListed, inLevel } from '../lib/entityLevel';
+import { inList, type ListFilter } from '../lib/entityLevel';
+import { entityPath } from '../lib/entityPath';
 import { displayName } from '../lib/names';
 import { percent } from '../lib/stats';
 
@@ -29,13 +31,13 @@ interface Row {
   bevShare: number | null;
 }
 
-type Filter = 'all' | 'make' | 'model';
 const PAGE_SIZE = 50;
 
 export function Models() {
   const { lang, t, fmt } = useI18n();
   const { entities, byId } = useCatalog();
-  const [filter, setFilter] = useState<Filter>('all');
+  const hasGroups = useHasCorporateGroups();
+  const [filter, setFilter] = useState<ListFilter>('all');
   const [query, setQuery] = useState('');
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [sorting, setSorting] = useState<SortingState>([{ id: 'last12', desc: true }]);
@@ -44,8 +46,7 @@ export function Models() {
   const data = useMemo<Row[]>(
     () =>
       entities
-        .filter((e) => isListed(e.kind))
-        .filter((e) => filter === 'all' || inLevel(e.kind, filter))
+        .filter((e) => inList(e.kind, filter))
         .map((e) => ({
           id: e.id,
           name: displayName(e.label),
@@ -63,7 +64,10 @@ export function Models() {
       {
         accessorKey: 'name',
         header: t('models.col.name'),
-        cell: (c) => <Link to={`/${lang}/models/${c.row.original.id}`}>{c.row.original.name}</Link>,
+        cell: (c) => {
+          const { kind, id, name } = c.row.original;
+          return <Link to={entityPath(lang, kind, id)}>{name}</Link>;
+        },
       },
       {
         accessorKey: 'kind',
@@ -135,6 +139,9 @@ export function Models() {
             { value: 'all', label: t('models.filterAll') },
             { value: 'make', label: t('models.filterMakes') },
             { value: 'model', label: t('models.filterModels') },
+            ...(hasGroups
+              ? [{ value: 'corporategroup' as const, label: t('models.filterGroups') }]
+              : []),
           ]}
           onChange={(v) => {
             setFilter(v);
@@ -145,7 +152,11 @@ export function Models() {
       {total === 0 ? (
         <StatusPanel title={t('models.empty')} hint={t('search.emptyHint')} />
       ) : (
-        <DataTable table={table} limit={limit} caption={t('models.caption')} />
+        <DataTable
+          table={table}
+          limit={limit}
+          caption={t(filter === 'corporategroup' ? 'models.captionGroups' : 'models.caption')}
+        />
       )}
       {total > limit && (
         <button type="button" className="button" onClick={() => setLimit((l) => l + PAGE_SIZE)}>
