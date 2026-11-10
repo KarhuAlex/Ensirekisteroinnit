@@ -1,20 +1,17 @@
 import type { Dataset, Observation } from '@regs/core';
 import { consoleLogger, type Logger } from '../../logger.js';
 import type { AdapterResult, RawFile, SourceAdapter } from '../types.js';
-import { PxWebClient, type PxQuery, type PxVariable } from './client.js';
-import { iterateCells, type JsonStatDoc } from './jsonstat.js';
+import { PxWebClient, type PxQuery } from './client.js';
+import { collectObservations, planChunks, type PxApi } from './query.js';
+import { ALL_CARS_CODE, buildEntities } from './mapping.js';
 import {
-  ALL_CARS_CODE,
-  buildEntities,
-  FUEL_CODE_MAP,
-  FUEL_TOTAL_CODE,
-  periodFromCode,
-} from './mapping.js';
-
-const VAR_AREA = 'Alue';
-const VAR_MODEL = 'Mallisarja';
-const VAR_FUEL = 'Käyttövoima';
-const VAR_MONTH = 'Kuukausi';
+  assertKnownFuels,
+  requireVariable,
+  VAR_AREA,
+  VAR_FUEL,
+  VAR_MODEL,
+  VAR_MONTH,
+} from './table-schema.js';
 
 export interface TraficomPxWebOptions {
   client?: PxApi;
@@ -37,9 +34,6 @@ const DEFAULTS = {
   areaCode: 'MA1',
   maxCells: 100_000,
 } as const;
-
-/** The part of the PxWeb client the adapter uses, so tests can pass a fake. */
-export type PxApi = Pick<PxWebClient, 'listFolder' | 'getTableMeta' | 'query'>;
 
 /**
  * Reads first registrations of passenger cars by model series, fuel and month from Traficom's
@@ -93,10 +87,7 @@ export class TraficomPxWebAdapter implements SourceAdapter {
     if (!area.values.includes(this.areaCode)) {
       throw new Error(`Area ${this.areaCode} not present in ${this.tableId}`);
     }
-    const unknownFuels = fuels.values.filter((c) => c !== FUEL_TOTAL_CODE && !(c in FUEL_CODE_MAP));
-    if (unknownFuels.length > 0) {
-      throw new Error(`Unmapped fuel codes in source: ${unknownFuels.join(', ')}`);
-    }
+    assertKnownFuels(fuels);
 
     const { entities, idByCode } = buildEntities(
       models.values.map((code, i) => ({ code, label: models.valueTexts[i] ?? code })),
@@ -156,22 +147,6 @@ export class TraficomPxWebAdapter implements SourceAdapter {
   }
 }
 
-/**
- * Splits items into requests within a cell budget. The API caps cells, not items, so the batch
- * size shrinks as the table gains months or fuel classes.
- */
-export function planChunks<T>(
-  items: readonly T[],
-  cellsPerItem: number,
-  maxCells: number,
-  fixedSize?: number,
-): T[][] {
-  const size = fixedSize ?? Math.max(1, Math.floor(maxCells / Math.max(1, cellsPerItem)));
-  const chunks: T[][] = [];
-  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
-  return chunks;
-}
-
 export function buildQuery(areaCode: string, modelCodes: string[]): PxQuery {
   return {
     query: [
@@ -182,54 +157,6 @@ export function buildQuery(areaCode: string, modelCodes: string[]): PxQuery {
     ],
     response: { format: 'json-stat2' },
   };
-}
-
-/**
- * Turns one JSON-stat response into canonical observations, dropping zero and missing cells. It
- * also checks that the per-fuel rows add up to the source's own all-fuels row.
- */
-export function collectObservations(
-  doc: JsonStatDoc,
-  idByCode: ReadonlyMap<string, string>,
-): { observations: Observation[]; mismatches: number } {
-  const observations: Observation[] = [];
-  const fuelSums = new Map<string, number>();
-  const reportedTotals = new Map<string, number>();
-
-  for (const { coords, value } of iterateCells(doc)) {
-    const modelCode = coords[VAR_MODEL];
-    const fuelCode = coords[VAR_FUEL];
-    const monthCode = coords[VAR_MONTH];
-    if (modelCode === undefined || fuelCode === undefined || monthCode === undefined) {
-      throw new Error('JSON-stat response is missing an expected dimension');
-    }
-    const entityId = idByCode.get(modelCode);
-    if (!entityId) throw new Error(`Unknown model series code in response: ${modelCode}`);
-    const key = `${modelCode}|${monthCode}`;
-    const count = value ?? 0;
-
-    if (fuelCode === FUEL_TOTAL_CODE) {
-      reportedTotals.set(key, count);
-      continue;
-    }
-    fuelSums.set(key, (fuelSums.get(key) ?? 0) + count);
-    const fuel = FUEL_CODE_MAP[fuelCode];
-    if (!fuel) throw new Error(`Unmapped fuel code in response: ${fuelCode}`);
-    if (count !== 0)
-      observations.push({ entityId, period: periodFromCode(monthCode), fuel, count });
-  }
-
-  let mismatches = 0;
-  for (const [key, total] of reportedTotals) {
-    if ((fuelSums.get(key) ?? 0) !== total) mismatches++;
-  }
-  return { observations, mismatches };
-}
-
-function requireVariable(variables: PxVariable[], code: string): PxVariable {
-  const variable = variables.find((v) => v.code === code);
-  if (!variable) throw new Error(`Table has no variable "${code}" — source schema changed?`);
-  return variable;
 }
 
 export { ALL_CARS_CODE };

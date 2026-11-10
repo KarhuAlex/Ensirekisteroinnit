@@ -1,11 +1,17 @@
 import {
   AcsEmailNotifier,
   BlobStore,
+  PrefixedStore,
+  regionalPipeline,
   TraficomPxWebAdapter,
+  TraficomRegionalAdapter,
   type Notifier,
   type ObjectStore,
+  type Pipeline,
+  type PipelineOptions,
   type SourceAdapter,
 } from '@regs/ingest';
+import type { RegionalDataset } from '@regs/core';
 
 export interface Runtime {
   adapter: SourceAdapter;
@@ -19,7 +25,7 @@ export interface Runtime {
  * identity (`DATA_STORAGE_ACCOUNT_URL`); locally a connection string works, for example for
  * Azurite. To change the data source, change the adapter below.
  */
-/** Emails are sent only when all three settings are present; the recipient is never in the repo. */
+/** Emails go out only when all three settings are set. The recipient lives in app settings, never in the repo. */
 function createNotifier(env: NodeJS.ProcessEnv): Notifier | undefined {
   const endpoint = env['ACS_EMAIL_ENDPOINT'];
   const from = env['NOTIFY_EMAIL_FROM'];
@@ -62,4 +68,25 @@ let cached: Runtime | undefined;
 export function getRuntime(): Runtime {
   cached ??= createRuntime();
   return cached;
+}
+
+export interface RegionalRuntime {
+  pipeline: Pipeline<RegionalDataset>;
+  options: PipelineOptions;
+}
+
+/** The regional dataset shares the containers with the national one under its own prefixes. */
+export function getRegionalRuntime(): RegionalRuntime {
+  const { rawStore, publishedStore, notifier } = getRuntime();
+  const adapter = new TraficomRegionalAdapter({
+    cache: new PrefixedStore(rawStore, 'regional-cache/'),
+  });
+  return {
+    pipeline: regionalPipeline(adapter),
+    options: {
+      rawStore: new PrefixedStore(rawStore, 'regional/'),
+      publishedStore: new PrefixedStore(publishedStore, 'regional/'),
+      ...(notifier ? { notifier } : {}),
+    },
+  };
 }

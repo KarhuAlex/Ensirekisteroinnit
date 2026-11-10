@@ -10,7 +10,7 @@ import {
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTable } from '../components/DataTable';
-import { Icon } from '../components/Icon';
+import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useI18n } from '../i18n';
@@ -121,18 +121,12 @@ export function Models() {
   return (
     <>
       <PageHeader title={t('models.title')} lede={t('models.subtitle')} />
-      <div className="toolbar">
-        <label className="field">
-          <span>{t('models.filter')}</span>
-          <span className="field-input">
-            <Icon name="search" size={18} />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => table.setGlobalFilter(e.target.value)}
-            />
-          </span>
-        </label>
+      <TableToolbar
+        searchLabel={t('models.filter')}
+        query={query}
+        onQueryChange={(value) => table.setGlobalFilter(value)}
+        countText={t('models.count', { n: fmt.int(total) })}
+      >
         <Segmented
           label={t('models.col.type')}
           value={filter}
@@ -146,10 +140,7 @@ export function Models() {
             setLimit(PAGE_SIZE);
           }}
         />
-        <span className="muted count" aria-live="polite">
-          {t('models.count', { n: fmt.int(total) })}
-        </span>
-      </div>
+      </TableToolbar>
       {total === 0 ? (
         <StatusPanel title={t('models.empty')} hint={t('search.emptyHint')} />
       ) : (

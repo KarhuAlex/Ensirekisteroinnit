@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import {
-  planChunks,
-  TraficomPxWebAdapter,
-  type PxApi,
-} from '../src/adapters/traficom-pxweb/adapter.js';
+import { TraficomPxWebAdapter } from '../src/adapters/traficom-pxweb/adapter.js';
 import type { PxQuery } from '../src/adapters/traficom-pxweb/client.js';
 import type { JsonStatDoc } from '../src/adapters/traficom-pxweb/jsonstat.js';
+import { planChunks } from '../src/adapters/traficom-pxweb/query.js';
 import { silentLogger } from '../src/logger.js';
 
 const MODELS = [

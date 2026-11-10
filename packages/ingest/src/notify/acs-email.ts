@@ -1,7 +1,7 @@
 import { DefaultAzureCredential } from '@azure/identity';
 import { EmailClient } from '@azure/communication-email';
-import { describePublish } from './message.js';
-import type { Notifier, PublishNotice } from './types.js';
+import { describeFailure, describePublish } from './message.js';
+import type { FailureNotice, Notifier, PublishNotice } from './types.js';
 
 export interface AcsEmailOptions {
   endpoint: string;
@@ -16,8 +16,15 @@ export class AcsEmailNotifier implements Notifier {
     this.client = new EmailClient(options.endpoint, new DefaultAzureCredential());
   }
 
-  async published(notice: PublishNotice): Promise<void> {
-    const { subject, text } = describePublish(notice);
+  published(notice: PublishNotice): Promise<void> {
+    return this.send(describePublish(notice));
+  }
+
+  failed(notice: FailureNotice): Promise<void> {
+    return this.send(describeFailure(notice));
+  }
+
+  private async send({ subject, text }: { subject: string; text: string }): Promise<void> {
     await this.client.beginSend({
       senderAddress: this.options.from,
       recipients: { to: this.options.to.map((address) => ({ address })) },

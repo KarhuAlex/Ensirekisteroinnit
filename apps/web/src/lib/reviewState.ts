@@ -1,12 +1,21 @@
 import { FUEL_GROUP_IDS, type FuelGroupId } from '@regs/core';
-import type { Level } from './entityLevel';
+import type { EntityLevel } from './entityLevel';
 import { sameRange, type CompareMode, type MonthRange } from './ranking';
 
+export type Level = EntityLevel | 'area';
+export type AreaLevel = 'municipality' | 'region';
+export type AreaMetric = 'share' | 'index' | 'count' | 'change';
+
+/** The review page is a function of this, and all of it lives in the URL. */
 export interface ReviewState {
   range: MonthRange;
   level: Level;
   fuels: FuelGroupId[];
   compare: CompareMode;
+  areaLevel: AreaLevel;
+  areaMetric: AreaMetric;
+  /** The make or model whose areas are ranked; `null` means all cars. */
+  entity: string | null;
 }
 
 const COMPARE_PARAM: Record<CompareMode, string> = {
@@ -15,6 +24,12 @@ const COMPARE_PARAM: Record<CompareMode, string> = {
   yearAgo: 'year',
 };
 const DEFAULT_COMPARE: CompareMode = 'yearAgo';
+const AREA_LEVELS: readonly AreaLevel[] = ['region', 'municipality'];
+const AREA_METRICS: readonly AreaMetric[] = ['share', 'index', 'count', 'change'];
+const LEVELS: readonly Level[] = ['model', 'make', 'area'];
+
+const oneOf = <T extends string>(options: readonly T[], value: string | null): T =>
+  options.find((option) => option === value) ?? (options[0] as T);
 
 export function defaultState(monthCount: number): ReviewState {
   const last = Math.max(0, monthCount - 1);
@@ -23,6 +38,9 @@ export function defaultState(monthCount: number): ReviewState {
     level: 'model',
     fuels: [...FUEL_GROUP_IDS],
     compare: DEFAULT_COMPARE,
+    areaLevel: 'region',
+    areaMetric: 'share',
+    entity: null,
   };
 }
 
@@ -47,9 +65,12 @@ export function parseState(params: URLSearchParams, months: readonly string[]): 
 
   return {
     range,
-    level: params.get('level') === 'make' ? 'make' : 'model',
+    level: oneOf(LEVELS, params.get('level')),
     fuels: fuels.length > 0 ? [...fuels] : base.fuels,
     compare,
+    areaLevel: oneOf(AREA_LEVELS, params.get('by')),
+    areaMetric: oneOf(AREA_METRICS, params.get('metric')),
+    entity: params.get('entity') || null,
   };
 }
 
@@ -64,5 +85,8 @@ export function toSearchParams(state: ReviewState, months: readonly string[]): U
   if (state.level !== base.level) params.set('level', state.level);
   if (state.fuels.length < FUEL_GROUP_IDS.length) params.set('fuels', state.fuels.join(','));
   if (state.compare !== base.compare) params.set('cmp', COMPARE_PARAM[state.compare]);
+  if (state.areaLevel !== base.areaLevel) params.set('by', state.areaLevel);
+  if (state.areaMetric !== base.areaMetric) params.set('metric', state.areaMetric);
+  if (state.entity) params.set('entity', state.entity);
   return params;
 }

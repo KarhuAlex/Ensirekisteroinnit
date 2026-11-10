@@ -11,6 +11,7 @@ import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
 import { summarizeElectrification } from '../lib/electrification';
 import { buildSeriesView } from '../lib/seriesView';
+import { toneOf } from '../lib/stats';
 
 function bevStoryKey(delta: number | null): 'story.bevUp' | 'story.bevDown' | 'story.bevFlat' {
   if (delta === null || Math.abs(delta) < 0.05) return 'story.bevFlat';
@@ -41,8 +42,6 @@ export function Overview() {
 
   const monthLabel = axis.latestMonthLabel;
   const pp = ` ${t('unit.pp')}`;
-  const tone = (v: number | null) =>
-    v === null || v === 0 ? 'neutral' : v > 0 ? 'positive' : 'negative';
 
   return (
     <>
@@ -105,25 +104,25 @@ export function Overview() {
                 label: t('kpi.registrations', { month: monthLabel }),
                 value: fmt.int(view.regsNow),
                 note: t('kpi.vsYear', { value: fmt.signed(view.regsDelta, ' %') }),
-                tone: tone(view.regsDelta),
+                tone: toneOf(view.regsDelta),
               },
               {
                 label: t('kpi.bevShare', { month: monthLabel }),
                 value: fmt.pct(view.bevNow),
                 note: t('kpi.vsYear', { value: fmt.signed(view.bevDelta, pp) }),
-                tone: tone(view.bevDelta),
+                tone: toneOf(view.bevDelta),
               },
               {
                 label: t('kpi.bevShare12'),
                 value: fmt.pct(view.bev12),
                 note: t('kpi.vsYear', { value: fmt.signed(view.bev12Delta, pp) }),
-                tone: tone(view.bev12Delta),
+                tone: toneOf(view.bev12Delta),
               },
               {
                 label: t('kpi.plugShare12'),
                 value: fmt.pct(view.plug12),
                 note: t('kpi.vsYear', { value: fmt.signed(view.plug12Delta, pp) }),
-                tone: tone(view.plug12Delta),
+                tone: toneOf(view.plug12Delta),
               },
             ]}
           />

@@ -823,10 +823,10 @@ mark {
   gap: 4px;
   font-weight: 700;
 }
-.change--pos {
+.change--positive {
   color: var(--pos);
 }
-.change--neg {
+.change--negative {
   color: var(--neg);
 }
 .fuel-mix {
@@ -855,4 +855,11 @@ mark {
 .hero-link {
   margin: var(--s-3) 0 0;
   color: var(--ink-2);
+}
+
+.area-map {
+  cursor: default;
+}
+.review-controls .field-input {
+  min-width: 240px;
 }

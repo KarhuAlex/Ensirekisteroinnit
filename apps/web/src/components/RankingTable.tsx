@@ -10,11 +10,13 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n';
 import { downloadCsv } from '../lib/download';
+import { toneOf } from '../lib/stats';
 import { changeOf, type NamedRow } from '../lib/ranking';
 import { rankingToCsv } from '../lib/rankingCsv';
 import { DataTable } from './DataTable';
 import { FuelMix } from './FuelMix';
 import { Icon } from './Icon';
+import { TableToolbar } from './TableToolbar';
 
 const PAGE_SIZE = 25;
 
@@ -22,7 +24,7 @@ function ChangeCell({ count, previous }: { count: number; previous: number | nul
   const { fmt } = useI18n();
   const change = changeOf(count, previous);
   if (!change) return <span className="muted">–</span>;
-  const tone = change.delta > 0 ? 'pos' : change.delta < 0 ? 'neg' : 'flat';
+  const tone = toneOf(change.delta);
   const text =
     change.percent !== null ? fmt.signedPct(change.percent) : fmt.signedInt(change.delta);
   return (
@@ -125,39 +127,22 @@ export function RankingTable({
 
   return (
     <>
-      <div className="toolbar">
-        <label className="field">
-          <span>{t('models.filter')}</span>
-          <span className="field-input">
-            <Icon name="search" size={18} />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => table.setGlobalFilter(e.target.value)}
-            />
-          </span>
-        </label>
-        <button
-          type="button"
-          className="button"
-          disabled={shown.length === 0}
-          onClick={() =>
-            downloadCsv(
-              `first-registrations-${period}.csv`,
-              rankingToCsv(
-                shown.map((r) => r.original),
-                period,
-              ),
-            )
-          }
-        >
-          <Icon name="download" size={18} />
-          {t('table.download')}
-        </button>
-        <span className="muted count" aria-live="polite">
-          {t('models.count', { n: fmt.int(shown.length) })}
-        </span>
-      </div>
+      <TableToolbar
+        searchLabel={t('models.filter')}
+        query={query}
+        onQueryChange={(value) => table.setGlobalFilter(value)}
+        canDownload={shown.length > 0}
+        onDownload={() =>
+          downloadCsv(
+            `first-registrations-${period}.csv`,
+            rankingToCsv(
+              shown.map((r) => r.original),
+              period,
+            ),
+          )
+        }
+        countText={t('models.count', { n: fmt.int(shown.length) })}
+      />
       <DataTable table={table} limit={limit} caption={caption} />
       {shown.length > limit && (
         <button type="button" className="button" onClick={() => setLimit((l) => l + PAGE_SIZE)}>

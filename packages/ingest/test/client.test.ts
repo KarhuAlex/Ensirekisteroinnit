@@ -54,3 +54,19 @@ describe('PxWebClient', () => {
     expect(calls).toHaveLength(3);
   });
 });
+
+describe('request timeout', () => {
+  it('aborts a request that takes too long', async () => {
+    const hanging: typeof fetch = (_url, init) =>
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+      });
+    const client = new PxWebClient({
+      baseUrl: 'https://example.org',
+      fetchImpl: hanging,
+      maxRetries: 0,
+      timeoutMs: 20,
+    });
+    await expect(client.listFolder('x')).rejects.toBeDefined();
+  });
+});

@@ -1,4 +1,12 @@
-import type { EntitySeries, EntitySummary, LatestPointer, Manifest, Matrix } from '@regs/core';
+import type {
+  EntitySeries,
+  EntitySummary,
+  LatestPointer,
+  Manifest,
+  Matrix,
+  RegionalIndex,
+  RegionalYear,
+} from '@regs/core';
 
 /** Root of the published data. Production builds set VITE_DATA_BASE_URL to the storage endpoint. */
 export const DATA_BASE = (import.meta.env.VITE_DATA_BASE_URL || '/data').replace(/\/+$/, '');
@@ -47,4 +55,19 @@ export async function loadMatrix(release: string, months: readonly string[]): Pr
 
 export function loadSeries(release: string, id: string): Promise<EntitySeries> {
   return getJson<EntitySeries>(`${DATA_BASE}/${release}/entities/${encodeURIComponent(id)}.json`);
+}
+
+export interface RegionalCatalog {
+  release: string;
+  index: RegionalIndex;
+}
+
+export async function loadRegionalCatalog(): Promise<RegionalCatalog> {
+  const latest = await getJson<LatestPointer>(`${DATA_BASE}/regional/latest.json`);
+  const index = await getJson<RegionalIndex>(`${DATA_BASE}/regional/${latest.release}/index.json`);
+  return { release: latest.release, index };
+}
+
+export function loadRegionalYear(release: string, year: string): Promise<RegionalYear> {
+  return getJson<RegionalYear>(`${DATA_BASE}/regional/${release}/years/${year}.json`);
 }

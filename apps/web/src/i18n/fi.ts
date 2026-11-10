@@ -244,6 +244,50 @@ export const fi = {
   'about.contactLink': 'Ota yhteyttä',
   'about.repoText': 'Palvelun lähdekoodi on avoimesti saatavilla.',
   'about.repoLink': 'Avaa lähdekoodi',
+  'review.level.area': 'Alueet',
+  'review.headline.area': 'Ensirekisteröinnit alueittain, {period}',
+  'review.headline.areaEntity': '{entity} alueittain, {period}',
+  'review.areaBy': 'Alueen taso',
+  'review.by.region': 'Maakunnat',
+  'review.by.municipality': 'Kunnat',
+  'review.metric': 'Mittari',
+  'review.metric.share': 'Osuus',
+  'review.metric.index': 'Indeksi',
+  'review.metric.count': 'Määrä',
+  'review.metric.change': 'Osuuden muutos',
+  'review.entity': 'Rajaa merkkiin tai malliin',
+  'review.entityPlaceholder': 'Kaikki autot',
+
+  'review.col.area': 'Alue',
+  'review.col.total': 'Alueen rekisteröinnit',
+  'review.col.index': 'Indeksi',
+  'review.col.shareChange': 'Osuuden muutos',
+  'review.col.unreliable': 'Liian vähän rekisteröintejä luotettavaan arvoon',
+  'review.caption.area': 'Ensirekisteröinnit alueittain, {period}',
+  'review.area.abroad': 'Ulkomaat',
+  'review.area.unknown': 'Tuntematon',
+
+  'review.kpi.national': 'Koko maa',
+  'review.kpi.nationalNote': 'Osuus kaikista rekisteröinneistä {share}',
+  'review.kpi.topArea': 'Suurin: {metric}',
+  'review.kpi.areas': 'Alueita, joilla on luotettava arvo',
+
+  'review.map.title': 'Kartta: {metric}, {period}',
+  'review.map.noData':
+    'Harmaalla alueella on liian vähän rekisteröintejä (alle {min}) luotettavaan osuuteen.',
+  'review.geo.source': 'Aluerajat: Tilastokeskus (CC BY 4.0).',
+  'review.area.note':
+    'Rekisteröintialue on auton haltijan kotikunta tai yrityksen kotipaikka. Yritys- ja leasingautot rekisteröidään usein pääkonttorin kuntaan, joten luvut eivät kerro suoraan, mitä alueella ajetaan. Osuutta ei lasketa alueille, joilla on alle {min} rekisteröintiä, ja pienillä alueilla yksi kauppa muuttaa lukuja paljon. Käytä mieluummin koko vuotta tai maakuntatasoa. Indeksi 100 tarkoittaa koko maan tasoa.',
+
+  'review.regional.unavailable': 'Aluetiedot eivät ole vielä käytettävissä.',
+  'review.regional.unavailableHint':
+    'Aluetietojen julkaisu on vielä kesken. Yritä hetken kuluttua uudelleen.',
+  'review.regional.before': 'Aluetiedot alkavat vuodesta {year}.',
+  'review.regional.beforeHint': 'Valitse myöhempi ajanjakso.',
+  'review.regional.clamped':
+    'Aluetiedot alkavat vuodesta {year}, joten ajanjakso on rajattu sen mukaan.',
+  'review.area.narrow':
+    'Valitse käyttövoima tai rajaa merkkiin tai malliin, niin osuus, indeksi ja muutos kertovat enemmän. Nyt näytetään vain määrä.',
 } as const;
 
 export type MessageKey = keyof typeof fi;

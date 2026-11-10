@@ -216,3 +216,72 @@ export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
     })),
   };
 }
+
+export interface MapDatum {
+  /** Matches the `id` property of the boundary features. */
+  id: string;
+  value: number | null;
+  tooltip: string[];
+}
+
+interface MapOptions {
+  colors: ThemeColors;
+  mapName: string;
+  data: readonly MapDatum[];
+  scale: { min: number; max: number };
+  diverging: boolean;
+  formatValue: (value: number) => string;
+  noDataColor: string;
+}
+
+const escapeHtml = (text: string): string =>
+  text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+/** A choropleth where areas without a value keep a neutral colour. */
+export function areaMapOption(o: MapOptions): EChartsCoreOption {
+  const tooltips = new Map(o.data.map((d) => [d.id, d.tooltip]));
+  const colours = o.diverging
+    ? [o.colors.fuel.phev, o.colors.ground, o.colors.fuel.bev]
+    : [o.colors.ground, o.colors.fuel.bev];
+  return {
+    animation: false,
+    tooltip: {
+      trigger: 'item',
+      confine: true,
+      formatter: (params: { name: string }) => {
+        const lines = tooltips.get(params.name) ?? [];
+        const [title = '', ...rest] = lines;
+        return `<strong>${escapeHtml(title)}</strong>${rest.map((l) => `<br/>${escapeHtml(l)}`).join('')}`;
+      },
+    },
+    visualMap: {
+      min: o.scale.min,
+      max: o.scale.max,
+      calculable: false,
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 0,
+      itemWidth: 14,
+      itemHeight: 160,
+      text: [o.formatValue(o.scale.max), o.formatValue(o.scale.min)],
+      textStyle: { color: o.colors.muted },
+      inRange: { color: colours },
+    },
+    series: [
+      {
+        type: 'map',
+        map: o.mapName,
+        nameProperty: 'id',
+        roam: false,
+        selectedMode: false,
+        label: { show: false },
+        itemStyle: { areaColor: o.noDataColor, borderColor: o.colors.rule, borderWidth: 0.5 },
+        emphasis: {
+          label: { show: false },
+          itemStyle: { borderColor: o.colors.ink, borderWidth: 1.5 },
+        },
+        data: o.data.map((d) => ({ name: d.id, value: d.value })),
+      },
+    ],
+  };
+}

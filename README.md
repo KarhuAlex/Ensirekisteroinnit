@@ -20,6 +20,10 @@ the site stays fast and keeps working when the upstream service is slow or down.
 - The review page ranks makes or models for any period: one month, several months, a year or
   several years. It can filter by fuel, compare with the previous period or a year earlier, and
   export CSV. Every choice is kept in the URL, so views can be shared.
+- The review page can also rank areas, by region or municipality, on a map and in a table. It shows
+  the share of an area's registrations that a fuel, make or model accounts for, an index against the
+  national level, the count and the change in share. Areas with few registrations are left uncoloured.
+  The regional data starts in 2021 and is published separately under `regional/`.
 - The table page shows all passenger cars by month or year, sortable and searchable, with CSV export.
 - Fuel types differ in shape as well as colour. Charts can be stepped through with the keyboard and
   are read out by screen readers. There are light and dark themes.
@@ -189,4 +193,5 @@ The storage website has no custom response headers, so security headers such as
 ## Licence
 
 Code: [MIT](LICENSE). Data: © Traficom, licensed under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Area boundaries: © Statistics Finland,
+licensed under CC BY 4.0. Rebuild them with `node apps/web/scripts/build-geo.mjs`.

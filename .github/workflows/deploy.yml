@@ -83,9 +83,15 @@ jobs:
           az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite
           -d '$web' --destination-path assets -s apps/web/dist/assets
           --content-cache-control "public, max-age=31536000, immutable"
+      # Map boundaries change only when the municipality division does, so a day of caching is plenty.
+      - name: Upload map data
+        run: >
+          az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite
+          -d '$web' --destination-path geo -s apps/web/dist/geo
+          --content-cache-control "public, max-age=86400"
       - name: Upload pages and icons
         run: |
-          for pattern in '*.html' '*.svg' '*.json'; do
+          for pattern in '*.html' '*.svg' 'site.config.json'; do
             az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite \
               -d '$web' -s apps/web/dist --pattern "$pattern" \
               --content-cache-control "public, max-age=0, must-revalidate"

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildEntities, periodFromCode, slugify } from '../src/adapters/traficom-pxweb/mapping.js';
+import {
+  buildEntities,
+  codeFromPeriod,
+  periodFromCode,
+  slugify,
+} from '../src/adapters/traficom-pxweb/mapping.js';
 
 describe('slugify', () => {
   it('lowercases, strips diacritics and collapses separators', () => {
@@ -56,5 +61,12 @@ describe('buildEntities', () => {
       { code: 'B', label: 'ZETA yhteensä' },
     ]);
     expect(new Set(dup.entities.map((e) => e.id)).size).toBe(2);
+  });
+});
+
+describe('codeFromPeriod', () => {
+  it('is the inverse of periodFromCode', () => {
+    expect(codeFromPeriod('2026-03')).toBe('2026M03');
+    expect(periodFromCode(codeFromPeriod('2014-12'))).toBe('2014-12');
   });
 });

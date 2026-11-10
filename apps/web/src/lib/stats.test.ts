@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { aggregateByYear, modelStory, percent, rangeStart, rollingShare, sumRange } from './stats';
+import {
+  aggregateByYear,
+  modelStory,
+  percent,
+  rangeStart,
+  rollingShare,
+  sumRange,
+  toneOf,
+} from './stats';
 
 describe('aggregateByYear', () => {
   it('sums months into calendar years', () => {
@@ -58,5 +66,14 @@ describe('modelStory', () => {
   });
   it('reports the electric share for mixed models', () => {
     expect(modelStory(200, 50)).toEqual({ kind: 'mixed', count: 200, bevShare: 25 });
+  });
+});
+
+describe('toneOf', () => {
+  it('is positive for a rise, negative for a fall and neutral otherwise', () => {
+    expect(toneOf(2)).toBe('positive');
+    expect(toneOf(-2)).toBe('negative');
+    expect(toneOf(0)).toBe('neutral');
+    expect(toneOf(null)).toBe('neutral');
   });
 });

@@ -12,10 +12,6 @@ export function yearRange(months: readonly string[], year: string): MonthRange |
 
 export const yearsOf = (months: readonly string[]): string[] => [...new Set(months.map(yearOf))];
 
-export function monthIndex(months: readonly string[], year: string, month: number): number {
-  return months.indexOf(`${year}-${String(month).padStart(2, '0')}`);
-}
-
 export type RangeKind =
   | { kind: 'month'; period: string }
   | { kind: 'year'; year: string; partial: boolean }

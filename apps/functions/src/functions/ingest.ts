@@ -5,8 +5,8 @@ import {
   type InvocationContext,
   type Timer,
 } from '@azure/functions';
-import { runIngest, type Logger } from '@regs/ingest';
-import { getRuntime } from '../config.js';
+import { runIngest, runPipeline, type Logger } from '@regs/ingest';
+import { getRegionalRuntime, getRuntime } from '../config.js';
 
 function contextLogger(context: InvocationContext): Logger {
   return {
@@ -27,6 +27,20 @@ app.timer('ingestTimer', {
   handler: async (_timer: Timer, context: InvocationContext): Promise<void> => {
     const result = await runIngest({ ...getRuntime(), logger: contextLogger(context) });
     context.log('Ingest finished', result);
+  },
+});
+
+/**
+ * The municipality-level data runs on the same schedule. A first run can outlast one invocation,
+ * so progress is saved per area and the next run continues from there.
+ */
+app.timer('ingestRegionalTimer', {
+  schedule: '%INGEST_SCHEDULE%',
+  runOnStartup: false,
+  handler: async (_timer: Timer, context: InvocationContext): Promise<void> => {
+    const { pipeline, options } = getRegionalRuntime();
+    const result = await runPipeline(pipeline, { ...options, logger: contextLogger(context) });
+    context.log('Regional ingest finished', result);
   },
 });
 

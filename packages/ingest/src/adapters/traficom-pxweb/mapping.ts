@@ -1,4 +1,4 @@
-import { TOTAL_ENTITY_ID, type Entity, type FuelId, type Period } from '@regs/core';
+import { TOTAL_ENTITY_ID, type Area, type Entity, type FuelId, type Period } from '@regs/core';
 
 /** Traficom fuel codes (table 050_ensirek_tau_105) mapped to canonical fuel ids. */
 export const FUEL_CODE_MAP: Readonly<Record<string, FuelId>> = {
@@ -33,6 +33,10 @@ export function periodFromCode(code: string): Period {
   const match = /^(\d{4})M(\d{2})$/.exec(code);
   if (!match) throw new Error(`Unexpected month code: ${code}`);
   return `${match[1]}-${match[2]}`;
+}
+
+export function codeFromPeriod(period: Period): string {
+  return period.replace('-', 'M');
 }
 
 export interface SourceValue {
@@ -104,4 +108,21 @@ export function buildEntities(values: readonly SourceValue[]): {
   }
 
   return { entities, idByCode };
+}
+
+export const NATIONAL_AREA_CODE = 'MA1';
+
+/**
+ * Maps a source area code to a canonical area. Municipalities are `KU` plus a three-digit number.
+ * The source also has rows for cars registered abroad and for unknown places. The national row
+ * returns `null` because it is the sum of the others.
+ */
+export function areaFromCode(code: string, name: string): Area | null {
+  if (code === NATIONAL_AREA_CODE) return null;
+  const municipality = /^KU(\d{3})$/.exec(code);
+  if (municipality)
+    return { id: municipality[1] as string, name: name.trim(), kind: 'municipality' };
+  if (code === '200') return { id: 'abroad', name: name.trim(), kind: 'abroad' };
+  if (code === 'X') return { id: 'unknown', name: name.trim(), kind: 'unknown' };
+  throw new Error(`Unrecognised area code in source: ${code}`);
 }

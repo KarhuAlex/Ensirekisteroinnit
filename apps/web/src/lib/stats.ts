@@ -78,3 +78,10 @@ export function modelStory(last12: number, bevLast12: number): ModelStory {
 export function markIncompleteYear(years: readonly string[], incomplete: boolean): string[] {
   return years.map((year, i) => (incomplete && i === years.length - 1 ? `${year} *` : year));
 }
+
+export type Tone = 'positive' | 'negative' | 'neutral';
+
+export function toneOf(change: number | null): Tone {
+  if (change === null || change === 0) return 'neutral';
+  return change > 0 ? 'positive' : 'negative';
+}

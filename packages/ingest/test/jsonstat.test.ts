@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { collectObservations } from '../src/adapters/traficom-pxweb/adapter.js';
+import { collectObservations } from '../src/adapters/traficom-pxweb/query.js';
 import { iterateCells, type JsonStatDoc } from '../src/adapters/traficom-pxweb/jsonstat.js';
 
 function doc(): JsonStatDoc {

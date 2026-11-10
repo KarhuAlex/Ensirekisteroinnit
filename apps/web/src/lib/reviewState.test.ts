@@ -13,6 +13,9 @@ describe('review state in the URL', () => {
       level: 'model',
       fuels: [...FUEL_GROUP_IDS],
       compare: 'yearAgo',
+      areaLevel: 'region',
+      areaMetric: 'share',
+      entity: null,
     });
   });
 
@@ -32,9 +35,26 @@ describe('review state in the URL', () => {
     expect(parse('fuels=diesel,bev,steam').fuels).toEqual(['diesel', 'bev']);
   });
 
+  it('reads the area view choices and ignores unknown ones', () => {
+    const state = parse('level=area&by=municipality&metric=index&entity=tesla-motors');
+    expect(state).toMatchObject({
+      level: 'area',
+      areaLevel: 'municipality',
+      areaMetric: 'index',
+      entity: 'tesla-motors',
+    });
+    expect(parse('level=nope&by=x&metric=y')).toMatchObject({
+      level: 'model',
+      areaLevel: 'region',
+      areaMetric: 'share',
+    });
+  });
+
   it('round-trips and leaves defaults out of the URL', () => {
     expect(toSearchParams(defaultState(months.length), months).toString()).toBe('');
-    const state = parse('from=2025-12&to=2026-02&level=make&fuels=bev,phev&cmp=prev');
+    const state = parse(
+      'from=2025-12&to=2026-02&level=area&fuels=bev,phev&cmp=prev&by=municipality&metric=change&entity=x',
+    );
     const params = toSearchParams(state, months);
     expect(params.get('from')).toBe('2025-12');
     expect(params.get('cmp')).toBe('prev');

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeRange, monthIndex, presetRange, stepRange, yearRange, yearsOf } from './period';
+import { describeRange, presetRange, stepRange, yearRange, yearsOf } from './period';
 
 const months = [
   ...Array.from({ length: 12 }, (_, i) => `2025-${String(i + 1).padStart(2, '0')}`),
@@ -12,11 +12,6 @@ describe('period helpers', () => {
     expect(yearRange(months, '2026')).toEqual({ from: 12, to: 21 });
     expect(yearRange(months, '2024')).toBeNull();
     expect(yearsOf(months)).toEqual(['2025', '2026']);
-  });
-
-  it('looks up a month by year and number', () => {
-    expect(monthIndex(months, '2026', 3)).toBe(14);
-    expect(monthIndex(months, '2026', 12)).toBe(-1);
   });
 
   it('describes a range the way a person would say it', () => {

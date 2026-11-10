@@ -10,7 +10,7 @@ import {
 import { useMemo, useState } from 'react';
 import { DataTable } from '../components/DataTable';
 import { FuelMark } from '../components/FuelMark';
-import { Icon } from '../components/Icon';
+import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { useI18n } from '../i18n';
@@ -95,19 +95,20 @@ export function TablePage() {
   return (
     <>
       <PageHeader title={t('table.title')} lede={t('table.subtitle')} />
-      <div className="toolbar">
-        <label className="field">
-          <span>{t('table.search')}</span>
-          <span className="field-input">
-            <Icon name="search" size={18} />
-            <input
-              type="search"
-              value={query}
-              placeholder={t('table.searchPlaceholder')}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </span>
-        </label>
+      <TableToolbar
+        searchLabel={t('table.search')}
+        placeholder={t('table.searchPlaceholder')}
+        query={query}
+        onQueryChange={setQuery}
+        canDownload={rowCount > 0}
+        onDownload={() =>
+          downloadCsv(
+            `registrations-${granularity}.csv`,
+            toCsv(table.getRowModel().rows.map((r) => r.original)),
+          )
+        }
+        countText={t('table.rows', { n: fmt.int(rowCount) })}
+      >
         <Segmented
           label={t('table.granularity')}
           value={granularity}
@@ -117,24 +118,7 @@ export function TablePage() {
           ]}
           onChange={setGranularity}
         />
-        <button
-          type="button"
-          className="button"
-          disabled={rowCount === 0}
-          onClick={() =>
-            downloadCsv(
-              `registrations-${granularity}.csv`,
-              toCsv(table.getRowModel().rows.map((r) => r.original)),
-            )
-          }
-        >
-          <Icon name="download" size={18} />
-          {t('table.download')}
-        </button>
-        <span className="muted count" aria-live="polite">
-          {t('table.rows', { n: fmt.int(rowCount) })}
-        </span>
-      </div>
+      </TableToolbar>
       {error ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !series ? (

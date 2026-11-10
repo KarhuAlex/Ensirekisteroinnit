@@ -31,8 +31,12 @@ export interface PxWebClientOptions {
   maxRetries?: number;
   /** Base delay for exponential backoff, in ms. */
   retryDelayMs?: number;
+  /** A request that runs longer is aborted and retried. */
+  timeoutMs?: number;
   userAgent?: string;
 }
+
+const DEFAULT_TIMEOUT_MS = 180_000;
 
 /** Thin client for the PxWeb v1 API (https://www.scb.se/en/services/statistical-programs-for-px-files/px-web/). */
 export class PxWebClient {
@@ -40,13 +44,15 @@ export class PxWebClient {
   private readonly fetchImpl: typeof fetch;
   private readonly maxRetries: number;
   private readonly retryDelayMs: number;
+  private readonly timeoutMs: number;
   private readonly userAgent: string;
 
   constructor(opts: PxWebClientOptions) {
     this.baseUrl = opts.baseUrl.replace(/\/+$/, '');
     this.fetchImpl = opts.fetchImpl ?? fetch;
-    this.maxRetries = opts.maxRetries ?? 3;
-    this.retryDelayMs = opts.retryDelayMs ?? 1000;
+    this.maxRetries = opts.maxRetries ?? 5;
+    this.retryDelayMs = opts.retryDelayMs ?? 2000;
+    this.timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.userAgent = opts.userAgent ?? 'ensirekisteroinnit-ingest/0.1';
   }
 
@@ -91,6 +97,7 @@ export class PxWebClient {
         ...(body ? { 'Content-Type': 'application/json' } : {}),
       },
       ...(body ? { body } : {}),
+      signal: AbortSignal.timeout(this.timeoutMs),
     });
     if (res.ok) return res.text();
     throw new PxWebHttpError(method, url, res.status, await res.text());

@@ -244,4 +244,47 @@ export const en: Record<MessageKey, string> = {
   'about.contactLink': 'Get in touch',
   'about.repoText': 'The source code of the service is openly available.',
   'about.repoLink': 'Open the source code',
+  'review.level.area': 'Areas',
+  'review.headline.area': 'First registrations by area, {period}',
+  'review.headline.areaEntity': '{entity} by area, {period}',
+  'review.areaBy': 'Area level',
+  'review.by.region': 'Regions',
+  'review.by.municipality': 'Municipalities',
+  'review.metric': 'Measure',
+  'review.metric.share': 'Share',
+  'review.metric.index': 'Index',
+  'review.metric.count': 'Count',
+  'review.metric.change': 'Change in share',
+  'review.entity': 'Limit to a make or model',
+  'review.entityPlaceholder': 'All cars',
+
+  'review.col.area': 'Area',
+  'review.col.total': 'Registrations in the area',
+  'review.col.index': 'Index',
+  'review.col.shareChange': 'Change in share',
+  'review.col.unreliable': 'Too few registrations for a reliable value',
+  'review.caption.area': 'First registrations by area, {period}',
+  'review.area.abroad': 'Abroad',
+  'review.area.unknown': 'Unknown',
+
+  'review.kpi.national': 'Whole country',
+  'review.kpi.nationalNote': 'Share of all registrations: {share}',
+  'review.kpi.topArea': 'Highest: {metric}',
+  'review.kpi.areas': 'Areas with a reliable value',
+
+  'review.map.title': 'Map: {metric}, {period}',
+  'review.map.noData': 'Grey areas have too few registrations (under {min}) for a reliable share.',
+  'review.geo.source': 'Area boundaries: Statistics Finland (CC BY 4.0).',
+  'review.area.note':
+    'The registration area is the home municipality of the holder, or the seat of a company. Company and leasing cars are often registered in the municipality of the head office, so the figures do not directly show what is driven in an area. No share is calculated for areas with fewer than {min} registrations, and in small areas a single sale moves the figures a lot. Prefer a whole year or the regional level. An index of 100 means the national level.',
+
+  'review.regional.unavailable': 'The regional data is not available yet.',
+  'review.regional.unavailableHint':
+    'The regional data is still being published. Please try again in a moment.',
+  'review.regional.before': 'The regional data starts in {year}.',
+  'review.regional.beforeHint': 'Choose a later period.',
+  'review.regional.clamped':
+    'The regional data starts in {year}, so the period has been cut to match.',
+  'review.area.narrow':
+    'Pick a fuel or narrow to a make or model, and the share, index and change become informative. For now only the count is shown.',
 };
