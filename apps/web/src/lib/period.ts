@@ -10,6 +10,13 @@ export function yearRange(months: readonly string[], year: string): MonthRange |
   return { from, to };
 }
 
+/** The months a table row stands for: one month for `2026-10`, the months of the year for `2026`. */
+export function rangeOfPeriod(months: readonly string[], period: string): MonthRange | null {
+  const index = months.indexOf(period);
+  if (index >= 0) return { from: index, to: index };
+  return yearRange(months, period);
+}
+
 export const yearsOf = (months: readonly string[]): string[] => [...new Set(months.map(yearOf))];
 
 export type RangeKind =

@@ -99,6 +99,7 @@ export const fi = {
   'table.search': 'Hae ajanjaksoa',
   'table.searchPlaceholder': 'Esimerkiksi 2025',
   'table.granularity': 'Tarkkuus',
+  'table.openReview': 'Avaa katsaus: {period}',
   'table.period': 'Ajanjakso',
   'table.total': 'Yhteensä',
   'table.bevShare': 'Täyssähkö, %',

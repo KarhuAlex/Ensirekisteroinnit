@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   describeRange,
   presetRange,
+  rangeOfPeriod,
   translateRange,
   stepRange,
   yearRange,
@@ -19,6 +20,14 @@ describe('period helpers', () => {
     expect(yearRange(months, '2026')).toEqual({ from: 12, to: 21 });
     expect(yearRange(months, '2024')).toBeNull();
     expect(yearsOf(months)).toEqual(['2025', '2026']);
+  });
+
+  it('turns a table period into the months it covers', () => {
+    expect(rangeOfPeriod(months, '2026-03')).toEqual({ from: 14, to: 14 });
+    expect(rangeOfPeriod(months, '2025')).toEqual({ from: 0, to: 11 });
+    expect(rangeOfPeriod(months, '2026')).toEqual({ from: 12, to: 21 });
+    expect(rangeOfPeriod(months, '2024')).toBeNull();
+    expect(rangeOfPeriod(months, '2024-05')).toBeNull();
   });
 
   it('describes a range the way a person would say it', () => {

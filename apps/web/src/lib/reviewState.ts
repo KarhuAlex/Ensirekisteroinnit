@@ -1,5 +1,7 @@
 import { FUEL_GROUP_IDS, type FuelGroupId } from '@regs/core';
 import type { EntityLevel } from './entityLevel';
+import type { Lang } from './format';
+import { rangeOfPeriod } from './period';
 import { sameRange, type CompareMode, type MonthRange } from './ranking';
 
 export type Level = EntityLevel | 'area';
@@ -105,4 +107,16 @@ export function levelAvailable(source: Source, level: Level): boolean {
 
 export function effectiveLevel(state: Pick<ReviewState, 'source' | 'level'>): Level {
   return levelAvailable(state.source, state.level) ? state.level : 'make';
+}
+
+/** The query string that opens the review on a period and nothing else; empty for the default. */
+export function reviewSearch(months: readonly string[], range: MonthRange): string {
+  const query = toSearchParams({ ...defaultState(months.length), range }, months).toString();
+  return query ? `?${query}` : '';
+}
+
+/** The review page for a table period (a month or a year); `null` if the data lacks it. */
+export function reviewPath(lang: Lang, months: readonly string[], period: string): string | null {
+  const range = rangeOfPeriod(months, period);
+  return range ? `/${lang}/review${reviewSearch(months, range)}` : null;
 }

@@ -100,6 +100,7 @@ export const en: Record<MessageKey, string> = {
   'table.search': 'Search periods',
   'table.searchPlaceholder': 'For example 2025',
   'table.granularity': 'Interval',
+  'table.openReview': 'Open the review: {period}',
   'table.period': 'Period',
   'table.total': 'Total',
   'table.bevShare': 'Electric, %',

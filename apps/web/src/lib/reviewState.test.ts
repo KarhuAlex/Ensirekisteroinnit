@@ -5,6 +5,8 @@ import {
   effectiveLevel,
   levelAvailable,
   parseState,
+  reviewPath,
+  reviewSearch,
   toSearchParams,
 } from './reviewState';
 import { rankingToCsv } from './rankingCsv';
@@ -83,6 +85,29 @@ describe('review state in the URL', () => {
     expect(params.get('from')).toBe('2025-12');
     expect(params.get('cmp')).toBe('prev');
     expect(parseState(params, months)).toEqual(state);
+  });
+});
+
+describe('reviewSearch', () => {
+  it('opens the review on a month or a span with everything else left at its default', () => {
+    expect(reviewSearch(months, { from: 1, to: 1 })).toBe('?from=2025-12&to=2025-12');
+    expect(reviewSearch(months, { from: 1, to: 3 })).toBe('?from=2025-12&to=2026-02');
+  });
+
+  it('is empty for the latest month, which is the default', () => {
+    expect(reviewSearch(months, { from: 4, to: 4 })).toBe('');
+  });
+});
+
+describe('reviewPath', () => {
+  it('links a month, a year and the latest month to the review in the page language', () => {
+    expect(reviewPath('fi', months, '2025-12')).toBe('/fi/review?from=2025-12&to=2025-12');
+    expect(reviewPath('en', months, '2026')).toBe('/en/review?from=2026-01&to=2026-03');
+    expect(reviewPath('fi', months, '2026-03')).toBe('/fi/review');
+  });
+
+  it('has no link for a period the data does not have', () => {
+    expect(reviewPath('fi', months, '2019')).toBeNull();
   });
 });
 

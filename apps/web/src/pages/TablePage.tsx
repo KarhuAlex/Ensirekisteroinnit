@@ -10,6 +10,7 @@ import {
 import { useMemo, useState } from 'react';
 import { DataTable } from '../components/DataTable';
 import { FuelMark } from '../components/FuelMark';
+import { PeriodLink } from '../components/PeriodLink';
 import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
@@ -63,7 +64,13 @@ export function TablePage() {
       sortDescFirst: true,
     });
     return [
-      { accessorKey: 'period', header: t('table.period') },
+      {
+        accessorKey: 'period',
+        header: t('table.period'),
+        cell: (c) => (
+          <PeriodLink period={c.row.original.period} monthly={granularity === 'month'} />
+        ),
+      },
       ...STACK_ORDER.map(fuel),
       {
         accessorKey: 'total',
@@ -76,7 +83,7 @@ export function TablePage() {
       share('bevShare', t('table.bevShare')),
       share('plugShare', t('table.plugShare')),
     ];
-  }, [t, fmt]);
+  }, [t, fmt, granularity]);
 
   const table = useReactTable({
     data,
