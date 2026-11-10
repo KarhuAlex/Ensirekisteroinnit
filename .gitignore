@@ -13,6 +13,7 @@ local.settings.json
 
 # AI tooling: assistant guidance, product/design briefs and tool state stay local
 CLAUDE.md
+.claude/
 AGENTS.md
 PRODUCT.md
 DESIGN.md
