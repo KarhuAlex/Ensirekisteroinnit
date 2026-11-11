@@ -13,7 +13,7 @@ export function Compare() {
   const { manifest } = useCatalog();
   const compare = useCompare();
   const { state, chosen } = compare;
-  const { matrix, error } = useMatrix(chosen.length > 0);
+  const matrix = useMatrix(chosen.length > 0);
   usePageTitle(`${t('compare.title')} – ${t('app.title')}`);
 
   return (
@@ -29,15 +29,15 @@ export function Compare() {
         onAdd={(id) => compare.update({ items: [...state.items, id] })}
         onRemove={(id) => compare.update({ items: state.items.filter((item) => item !== id) })}
       />
-      {error ? (
-        <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
-      ) : chosen.length === 0 ? (
+      {chosen.length === 0 ? (
         <StatusPanel title={t('compare.empty')} hint={t('compare.emptyHint')} />
-      ) : !matrix ? (
+      ) : matrix.status === 'loading' ? (
         <Skeleton height={340} label={t('status.loading')} />
+      ) : matrix.status !== 'ready' ? (
+        <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : (
         <CompareResults
-          matrix={matrix}
+          matrix={matrix.data}
           months={manifest.months}
           chosen={chosen}
           slots={compare.slots}

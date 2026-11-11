@@ -15,6 +15,7 @@ import { ShareValue } from '../components/ShareValue';
 import { TableToolbar } from '../components/TableToolbar';
 import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
+import { dataOf, hasFailed } from '../data/remote';
 import { useI18n } from '../i18n';
 import { downloadCsv } from '../lib/download';
 import { buildPeriodRows, toCsv, type PeriodRow } from '../lib/periodRows';
@@ -26,7 +27,9 @@ type Granularity = 'month' | 'year';
 export function TablePage() {
   const { t, fmt } = useI18n();
   const { manifest } = useCatalog();
-  const { series, error } = useEntitySeries(TOTAL_ENTITY_ID);
+  const seriesState = useEntitySeries(TOTAL_ENTITY_ID);
+  const series = dataOf(seriesState);
+  const failed = hasFailed(seriesState);
   const [granularity, setGranularity] = useState<Granularity>('month');
   const [query, setQuery] = useState('');
   const [sorting, setSorting] = useState<SortingState>([{ id: 'period', desc: true }]);
@@ -127,7 +130,7 @@ export function TablePage() {
           onChange={setGranularity}
         />
       </TableToolbar>
-      {error ? (
+      {failed ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !series ? (
         <Skeleton height={420} label={t('status.loading')} />

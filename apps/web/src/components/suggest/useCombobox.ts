@@ -1,5 +1,5 @@
-import { useId, useState, type KeyboardEvent } from 'react';
-import { activeAfterArrow, canChoose, isArrowKey } from '../../lib/comboboxKeys';
+import { useId, useReducer, type KeyboardEvent } from 'react';
+import { CLOSED, comboboxReducer, enterChoice, isArrowKey } from '../../lib/combobox';
 
 interface Options {
   count: number;
@@ -9,23 +9,17 @@ interface Options {
   typed: boolean;
 }
 
-/** Open state, the active option and the keys of a text field with a list of suggestions. */
+/** Wires the combobox state machine (`lib/combobox`) to a text field and its suggestion list. */
 export function useCombobox({ count, typed, onChoose }: Options) {
   const listId = useId();
   const inputId = `${listId}-input`;
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
-  const [moved, setMoved] = useState(false);
-
-  /** Opens the list at its first option, so nothing is left over from the last use. */
-  const reopen = () => {
-    setActive(0);
-    setMoved(false);
-    setOpen(true);
-  };
+  const [state, dispatch] = useReducer(comboboxReducer, CLOSED);
+  const openList = () => dispatch({ type: 'open' });
+  const closeList = () => dispatch({ type: 'close' });
+  const active = state.open ? state.active : 0;
 
   const choose = (index: number) => {
-    setOpen(false);
+    closeList();
     onChoose(index);
   };
 
@@ -33,45 +27,41 @@ export function useCombobox({ count, typed, onChoose }: Options) {
     const { key } = event;
     if (isArrowKey(key)) {
       event.preventDefault();
-      setOpen(true);
-      setMoved(true);
-      setActive((i) => activeAfterArrow(key, i, count));
+      dispatch({ type: 'arrow', key, count });
     } else if (key === 'Enter') {
-      if (canChoose({ open, active, count, typed, moved })) {
+      const index = enterChoice(state, count, typed);
+      if (index !== null) {
         event.preventDefault();
-        choose(active);
+        choose(index);
       }
     } else if (key === 'Escape') {
-      setOpen(false);
+      closeList();
     }
   };
 
-  const listed = open && count > 0;
+  const listed = state.open && count > 0;
   return {
     listId,
     inputId,
-    open,
+    open: state.open,
     active,
     /** Closes the list and passes the chosen suggestion on. */
     choose,
     /** The text changed: back to the first suggestion, with the list open. */
-    textChanged: reopen,
-    hover: (index: number) => {
-      setActive(index);
-      setMoved(true);
-    },
+    textChanged: openList,
+    hover: (index: number) => dispatch({ type: 'hover', index }),
     inputProps: {
       id: inputId,
       role: 'combobox',
-      'aria-expanded': open,
+      'aria-expanded': state.open,
       'aria-controls': listed ? listId : undefined,
       'aria-autocomplete': 'list' as const,
       'aria-activedescendant': listed && active < count ? `${listId}-${active}` : undefined,
       autoComplete: 'off',
       autoCapitalize: 'off',
       spellCheck: false,
-      onFocus: reopen,
-      onBlur: () => setOpen(false),
+      onFocus: openList,
+      onBlur: closeList,
       onKeyDown,
     },
   };

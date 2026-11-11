@@ -4,6 +4,7 @@ import { Skeleton, StatusPanel } from '../../components/ui';
 import { useCatalog } from '../../data/DataProvider';
 import { useGeo, type Geo } from '../../data/geo';
 import { useRegional } from '../../data/regional';
+import { hasFailed } from '../../data/remote';
 import { useI18n } from '../../i18n';
 import { areaGroupOf } from '../../lib/areaGrouping';
 import { effectiveMetric, isUnnarrowed } from '../../lib/areaMetrics';
@@ -28,7 +29,7 @@ export function AreaView({ state, months, periodLabel, fileStem }: Props) {
   const compareRange = comparisonRange(state.range, state.compare, months.length);
   const compareSpan = compareRange ? spanOf(months, compareRange) : null;
   const regional = useRegional(yearsOfSpans(mainSpan, compareSpan));
-  const { geo, error: geoError } = useGeo();
+  const geo = useGeo();
 
   if (regional.status === 'unavailable') {
     return (
@@ -38,10 +39,11 @@ export function AreaView({ state, months, periodLabel, fileStem }: Props) {
       />
     );
   }
-  if (regional.status === 'error' || geoError) {
+  // The map files ship with the site, so even a 404 for them is an error.
+  if (regional.status === 'error' || hasFailed(geo)) {
     return <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />;
   }
-  if (regional.status === 'loading' || !geo) {
+  if (regional.status === 'loading' || geo.status !== 'ready') {
     return (
       <div className="loading" role="status" aria-label={t('status.loading')}>
         <Skeleton height={72} />
@@ -51,8 +53,8 @@ export function AreaView({ state, months, periodLabel, fileStem }: Props) {
   }
   return (
     <AreaResults
-      view={{ index: regional.index, years: regional.years }}
-      geo={geo}
+      view={regional.data}
+      geo={geo.data}
       state={state}
       mainSpan={mainSpan}
       compareSpan={compareSpan}

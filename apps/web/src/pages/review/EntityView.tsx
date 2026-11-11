@@ -1,5 +1,4 @@
 import { StatusPanel } from '../../components/ui';
-import { HttpError } from '../../data/api';
 import { useCatalog, useMatrix } from '../../data/DataProvider';
 import { useI18n } from '../../i18n';
 import type { EntityLevel } from '../../lib/entityLevel';
@@ -20,23 +19,19 @@ const NO_LINKS = () => false;
 export function EntityView({ state, periodLabel, partialYear, fileStem }: Props) {
   const { t } = useI18n();
   const { byId } = useCatalog();
-  const { matrix, error } = useMatrix();
+  const matrix = useMatrix();
 
-  if (error) {
-    const missing = error instanceof HttpError && error.status === 404;
-    return (
-      <StatusPanel
-        tone={missing ? 'neutral' : 'error'}
-        title={t(missing ? 'review.unavailable' : 'status.error')}
-        hint={t(missing ? 'review.unavailableHint' : 'status.errorHint')}
-      />
-    );
+  if (matrix.status === 'loading') return <ResultsSkeleton />;
+  if (matrix.status === 'unavailable') {
+    return <StatusPanel title={t('review.unavailable')} hint={t('review.unavailableHint')} />;
   }
-  if (!matrix) return <ResultsSkeleton />;
+  if (matrix.status === 'error') {
+    return <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />;
+  }
 
   return (
     <EntityResults
-      matrix={matrix}
+      matrix={matrix.data}
       byId={byId}
       source="new"
       level={state.level}

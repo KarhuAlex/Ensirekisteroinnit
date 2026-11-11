@@ -51,6 +51,12 @@ export function SearchBox({ variant }: { variant: 'hero' | 'compact' }) {
     },
   });
 
+  /** Every change of the text, typed or cleared, starts the list again from its first option. */
+  const edit = (next: string) => {
+    setQuery(next);
+    combobox.textChanged();
+  };
+
   // Pressing / focuses the search, unless the user is already typing.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -87,15 +93,12 @@ export function SearchBox({ variant }: { variant: 'hero' | 'compact' }) {
         enterKeyHint="search"
         placeholder={placeholder}
         value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          combobox.textChanged();
-        }}
+        onChange={(e) => edit(e.target.value)}
       />
       {query ? (
         <ClearButton
           onClick={() => {
-            setQuery('');
+            edit('');
             inputRef.current?.focus();
           }}
         />

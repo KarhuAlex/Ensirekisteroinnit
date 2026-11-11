@@ -9,6 +9,7 @@ import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
 import { Facts, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
+import { dataOf, hasFailed } from '../data/remote';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
 import { summarizeElectrification } from '../lib/electrification';
@@ -18,7 +19,9 @@ import { toneOf } from '../lib/stats';
 export function Overview() {
   const { lang, t, fmt } = useI18n();
   const { manifest } = useCatalog();
-  const { series, error } = useEntitySeries(TOTAL_ENTITY_ID);
+  const seriesState = useEntitySeries(TOTAL_ENTITY_ID);
+  const series = dataOf(seriesState);
+  const failed = hasFailed(seriesState);
   usePageTitle(t('app.title'));
 
   const axis = useTimeAxis();
@@ -46,8 +49,8 @@ export function Overview() {
         <SearchBox variant="hero" />
       </div>
 
-      {(error || !view) && <h1 className="sr-only">{t('app.title')}</h1>}
-      {error ? (
+      {(failed || !view) && <h1 className="sr-only">{t('app.title')}</h1>}
+      {failed ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !view ? (
         <div className="loading" role="status" aria-label={t('status.loading')}>

@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { once, useRemote } from './remote';
 import { loadSiteConfig, type SiteConfig } from './siteConfig';
 
 interface Value {
@@ -7,19 +8,18 @@ interface Value {
   ready: boolean;
 }
 
-const SiteConfigContext = createContext<Value>({ config: {}, ready: false });
+const NOT_READ: Value = { config: {}, ready: false };
+const SiteConfigContext = createContext<Value>(NOT_READ);
+
+// Never fails: a missing or broken file reads as an empty config.
+const loadSiteConfigOnce = once(loadSiteConfig);
 
 export function SiteConfigProvider({ children }: { children: ReactNode }) {
-  const [value, setValue] = useState<Value>({ config: {}, ready: false });
-
-  useEffect(() => {
-    let cancelled = false;
-    void loadSiteConfig().then((config) => !cancelled && setValue({ config, ready: true }));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+  const remote = useRemote(loadSiteConfigOnce);
+  const value = useMemo<Value>(
+    () => (remote.status === 'ready' ? { config: remote.data, ready: true } : NOT_READ),
+    [remote],
+  );
   return <SiteConfigContext.Provider value={value}>{children}</SiteConfigContext.Provider>;
 }
 

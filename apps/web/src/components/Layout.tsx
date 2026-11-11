@@ -120,7 +120,8 @@ function DataGate() {
       </div>
     );
   }
-  if (state.status === 'error') {
+  // Without the national catalog there is no site, so "not published" is an error here too.
+  if (state.status !== 'ready') {
     return (
       <StatusPanel
         tone="error"

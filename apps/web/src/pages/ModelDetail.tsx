@@ -16,6 +16,7 @@ import {
 } from '../components/ui';
 import { SourceNote } from '../components/SourceNote';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
+import { dataOf, hasFailed } from '../data/remote';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
 import { hasPage } from '../lib/entityLevel';
@@ -33,7 +34,9 @@ export function ModelDetail() {
   const [granularity, setGranularity] = useState<Granularity>('monthly');
   const found = id ? byId.get(id) : undefined;
   const entity = found && hasPage(found.kind) ? found : undefined;
-  const { series, error } = useEntitySeries(id);
+  const seriesState = useEntitySeries(id);
+  const series = dataOf(seriesState);
+  const failed = hasFailed(seriesState);
 
   const name = entity
     ? entity.kind === 'total'
@@ -140,7 +143,7 @@ export function ModelDetail() {
         </p>
       </PageHeader>
 
-      {error ? (
+      {failed ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !view ? (
         <div className="loading" role="status" aria-label={t('status.loading')}>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { once, useRemote, type Remote } from './remote';
 
 export interface GeoFeature {
   type: 'Feature';
@@ -25,40 +25,20 @@ async function fetchCollection(name: string): Promise<GeoCollection> {
   return (await res.json()) as GeoCollection;
 }
 
-let geoPromise: Promise<Geo> | null = null;
-
-function loadGeo(): Promise<Geo> {
-  geoPromise ??= Promise.all([fetchCollection('kunta'), fetchCollection('maakunta')]).then(
-    ([municipalities, regions]) => ({
-      municipalities,
-      regions,
-      regionOfMunicipality: new Map(
-        municipalities.features.map((f) => [f.properties.id, f.properties.region ?? '']),
-      ),
-      regionName: new Map(regions.features.map((f) => [f.properties.id, f.properties.name])),
-    }),
-  );
-  geoPromise.catch(() => (geoPromise = null));
-  return geoPromise;
-}
-
 /** Boundaries and the municipality-to-region mapping, loaded once when an area view needs them. */
-export function useGeo(): { geo: Geo | null; error: Error | null } {
-  const [state, setState] = useState<{ geo: Geo | null; error: Error | null }>({
-    geo: null,
-    error: null,
-  });
-  useEffect(() => {
-    let cancelled = false;
-    loadGeo().then(
-      (geo) => !cancelled && setState({ geo, error: null }),
-      (error: unknown) =>
-        !cancelled &&
-        setState({ geo: null, error: error instanceof Error ? error : new Error(String(error)) }),
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-  return state;
-}
+const loadGeo = once(async (): Promise<Geo> => {
+  const [municipalities, regions] = await Promise.all([
+    fetchCollection('kunta'),
+    fetchCollection('maakunta'),
+  ]);
+  return {
+    municipalities,
+    regions,
+    regionOfMunicipality: new Map(
+      municipalities.features.map((f) => [f.properties.id, f.properties.region ?? '']),
+    ),
+    regionName: new Map(regions.features.map((f) => [f.properties.id, f.properties.name])),
+  };
+});
+
+export const useGeo = (): Remote<Geo> => useRemote(loadGeo);

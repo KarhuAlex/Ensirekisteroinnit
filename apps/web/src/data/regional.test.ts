@@ -1,7 +1,8 @@
 import { SCHEMA_VERSION, type RegionalIndex, type RegionalYear } from '@regs/core';
 import { describe, expect, it } from 'vitest';
 import { HttpError } from './api';
-import { currentRegionalState, loadRegionalState, type RegionalSource } from './regional';
+import { loadRegional, regionalLoad, type RegionalSource } from './regional';
+import { loadRemote } from './remote';
 
 const index = {
   years: ['2025', '2026'],
@@ -22,44 +23,42 @@ const source = (over: Partial<RegionalSource> = {}): RegionalSource => ({
   ...over,
 });
 
-describe('loadRegionalState', () => {
-  it('loads the wanted years that exist and remembers which years it was for', async () => {
-    const state = await loadRegionalState(['2024', '2025', '2026'], source());
-    expect(state).toMatchObject({ status: 'ready', key: '2024,2025,2026' });
-    if (state.status === 'ready') expect([...state.years.keys()]).toEqual(['2025', '2026']);
+describe('loadRegional', () => {
+  it('loads the wanted years that exist and skips the rest', async () => {
+    const view = await loadRegional(['2024', '2025', '2026'], source());
+    expect(view.index).toBe(index);
+    expect([...view.years.keys()]).toEqual(['2025', '2026']);
   });
 
-  it('reports missing regional data as unavailable', async () => {
+  it('is unavailable while the regional data is not published', async () => {
     const missing = source({
       catalog: async () => {
         throw new HttpError(404, 'https://example.org/regional/latest.json');
       },
     });
-    expect(await loadRegionalState(['2026'], missing)).toEqual({ status: 'unavailable' });
+    expect(await loadRemote(() => loadRegional(['2026'], missing))).toEqual({
+      status: 'unavailable',
+    });
   });
 
-  it('reports other failures as errors', async () => {
+  it('is an error when anything else fails', async () => {
     const broken = source({
       year: async () => {
         throw new Error('network down');
       },
     });
-    const state = await loadRegionalState(['2026'], broken);
-    expect(state.status).toBe('error');
+    expect((await loadRemote(() => loadRegional(['2026'], broken))).status).toBe('error');
   });
 });
 
-describe('currentRegionalState', () => {
-  it('does not offer data loaded for other years as the current data', async () => {
-    const ready = await loadRegionalState(['2026'], source());
-    expect(currentRegionalState(ready, '2026').status).toBe('ready');
-    expect(currentRegionalState(ready, '2025').status).toBe('loading');
+describe('regionalLoad', () => {
+  it('gives the same load for the same years, however the array is built', () => {
+    expect(regionalLoad(['2025', '2026'])).toBe(regionalLoad(['2025', '2026']));
+    expect(regionalLoad([])).toBe(regionalLoad([]));
   });
 
-  it('passes the other states through', () => {
-    expect(currentRegionalState({ status: 'unavailable' }, '2025')).toEqual({
-      status: 'unavailable',
-    });
-    expect(currentRegionalState({ status: 'loading' }, '2025')).toEqual({ status: 'loading' });
+  it('gives another load for other years', () => {
+    expect(regionalLoad(['2025'])).not.toBe(regionalLoad(['2026']));
+    expect(regionalLoad(['2025', '2026'])).not.toBe(regionalLoad(['2026', '2025']));
   });
 });
