@@ -40,6 +40,15 @@ function monthTick(visibleMonths: number) {
   };
 }
 
+/** Points a quarter apart, labelled by the month the quarter ends in: the year at the first one. */
+function quarterTick(visibleQuarters: number) {
+  return (value: string): string => {
+    const [year, month] = value.split('-');
+    if (month === '03') return year ?? '';
+    return visibleQuarters <= 12 ? `Q${Number(month) / 3}` : '';
+  };
+}
+
 export interface BarsOptions {
   colors: ThemeColors;
   fmt: Formatters;
@@ -149,6 +158,8 @@ interface TimeAxisOptions {
   months: string[];
   startIndex: number;
   reducedMotion: boolean;
+  /** The points are quarters, named by the month they end in, rather than every month. */
+  quarterly?: boolean;
 }
 
 /** What the line charts over the months share: grid, pointer, month axis and zoom window. */
@@ -174,7 +185,7 @@ function timeChartBase(o: TimeAxisOptions) {
         fontSize: 12,
         interval: 0,
         hideOverlap: true,
-        formatter: monthTick(n - o.startIndex),
+        formatter: (o.quarterly ? quarterTick : monthTick)(n - o.startIndex),
       },
     },
     dataZoom: [
@@ -208,19 +219,28 @@ const yLabels = (colors: ThemeColors, formatter: (v: number) => string) => ({
   formatter,
 });
 
+/** The top of a share axis that fits the highest value: a fifth, two fifths or the whole scale. */
+export function shareAxisMax(values: readonly (number | null)[]): number {
+  const highest = Math.max(0, ...values.map((v) => v ?? 0));
+  return [20, 40].find((max) => highest <= max) ?? 100;
+}
+
 export interface LinesOptions extends TimeAxisOptions {
   fmt: Formatters;
   series: { name: string; color: string; values: (number | null)[] }[];
+  /** Top of the share axis in percent; the whole scale, 100, when left out. */
+  yMax?: number;
 }
 
 export function shareLinesChart(o: LinesOptions): EChartsCoreOption {
+  const max = o.yMax ?? 100;
   return {
     ...timeChartBase(o),
     yAxis: {
       type: 'value',
       min: 0,
-      max: 100,
-      interval: 25,
+      max,
+      interval: max / 4,
       ...quietAxis(o.colors),
       axisLabel: yLabels(o.colors, (v) => `${v} %`),
     },

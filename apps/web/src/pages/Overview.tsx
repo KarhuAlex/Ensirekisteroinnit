@@ -7,13 +7,16 @@ import { FuelPriceSection } from '../components/FuelPriceSection';
 import { RollingChart } from '../components/RollingChart';
 import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
+import { StockSection } from '../components/StockSection';
 import { Facts, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
+import { useStock } from '../data/stock';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
 import { summarizeElectrification } from '../lib/electrification';
 import { buildSeriesView } from '../lib/seriesView';
+import { latestStock } from '../lib/stock';
 import { toneOf } from '../lib/stats';
 
 export function Overview() {
@@ -25,6 +28,9 @@ export function Overview() {
   usePageTitle(t('app.title'));
 
   const axis = useTimeAxis();
+  const stockState = useStock();
+  const carStock = dataOf(stockState);
+  const latestCarStock = useMemo(() => (carStock ? latestStock(carStock) : null), [carStock]);
 
   const view = useMemo(() => {
     if (!series) return null;
@@ -60,7 +66,12 @@ export function Overview() {
         </div>
       ) : (
         <>
-          <BevHero summary={view} month={monthLabel} />
+          <BevHero
+            summary={view}
+            month={monthLabel}
+            stock={latestCarStock}
+            stockPending={stockState.status === 'loading'}
+          />
 
           <Section
             id="share-title"
@@ -146,6 +157,7 @@ export function Overview() {
             </Section>
           </div>
 
+          <StockSection />
           <FuelPriceSection
             months={manifest.months}
             bev={view.bevSeries}

@@ -3,11 +3,13 @@ import { parseArgs } from 'node:util';
 import { TraficomPxWebAdapter } from './adapters/traficom-pxweb/adapter.js';
 import { TraficomRegionalAdapter } from './adapters/traficom-pxweb/regional-adapter.js';
 import { StatFinFuelPriceAdapter } from './adapters/statfin/fuel-prices-adapter.js';
+import { TraficomStockAdapter } from './adapters/traficom-pxweb/stock-adapter.js';
 import { TraficomUsedImportAdapter } from './adapters/traficom-pxweb/used-adapter.js';
 import { pricesPipeline } from './pipeline/prices.js';
 import { regionalPipeline } from './pipeline/regional.js';
 import { usedImportsPipeline } from './pipeline/registrations.js';
-import { runIngest, runPipeline, type IngestResult } from './pipeline/run.js';
+import { runIngest, runPipeline, type IngestResult, type PipelineOptions } from './pipeline/run.js';
+import { stockPipeline } from './pipeline/stock.js';
 import { BlobStore } from './storage/blob-store.js';
 import { FsStore } from './storage/fs-store.js';
 import { PrefixedStore } from './storage/prefixed-store.js';
@@ -27,14 +29,15 @@ const { values } = parseArgs({
 });
 
 if (values.help) {
-  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used|prices] [--force]
+  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used|prices|stock] [--force]
 
 Fetches the latest data and writes a release to <dir>/published (raw responses go to <dir>/raw).
   --out          Output directory (default: .data)
   --azure        Write to the data storage account instead, for example
                  https://<account>.blob.core.windows.net (uses your az login)
   --dataset      registrations (national, default), regional (per municipality),
-                 used (cars imported used, by make) or prices (pump prices of petrol and diesel)
+                 used (cars imported used, by make), prices (pump prices of petrol and diesel)
+                 or stock (passenger cars in traffic, by quarter)
   --from-year    First year of the regional data (default: 2021)
   --concurrency  Parallel requests for the regional data (default: 4)
   --force        Publish a new release even if the source has not changed
@@ -64,6 +67,24 @@ function underPrefix(
   };
 }
 
+/** The datasets that come from one small table: where they are published and how they run. */
+const SMALL_DATASETS: Readonly<
+  Record<string, { prefix: string; run: (options: PipelineOptions) => Promise<IngestResult> }>
+> = {
+  used: {
+    prefix: 'used/',
+    run: (options) => runPipeline(usedImportsPipeline(new TraficomUsedImportAdapter()), options),
+  },
+  prices: {
+    prefix: 'prices/',
+    run: (options) => runPipeline(pricesPipeline(new StatFinFuelPriceAdapter()), options),
+  },
+  stock: {
+    prefix: 'stock/',
+    run: (options) => runPipeline(stockPipeline(new TraficomStockAdapter()), options),
+  },
+};
+
 async function run(): Promise<IngestResult> {
   const stores = createStores();
   const { rawStore, publishedStore } = stores;
@@ -79,18 +100,8 @@ async function run(): Promise<IngestResult> {
       force,
     });
   }
-  if (values.dataset === 'used') {
-    return runPipeline(usedImportsPipeline(new TraficomUsedImportAdapter()), {
-      ...underPrefix(stores, 'used/'),
-      force,
-    });
-  }
-  if (values.dataset === 'prices') {
-    return runPipeline(pricesPipeline(new StatFinFuelPriceAdapter()), {
-      ...underPrefix(stores, 'prices/'),
-      force,
-    });
-  }
+  const small = SMALL_DATASETS[values.dataset ?? ''];
+  if (small) return small.run({ ...underPrefix(stores, small.prefix), force });
   if (values.dataset !== 'registrations') throw new Error(`Unknown dataset: ${values.dataset}`);
   return runIngest({ adapter: new TraficomPxWebAdapter(), rawStore, publishedStore, force });
 }

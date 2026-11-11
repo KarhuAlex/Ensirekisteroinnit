@@ -1,4 +1,11 @@
-import { TOTAL_ENTITY_ID, type Area, type Entity, type FuelId, type Period } from '@regs/core';
+import {
+  TOTAL_ENTITY_ID,
+  type Area,
+  type Entity,
+  type FuelGroupId,
+  type FuelId,
+  type Period,
+} from '@regs/core';
 
 /** Traficom fuel codes (table 050_ensirek_tau_105) mapped to canonical fuel ids. */
 export const FUEL_CODE_MAP: Readonly<Record<string, FuelId>> = {
@@ -32,6 +39,37 @@ export const USED_FUEL_CODE_MAP: Readonly<Record<string, FuelId>> = {
   '40': 'petrol_ethanol',
   '42': 'other',
   '44': 'phev_diesel',
+  Y: 'other',
+};
+
+/**
+ * Fuel codes of the table of cars in traffic, which has more classes than the registrations table.
+ * It counts cars, not registrations, so the groups are the coarse ones. Hybrids that cannot be
+ * plugged in are counted under petrol or diesel by the source and stay there.
+ */
+export const STOCK_FUEL_GROUP_MAP: Readonly<Record<string, FuelGroupId>> = {
+  '01': 'petrol',
+  '02': 'diesel',
+  '04': 'bev',
+  '39': 'phev',
+  '44': 'phev',
+  '03': 'other',
+  '05': 'other',
+  '06': 'other',
+  '10': 'other',
+  '11': 'other',
+  '13': 'other',
+  '31': 'other',
+  '33': 'other',
+  '34': 'other',
+  '37': 'other',
+  '38': 'other',
+  '40': 'other',
+  '42': 'other',
+  '43': 'other',
+  '56': 'other',
+  '65': 'other',
+  '67': 'other',
   Y: 'other',
 };
 

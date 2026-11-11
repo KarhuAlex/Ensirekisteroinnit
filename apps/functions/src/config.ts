@@ -5,8 +5,10 @@ import {
   pricesPipeline,
   regionalPipeline,
   StatFinFuelPriceAdapter,
+  stockPipeline,
   TraficomPxWebAdapter,
   TraficomRegionalAdapter,
+  TraficomStockAdapter,
   TraficomUsedImportAdapter,
   usedImportsPipeline,
   type Notifier,
@@ -15,7 +17,7 @@ import {
   type PipelineOptions,
   type SourceAdapter,
 } from '@regs/ingest';
-import type { Dataset, FuelPriceDataset, RegionalDataset } from '@regs/core';
+import type { Dataset, FuelPriceDataset, RegionalDataset, StockDataset } from '@regs/core';
 
 export interface Runtime {
   adapter: SourceAdapter;
@@ -80,44 +82,35 @@ export interface PipelineRuntime<T> {
   options: PipelineOptions;
 }
 
-/** The regional dataset shares the containers with the national one under its own prefixes. */
+/** A dataset shares the containers with the national one and keeps its files under a prefix. */
+function underPrefix<T>(prefix: string, pipeline: Pipeline<T>): PipelineRuntime<T> {
+  const { rawStore, publishedStore, notifier } = getRuntime();
+  return {
+    pipeline,
+    options: {
+      rawStore: new PrefixedStore(rawStore, prefix),
+      publishedStore: new PrefixedStore(publishedStore, prefix),
+      ...(notifier ? { notifier } : {}),
+    },
+  };
+}
+
+/** The regional data keeps its progress per area, outside the published files. */
 export function getRegionalRuntime(): PipelineRuntime<RegionalDataset> {
-  const { rawStore, publishedStore, notifier } = getRuntime();
   const adapter = new TraficomRegionalAdapter({
-    cache: new PrefixedStore(rawStore, 'regional-cache/'),
+    cache: new PrefixedStore(getRuntime().rawStore, 'regional-cache/'),
   });
-  return {
-    pipeline: regionalPipeline(adapter),
-    options: {
-      rawStore: new PrefixedStore(rawStore, 'regional/'),
-      publishedStore: new PrefixedStore(publishedStore, 'regional/'),
-      ...(notifier ? { notifier } : {}),
-    },
-  };
+  return underPrefix('regional/', regionalPipeline(adapter));
 }
 
-/** Cars imported used are published beside the national data, under their own prefix. */
 export function getUsedImportsRuntime(): PipelineRuntime<Dataset> {
-  const { rawStore, publishedStore, notifier } = getRuntime();
-  return {
-    pipeline: usedImportsPipeline(new TraficomUsedImportAdapter()),
-    options: {
-      rawStore: new PrefixedStore(rawStore, 'used/'),
-      publishedStore: new PrefixedStore(publishedStore, 'used/'),
-      ...(notifier ? { notifier } : {}),
-    },
-  };
+  return underPrefix('used/', usedImportsPipeline(new TraficomUsedImportAdapter()));
 }
 
-/** Pump prices come from Statistics Finland and are published under their own prefix. */
 export function getPricesRuntime(): PipelineRuntime<FuelPriceDataset> {
-  const { rawStore, publishedStore, notifier } = getRuntime();
-  return {
-    pipeline: pricesPipeline(new StatFinFuelPriceAdapter()),
-    options: {
-      rawStore: new PrefixedStore(rawStore, 'prices/'),
-      publishedStore: new PrefixedStore(publishedStore, 'prices/'),
-      ...(notifier ? { notifier } : {}),
-    },
-  };
+  return underPrefix('prices/', pricesPipeline(new StatFinFuelPriceAdapter()));
+}
+
+export function getStockRuntime(): PipelineRuntime<StockDataset> {
+  return underPrefix('stock/', stockPipeline(new TraficomStockAdapter()));
 }

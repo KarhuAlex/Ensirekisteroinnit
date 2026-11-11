@@ -5,9 +5,9 @@ import { useI18n } from '../i18n';
 import { focusIndex, useTimeline } from '../lib/hooks';
 import { alignToMonths, lastPricedIndex } from '../lib/prices';
 import { PriceChart } from './PriceChart';
-import { PriceSource } from './PriceSource';
 import { RangeControl } from './RangeControl';
 import { RollingChart } from './RollingChart';
+import { SourceCredit } from './SourceCredit';
 import { Section, StatusPanel } from './ui';
 
 const PANEL_HEIGHT = 240;
@@ -52,7 +52,7 @@ function PricePanels({ prices, months, bev, plugIn }: Props & { prices: FuelPric
       tools={<RangeControl value={timeline.range} onChange={timeline.setRange} />}
       footnote={
         <>
-          {t('prices.note')} <PriceSource source={prices.source} />
+          {t('prices.note')} <SourceCredit source={prices.source} message="prices.source" />
         </>
       }
     >

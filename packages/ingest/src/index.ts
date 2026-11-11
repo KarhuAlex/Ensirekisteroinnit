@@ -16,11 +16,16 @@ export {
   TraficomRegionalAdapter,
   type TraficomRegionalOptions,
 } from './adapters/traficom-pxweb/regional-adapter.js';
+export {
+  TraficomStockAdapter,
+  type TraficomStockOptions,
+} from './adapters/traficom-pxweb/stock-adapter.js';
 export { PxWebClient } from './adapters/pxweb/client.js';
 export * from './pipeline/pipeline.js';
 export * from './pipeline/registrations.js';
 export * from './pipeline/regional.js';
 export * from './pipeline/prices.js';
+export * from './pipeline/stock.js';
 export * from './pipeline/run.js';
 export * from './pipeline/release.js';
 export * from './pipeline/validate.js';

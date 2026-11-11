@@ -9,6 +9,8 @@ interface ChartBindings {
 interface Props {
   ariaLabel: string;
   count: number;
+  /** What one key press steps over; it is named in the hint for screen readers. */
+  unit?: 'month' | 'quarter';
   /** Earlier categories are hidden and cannot be stepped to. */
   lowest: number;
   hover: number | null;
@@ -24,6 +26,7 @@ interface Props {
  */
 export function ChartFocus({
   ariaLabel,
+  unit = 'month',
   count,
   lowest,
   hover,
@@ -76,7 +79,7 @@ export function ChartFocus({
         })}
       </div>
       <p id={hintId} className="sr-only">
-        {t('chart.keyboardHint')}
+        {t(unit === 'quarter' ? 'chart.keyboardHint.quarter' : 'chart.keyboardHint')}
       </p>
       <p className="sr-only" aria-live="polite">
         {announce ? describe(index) : ''}

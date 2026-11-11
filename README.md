@@ -11,7 +11,8 @@ single-page app reads those files. There is no database and no API server.
 ## What it does
 
 - **Overview:** a ring of the latest month's fuel mix with the electric share in the middle, then
-  share-over-time charts, yearly totals and fuel prices on the same time axis.
+  share-over-time charts, yearly totals, the electric share of all cars in traffic and fuel prices
+  on the same time axis.
 - **Makes and models:** more than 700 makes and model series, searchable and sortable, each with its
   own page.
 - **Review:** ranks makes, models or corporate groups for any period, for new or used-imported
@@ -81,7 +82,7 @@ npm run dev         # web app on http://localhost:5173
 ```
 
 `npm test`, `npm run typecheck`, `npm run lint` and `npm run build` run the quality checks. Other
-datasets load with `npm run ingest -- --dataset used|prices|regional`.
+datasets load with `npm run ingest -- --dataset used|prices|stock|regional`.
 
 ## Deployment
 
@@ -125,9 +126,9 @@ deployment.
    outputs), then push to `main` or run the _Deploy_ workflow.
 5. Load the first data without waiting for the schedule:
    `POST https://<functionAppName>.azurewebsites.net/api/ingest?force=true` with the function key in
-   the `x-functions-key` header. This loads the national data. The timer adds used imports and fuel
-   prices right after, and the regional data on its own timer. The first regional run can exceed the
-   function's 30 minute limit, so seed it from a workstation with
+   the `x-functions-key` header. This loads the national data. The timer adds used imports, fuel
+   prices and the car stock right after, and the regional data on its own timer. The first regional
+   run can exceed the function's 30 minute limit, so seed it from a workstation with
    `npm run ingest -- --dataset regional --azure`; interrupted runs resume where they stopped.
 
 **Operations.** `INGEST_SCHEDULE` (NCRONTAB, UTC, default `0 0 8,12 * * *`) changes the schedule
@@ -152,13 +153,13 @@ container is public on purpose (open data, CORS limited to the site); `raw` is p
 ## Data notes
 
 - Monthly data starts in January 2014; regional data starts in 2021.
-- The counts are first registrations, not cars in use. The current year is incomplete and the UI
-  marks it.
+- The counts are first registrations. The cars in traffic are a separate dataset, quarterly since
+  2008 and by fuel only, with no make or model. The current year is incomplete and the UI marks it.
 - The source excludes Åland and has a separate fuel category only for plug-in hybrids.
 - Used imports are known by make only. Corporate groups follow today's ownership.
 - Fuel prices are nominal monthly averages.
 
-Next on the list is vehicle stock ("cars in use") from Traficom's open vehicle register.
+Next on the list is the car stock by make, with the average age, from Traficom's stock tables.
 
 ## Licence
 

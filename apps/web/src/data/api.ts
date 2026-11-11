@@ -1,4 +1,5 @@
 import type {
+  CarStock,
   EntitySeries,
   EntitySummary,
   FuelPrices,
@@ -66,6 +67,12 @@ export async function loadMatrix(
 export async function loadPrices(): Promise<FuelPrices> {
   const latest = await getJson<LatestPointer>(`${folderUrl('prices')}/latest.json`);
   return getJson<FuelPrices>(`${folderUrl('prices')}/${latest.release}/prices.json`);
+}
+
+/** The cars in traffic by quarter, published apart from the registrations under `stock/`. */
+export async function loadStock(): Promise<CarStock> {
+  const latest = await getJson<LatestPointer>(`${folderUrl('stock')}/latest.json`);
+  return getJson<CarStock>(`${folderUrl('stock')}/${latest.release}/stock.json`);
 }
 
 export function loadSeries(release: string, id: string): Promise<EntitySeries> {

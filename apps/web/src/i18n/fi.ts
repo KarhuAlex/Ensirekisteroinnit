@@ -130,6 +130,7 @@ export const fi = {
   'about.caveat6':
     'Käytettynä maahan tuodut autot eivät ole mukana ensirekisteröinneissä, koska lähde tilastoi ne erikseen. Katsauksessa ne näkyvät valinnalla Käytettynä tuodut, mutta vain merkeittäin.',
   'about.priceSourceLink': 'Avaa hintojen lähde Tilastokeskuksen tietokannassa',
+  'about.stockSourceLink': 'Avaa autokannan lähde Traficomin tilastotietokannassa',
   'about.sourceNotesTitle': 'Lähteen omat huomautukset',
 
   'notfound.title': 'Sivua ei löytynyt',
@@ -148,6 +149,13 @@ export const fi = {
   'prices.note':
     'Nimellishinnat. Ohut viiva on kuukauden keskihinta ja paksu viiva 12 kuukauden keskiarvo. Oikean reunan luvut ovat tuoreimman kuukauden arvoja. Kaaviot näyttävät kehityksen rinnakkain, eivät syy-yhteyttä: sähköautojen osuuteen vaikuttavat myös autovero, tuet, mallitarjonta ja sähkön hinta, jota ei ole mukana.',
   'prices.source': 'Hinnat: {name}, {licence}. Aineiston versio: {updated}.',
+  'stock.title': 'Sähköautojen osuus autokannasta',
+  'stock.aria':
+    'Täyssähköautojen sekä täyssähkö- ja ladattavien hybridiautojen osuus liikennekäytössä olevista henkilöautoista neljänneksittäin',
+  'stock.note':
+    'Autokanta tarkoittaa liikennekäytössä olevia henkilöautoja neljänneksen viimeisenä päivänä, Ahvenanmaata lukuun ottamatta. Luku on tilannekuva eikä ensirekisteröintien summa, koska autoja poistuu käytöstä ja viedään ulkomaille ja käytettyjä tuodaan lisää. Kanta uusiutuu hitaasti, joten sähköautojen osuus kasvaa siinä uusien autojen osuutta hitaammin.',
+  'stock.source': 'Autokanta: {name}, {licence}. Aineiston versio: {updated}.',
+  'hero.stock': 'Koko autokannasta täyssähköä {share} ({date})',
   'range.label': 'Ajanjakso',
   'range.all': 'Kaikki',
   'range.5y': '5 v',
@@ -184,6 +192,7 @@ export const fi = {
   'model.breadcrumb': 'Sijainti',
   'chart.asTable': 'Näytä taulukkona',
   'chart.keyboardHint': 'Selaa kuukausia nuolinäppäimillä.',
+  'chart.keyboardHint.quarter': 'Selaa neljänneksiä nuolinäppäimillä.',
   'nav.review': 'Katsaus',
 
   'review.title': 'Katsaus',

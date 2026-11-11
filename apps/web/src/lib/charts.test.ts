@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareLinesChart, priceLinesChart, shareLinesChart } from './charts';
+import { compareLinesChart, priceLinesChart, shareAxisMax, shareLinesChart } from './charts';
 import { makeFormatters } from './format';
 import type { ThemeColors } from './theme';
 
@@ -107,5 +107,62 @@ describe('compareLinesChart', () => {
     const [a, b] = build('count').series;
     expect(a!.lineStyle.color).toBe('#00a');
     expect(b!.lineStyle.color).toBe('#a00');
+  });
+});
+
+describe('quarterly time axis', () => {
+  const quarters = ['2025-03', '2025-06', '2025-09', '2025-12', '2026-03'];
+  const label = (count: number, startIndex = 0) => {
+    const chart = shareLinesChart({
+      ...base,
+      months: quarters.slice(0, count),
+      startIndex,
+      quarterly: true,
+      series: [{ name: 'bev', color: '#0a0', values: [1, 2, 3, 4, 5].slice(0, count) }],
+    }) as unknown as { xAxis: { axisLabel: { formatter: (value: string) => string } } };
+    return chart.xAxis.axisLabel.formatter;
+  };
+
+  it('names the year at the first quarter and the quarter number on a short span', () => {
+    const short = label(5);
+    expect(short('2025-03')).toBe('2025');
+    expect(short('2025-09')).toBe('Q3');
+  });
+
+  it('leaves the quarters between the years unlabelled on a long span', () => {
+    const many = Array.from(
+      { length: 40 },
+      (_, i) => `${2010 + Math.floor(i / 4)}-${String((i % 4) * 3 + 3).padStart(2, '0')}`,
+    );
+    const chart = shareLinesChart({
+      ...base,
+      months: many,
+      quarterly: true,
+      series: [{ name: 'bev', color: '#0a0', values: many.map(() => 1) }],
+    }) as unknown as { xAxis: { axisLabel: { formatter: (value: string) => string } } };
+    expect(chart.xAxis.axisLabel.formatter('2012-03')).toBe('2012');
+    expect(chart.xAxis.axisLabel.formatter('2012-09')).toBe('');
+  });
+});
+
+describe('shareAxisMax', () => {
+  it('picks the smallest scale that holds the highest value', () => {
+    expect(shareAxisMax([null, 3, 14.6])).toBe(20);
+    expect(shareAxisMax([20.5])).toBe(40);
+    expect(shareAxisMax([55, 63])).toBe(100);
+  });
+
+  it('keeps the smallest scale for a series without values', () => {
+    expect(shareAxisMax([])).toBe(20);
+    expect(shareAxisMax([null, null])).toBe(20);
+  });
+
+  it('sets the axis of a share chart in quarters of its top', () => {
+    const chart = shareLinesChart({
+      ...base,
+      yMax: 20,
+      series: [{ name: 'bev', color: '#0a0', values: [1, 2, 3] }],
+    }) as unknown as { yAxis: { max: number; interval: number } };
+    expect(chart.yAxis).toMatchObject({ max: 20, interval: 5 });
   });
 });

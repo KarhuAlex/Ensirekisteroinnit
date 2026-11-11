@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useI18n } from '../i18n';
 import { shareLinesChart } from '../lib/charts';
 import { focusIndex, useNarrow, useReducedMotion, useTimeline, type Timeline } from '../lib/hooks';
-import { rangeStart } from '../lib/stats';
+import { axisTop, firstPoint, pointLabel } from '../lib/rolling';
 import { useThemeColors } from '../lib/theme';
 import { ChartFocus } from './ChartFocus';
 import { EChart } from './EChart';
@@ -17,9 +17,19 @@ interface Props {
   ariaLabel: string;
   /** Set when other charts share the range and the pointer; its owner then shows the range control. */
   timeline?: Timeline;
+  /** The points are quarters (named by the month they end in): always the whole span, labelled by day. */
+  quarterly?: boolean;
 }
 
-export function RollingChart({ months, bev, plugIn, height, ariaLabel, timeline }: Props) {
+export function RollingChart({
+  months,
+  bev,
+  plugIn,
+  height,
+  ariaLabel,
+  timeline,
+  quarterly = false,
+}: Props) {
   const { t, fmt } = useI18n();
   const colors = useThemeColors();
   const narrow = useNarrow();
@@ -29,7 +39,9 @@ export function RollingChart({ months, bev, plugIn, height, ariaLabel, timeline 
   const { range, setRange, hover, setHover } = shared;
   const n = months.length;
   const index = focusIndex(shared, n);
-  const start = rangeStart(n, range);
+  const start = firstPoint(quarterly, n, range);
+  const label = (period: string) => pointLabel(fmt, period, quarterly);
+  const yMax = axisTop(quarterly, plugIn);
 
   const option = useMemo(
     () =>
@@ -39,12 +51,14 @@ export function RollingChart({ months, bev, plugIn, height, ariaLabel, timeline 
         months,
         startIndex: start,
         reducedMotion,
+        quarterly,
+        ...(yMax === undefined ? {} : { yMax }),
         series: [
           { name: t('chart.plugLine'), color: colors.fuel.phev, values: plugIn },
           { name: t('chart.bevLine'), color: colors.fuel.bev, values: bev },
         ],
       }),
-    [colors, fmt, months, start, reducedMotion, t, plugIn, bev],
+    [colors, fmt, months, start, reducedMotion, quarterly, yMax, t, plugIn, bev],
   );
 
   return (
@@ -52,9 +66,9 @@ export function RollingChart({ months, bev, plugIn, height, ariaLabel, timeline 
       {!timeline && (
         <div className="chart-bar">
           <p className="readout-head">
-            <strong>{fmt.month(months[index] ?? '')}</strong>
+            <strong>{label(months[index] ?? '')}</strong>
           </p>
-          <RangeControl value={range} onChange={setRange} />
+          {!quarterly && <RangeControl value={range} onChange={setRange} />}
         </div>
       )}
       <ul className="plates" aria-label={t('legend.title')}>
@@ -76,13 +90,14 @@ export function RollingChart({ months, bev, plugIn, height, ariaLabel, timeline 
       </ul>
       <ChartFocus
         ariaLabel={ariaLabel}
+        unit={quarterly ? 'quarter' : 'month'}
         count={n}
         lowest={start}
         hover={hover}
         onHover={setHover}
         describe={(i) =>
           [
-            fmt.month(months[i] ?? ''),
+            label(months[i] ?? ''),
             `${t('chart.bevLine')} ${fmt.pct(bev[i] ?? null)}`,
             `${t('chart.plugLine')} ${fmt.pct(plugIn[i] ?? null)}`,
           ].join(', ')

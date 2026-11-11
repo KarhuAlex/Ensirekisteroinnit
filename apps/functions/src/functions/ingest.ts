@@ -10,6 +10,7 @@ import {
   getPricesRuntime,
   getRegionalRuntime,
   getRuntime,
+  getStockRuntime,
   getUsedImportsRuntime,
 } from '../config.js';
 import { contextLogger, ingestSecondary } from '../secondary.js';
@@ -29,6 +30,7 @@ app.timer('ingestTimer', {
     // own, so the sources never get several requests at the same moment.
     await ingestSecondary(context, 'Used imports', getUsedImportsRuntime());
     await ingestSecondary(context, 'Fuel prices', getPricesRuntime());
+    await ingestSecondary(context, 'Car stock', getStockRuntime());
   },
 });
 

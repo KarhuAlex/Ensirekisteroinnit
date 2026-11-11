@@ -1,8 +1,9 @@
-import { PriceSource } from '../components/PriceSource';
+import { SourceCredit } from '../components/SourceCredit';
 import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { usePrices } from '../data/prices';
 import { useSiteConfig } from '../data/SiteConfigProvider';
+import { useStock } from '../data/stock';
 import { useI18n } from '../i18n';
 
 export function About() {
@@ -10,6 +11,7 @@ export function About() {
   const { manifest } = useCatalog();
   const { config, ready } = useSiteConfig();
   const prices = usePrices();
+  const stock = useStock();
   usePageTitle(`${t('about.title')} – ${t('app.title')}`);
   const { source } = manifest;
 
@@ -35,11 +37,23 @@ export function About() {
         {prices.status === 'ready' && (
           <>
             <p>
-              <PriceSource source={prices.data.source} />
+              <SourceCredit source={prices.data.source} message="prices.source" />
             </p>
             <p>
               <a href={prices.data.source.url} rel="noopener noreferrer" target="_blank">
                 {t('about.priceSourceLink')}
+              </a>
+            </p>
+          </>
+        )}
+        {stock.status === 'ready' && (
+          <>
+            <p>
+              <SourceCredit source={stock.data.source} message="stock.source" />
+            </p>
+            <p>
+              <a href={stock.data.source.url} rel="noopener noreferrer" target="_blank">
+                {t('about.stockSourceLink')}
               </a>
             </p>
           </>

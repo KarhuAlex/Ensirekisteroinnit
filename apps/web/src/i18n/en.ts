@@ -131,6 +131,7 @@ export const en: Record<MessageKey, string> = {
   'about.caveat6':
     'Cars imported used are not part of the first registrations, because the source counts them separately. In the review they appear under Used imports, by make only.',
   'about.priceSourceLink': "Open the price source in Statistics Finland's database",
+  'about.stockSourceLink': 'Open the car stock source in the Traficom statistics database',
   'about.sourceNotesTitle': 'Notes from the source (in Finnish)',
 
   'notfound.title': 'Page not found',
@@ -149,6 +150,13 @@ export const en: Record<MessageKey, string> = {
   'prices.note':
     'Nominal prices. The thin line is the monthly average price and the thick line the 12-month average. The numbers at the right edge are for the latest month. The charts show the two side by side, not a cause: the share of electric cars is also driven by car tax, subsidies, the choice of models and the price of electricity, which is not included.',
   'prices.source': 'Prices: {name}, {licence}. Data version: {updated}.',
+  'stock.title': 'Electric cars in the car stock',
+  'stock.aria':
+    'Share of battery-electric cars, and of battery-electric and plug-in hybrid cars together, among passenger cars in traffic by quarter',
+  'stock.note':
+    'The car stock means the passenger cars in traffic on the last day of each quarter, excluding Åland. It is a snapshot, not a sum of first registrations: cars leave traffic or are exported, and used cars are imported. The stock turns over slowly, so the electric share grows more slowly in it than among new cars.',
+  'stock.source': 'Car stock: {name}, {licence}. Data version: {updated}.',
+  'hero.stock': 'Of all cars in traffic, {share} are battery electric ({date})',
   'range.label': 'Period',
   'range.all': 'All',
   'range.5y': '5 y',
@@ -185,6 +193,7 @@ export const en: Record<MessageKey, string> = {
   'model.breadcrumb': 'You are here',
   'chart.asTable': 'View as table',
   'chart.keyboardHint': 'Use the arrow keys to step through months.',
+  'chart.keyboardHint.quarter': 'Use the arrow keys to step through quarters.',
   'nav.review': 'Review',
 
   'review.title': 'Review',

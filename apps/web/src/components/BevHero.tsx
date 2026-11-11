@@ -1,6 +1,7 @@
 import type { ElectrificationSummary } from '../lib/electrification';
 import { useI18n } from '../i18n';
 import { NBSP } from '../lib/format';
+import type { LatestStock } from '../lib/stock';
 import { STACK_ORDER, toneOf } from '../lib/stats';
 import { FuelDonut } from './FuelDonut';
 import { FuelMark } from './FuelMark';
@@ -9,10 +10,14 @@ import { Icon } from './Icon';
 interface Props {
   summary: Pick<ElectrificationSummary, 'mixNow' | 'bevNow' | 'bevDelta' | 'bev12'>;
   month: string;
+  /** The electric share of all cars in traffic, shown below the share of new cars once published. */
+  stock?: LatestStock | null;
+  /** The stock is still loading. */
+  stockPending?: boolean;
 }
 
 /** The overview's opening figure: the latest month's fuel mix, with the electric share in the middle. */
-export function BevHero({ summary, month }: Props) {
+export function BevHero({ summary, month, stock, stockPending = false }: Props) {
   const { t, fmt } = useI18n();
   const { mixNow, bevNow, bevDelta, bev12 } = summary;
   if (bevNow === null) {
@@ -46,6 +51,7 @@ export function BevHero({ summary, month }: Props) {
           </p>
         )}
         <p className="bev-hero-year">{t('hero.share12', { share12: fmt.pct(bev12) })}</p>
+        <StockLine stock={stock} pending={stockPending} />
         <ul className="bev-hero-legend">
           {legend.map(({ group, name, share }) => (
             <li key={group}>
@@ -58,4 +64,21 @@ export function BevHero({ summary, month }: Props) {
       </div>
     </section>
   );
+}
+
+/** The electric share of all cars in traffic. While it loads, an empty line keeps the hero from jumping. */
+function StockLine({ stock, pending }: { stock?: LatestStock | null; pending: boolean }) {
+  const { t, fmt } = useI18n();
+  if (stock) {
+    return (
+      <p className="bev-hero-year">
+        {t('hero.stock', { share: fmt.pct(stock.bevShare), date: fmt.date(stock.date) })}
+      </p>
+    );
+  }
+  return pending ? (
+    <p className="bev-hero-year" aria-hidden="true">
+      {NBSP}
+    </p>
+  ) : null;
 }
