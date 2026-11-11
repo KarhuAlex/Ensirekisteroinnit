@@ -1,11 +1,13 @@
 import {
   AcsEmailNotifier,
   BlobStore,
+  fleetPipeline,
   PrefixedStore,
   pricesPipeline,
   regionalPipeline,
   StatFinFuelPriceAdapter,
   stockPipeline,
+  TraficomFleetAdapter,
   TraficomPxWebAdapter,
   TraficomRegionalAdapter,
   TraficomStockAdapter,
@@ -17,7 +19,13 @@ import {
   type PipelineOptions,
   type SourceAdapter,
 } from '@regs/ingest';
-import type { Dataset, FuelPriceDataset, RegionalDataset, StockDataset } from '@regs/core';
+import type {
+  Dataset,
+  FleetDataset,
+  FuelPriceDataset,
+  RegionalDataset,
+  StockDataset,
+} from '@regs/core';
 
 export interface Runtime {
   adapter: SourceAdapter;
@@ -113,4 +121,8 @@ export function getPricesRuntime(): PipelineRuntime<FuelPriceDataset> {
 
 export function getStockRuntime(): PipelineRuntime<StockDataset> {
   return underPrefix('stock/', stockPipeline(new TraficomStockAdapter()));
+}
+
+export function getFleetRuntime(): PipelineRuntime<FleetDataset> {
+  return underPrefix('fleet/', fleetPipeline(new TraficomFleetAdapter()));
 }

@@ -5,3 +5,4 @@ export * from './matrix.js';
 export * from './regional.js';
 export * from './prices.js';
 export * from './stock.js';
+export * from './fleet.js';

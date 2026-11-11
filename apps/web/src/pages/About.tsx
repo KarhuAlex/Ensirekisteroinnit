@@ -3,15 +3,17 @@ import { PageHeader, usePageTitle } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { usePrices } from '../data/prices';
 import { useSiteConfig } from '../data/SiteConfigProvider';
-import { useStock } from '../data/stock';
 import { useI18n } from '../i18n';
+
+/** The folder of the tables of cars in traffic, which the car stock and the car fleet come from. */
+const FLEET_SOURCE_URL =
+  'https://trafi2.stat.fi/PXWeb/pxweb/fi/TraFi/TraFi__Liikennekaytossa_olevat_ajoneuvot/';
 
 export function About() {
   const { t, fmt } = useI18n();
   const { manifest } = useCatalog();
   const { config, ready } = useSiteConfig();
   const prices = usePrices();
-  const stock = useStock();
   usePageTitle(`${t('about.title')} – ${t('app.title')}`);
   const { source } = manifest;
 
@@ -46,18 +48,12 @@ export function About() {
             </p>
           </>
         )}
-        {stock.status === 'ready' && (
-          <>
-            <p>
-              <SourceCredit source={stock.data.source} message="stock.source" />
-            </p>
-            <p>
-              <a href={stock.data.source.url} rel="noopener noreferrer" target="_blank">
-                {t('about.stockSourceLink')}
-              </a>
-            </p>
-          </>
-        )}
+        <p>{t('about.fleetSourceText')}</p>
+        <p>
+          <a href={FLEET_SOURCE_URL} rel="noopener noreferrer" target="_blank">
+            {t('about.fleetSourceLink')}
+          </a>
+        </p>
       </section>
 
       <section className="block" aria-labelledby="about-caveats">

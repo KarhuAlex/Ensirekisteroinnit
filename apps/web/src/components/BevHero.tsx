@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { ElectrificationSummary } from '../lib/electrification';
 import { useI18n } from '../i18n';
 import { NBSP } from '../lib/format';
@@ -14,10 +15,12 @@ interface Props {
   stock?: LatestStock | null;
   /** The stock is still loading. */
   stockPending?: boolean;
+  /** The car fleet page has data, so the line may link to it. */
+  fleetLink?: boolean;
 }
 
 /** The overview's opening figure: the latest month's fuel mix, with the electric share in the middle. */
-export function BevHero({ summary, month, stock, stockPending = false }: Props) {
+export function BevHero({ summary, month, stock, stockPending = false, fleetLink = false }: Props) {
   const { t, fmt } = useI18n();
   const { mixNow, bevNow, bevDelta, bev12 } = summary;
   if (bevNow === null) {
@@ -51,7 +54,7 @@ export function BevHero({ summary, month, stock, stockPending = false }: Props) 
           </p>
         )}
         <p className="bev-hero-year">{t('hero.share12', { share12: fmt.pct(bev12) })}</p>
-        <StockLine stock={stock} pending={stockPending} />
+        <StockLine stock={stock} pending={stockPending} link={fleetLink} />
         <ul className="bev-hero-legend">
           {legend.map(({ group, name, share }) => (
             <li key={group}>
@@ -67,12 +70,26 @@ export function BevHero({ summary, month, stock, stockPending = false }: Props) 
 }
 
 /** The electric share of all cars in traffic. While it loads, an empty line keeps the hero from jumping. */
-function StockLine({ stock, pending }: { stock?: LatestStock | null; pending: boolean }) {
-  const { t, fmt } = useI18n();
+function StockLine({
+  stock,
+  pending,
+  link,
+}: {
+  stock?: LatestStock | null;
+  pending: boolean;
+  link: boolean;
+}) {
+  const { lang, t, fmt } = useI18n();
   if (stock) {
     return (
       <p className="bev-hero-year">
         {t('hero.stock', { share: fmt.pct(stock.bevShare), date: fmt.date(stock.date) })}
+        {link && (
+          <>
+            {' '}
+            <Link to={`/${lang}/stock`}>{t('hero.stockLink')}</Link>
+          </>
+        )}
       </p>
     );
   }

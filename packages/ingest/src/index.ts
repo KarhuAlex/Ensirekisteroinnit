@@ -17,6 +17,10 @@ export {
   type TraficomRegionalOptions,
 } from './adapters/traficom-pxweb/regional-adapter.js';
 export {
+  TraficomFleetAdapter,
+  type TraficomFleetOptions,
+} from './adapters/traficom-pxweb/fleet-adapter.js';
+export {
   TraficomStockAdapter,
   type TraficomStockOptions,
 } from './adapters/traficom-pxweb/stock-adapter.js';
@@ -26,6 +30,7 @@ export * from './pipeline/registrations.js';
 export * from './pipeline/regional.js';
 export * from './pipeline/prices.js';
 export * from './pipeline/stock.js';
+export * from './pipeline/fleet.js';
 export * from './pipeline/run.js';
 export * from './pipeline/release.js';
 export * from './pipeline/validate.js';

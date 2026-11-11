@@ -13,8 +13,7 @@ import { releaseIdFor } from './release.js';
 /** The table starts in 2008; far fewer quarters means a cut-off response. */
 const MIN_QUARTERS = 60;
 /** Order of magnitude of the passenger car stock; a value outside is a unit or column mistake. */
-const MIN_TOTAL = 1_000_000;
-const MAX_TOTAL = 6_000_000;
+export const STOCK_TOTAL_RANGE = { min: 1_000_000, max: 6_000_000 } as const;
 
 function spanProblems(quarters: readonly string[], minQuarters: number): string[] {
   const problems: string[] = [];
@@ -44,7 +43,7 @@ function quarterCountProblems(quarter: string, counts: readonly number[], total:
   if (sum !== total) {
     problems.push(`${quarter}: the fuel groups add up to ${sum}, the total is ${total}`);
   }
-  if (total < MIN_TOTAL || total > MAX_TOTAL) {
+  if (total < STOCK_TOTAL_RANGE.min || total > STOCK_TOTAL_RANGE.max) {
     problems.push(`${quarter}: total ${total} is implausible`);
   }
   return problems;

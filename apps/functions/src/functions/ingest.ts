@@ -9,6 +9,7 @@ import { runIngest, runPipeline } from '@regs/ingest';
 import {
   getPricesRuntime,
   getRegionalRuntime,
+  getFleetRuntime,
   getRuntime,
   getStockRuntime,
   getUsedImportsRuntime,
@@ -31,6 +32,7 @@ app.timer('ingestTimer', {
     await ingestSecondary(context, 'Used imports', getUsedImportsRuntime());
     await ingestSecondary(context, 'Fuel prices', getPricesRuntime());
     await ingestSecondary(context, 'Car stock', getStockRuntime());
+    await ingestSecondary(context, 'Car fleet', getFleetRuntime());
   },
 });
 

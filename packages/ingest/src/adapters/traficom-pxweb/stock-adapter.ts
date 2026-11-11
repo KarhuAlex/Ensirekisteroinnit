@@ -3,7 +3,7 @@ import type { AdapterResult, SourceAdapter } from '../types.js';
 import { requireVariable, tableVersion, type PxApi } from '../pxweb/api.js';
 import { PxWebClient, type PxTableMeta } from '../pxweb/client.js';
 import { categoryCodes, iterateCells, type JsonStatDoc } from '../pxweb/jsonstat.js';
-import { FUEL_TOTAL_CODE, STOCK_FUEL_GROUP_MAP } from './mapping.js';
+import { assertKnownStockFuels, FUEL_TOTAL_CODE, STOCK_FUEL_GROUP_MAP } from './mapping.js';
 
 const VAR_AREA = 'Maakunta';
 const VAR_CLASS = 'Ajoneuvoluokka';
@@ -84,9 +84,7 @@ function assertSchema(meta: PxTableMeta): void {
   expectValue(meta, VAR_AREA, AREA_MAINLAND);
   expectValue(meta, VAR_CLASS, CLASS_PASSENGER_CARS);
   requireVariable(meta.variables, VAR_QUARTER);
-  const fuels = requireVariable(meta.variables, VAR_FUEL);
-  const unknown = fuels.values.filter((c) => c !== FUEL_TOTAL_CODE && !(c in STOCK_FUEL_GROUP_MAP));
-  if (unknown.length > 0) throw new Error(`Unmapped fuel codes in source: ${unknown.join(', ')}`);
+  assertKnownStockFuels(requireVariable(meta.variables, VAR_FUEL).values);
 }
 
 function expectValue(

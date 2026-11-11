@@ -65,6 +65,7 @@ export const STOCK_FUEL_GROUP_MAP: Readonly<Record<string, FuelGroupId>> = {
   '37': 'other',
   '38': 'other',
   '40': 'other',
+  '41': 'other',
   '42': 'other',
   '43': 'other',
   '56': 'other',
@@ -185,4 +186,10 @@ export function areaFromCode(code: string, name: string): Area | null {
   if (code === '200') return { id: 'abroad', name: name.trim(), kind: 'abroad' };
   if (code === 'X') return { id: 'unknown', name: name.trim(), kind: 'unknown' };
   throw new Error(`Unrecognised area code in source: ${code}`);
+}
+
+/** Fails on a fuel class of a stock table that has no group yet, so it is never dropped silently. */
+export function assertKnownStockFuels(codes: readonly string[]): void {
+  const unknown = codes.filter((c) => c !== FUEL_TOTAL_CODE && !(c in STOCK_FUEL_GROUP_MAP));
+  if (unknown.length > 0) throw new Error(`Unmapped fuel codes in source: ${unknown.join(', ')}`);
 }

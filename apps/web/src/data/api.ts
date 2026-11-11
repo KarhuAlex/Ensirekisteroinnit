@@ -1,4 +1,5 @@
 import type {
+  CarFleet,
   CarStock,
   EntitySeries,
   EntitySummary,
@@ -73,6 +74,16 @@ export async function loadPrices(): Promise<FuelPrices> {
 export async function loadStock(): Promise<CarStock> {
   const latest = await getJson<LatestPointer>(`${folderUrl('stock')}/latest.json`);
   return getJson<CarStock>(`${folderUrl('stock')}/${latest.release}/stock.json`);
+}
+
+/** Points at the newest car fleet snapshot; it exists once one has been published. */
+export const loadFleetPointer = (): Promise<LatestPointer> =>
+  getJson<LatestPointer>(`${folderUrl('fleet')}/latest.json`);
+
+/** The cars in traffic on one day, by municipality and make, published under `fleet/`. */
+export async function loadFleet(): Promise<CarFleet> {
+  const latest = await loadFleetPointer();
+  return getJson<CarFleet>(`${folderUrl('fleet')}/${latest.release}/fleet.json`);
 }
 
 export function loadSeries(release: string, id: string): Promise<EntitySeries> {

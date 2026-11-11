@@ -1,12 +1,13 @@
 # Ensirekisteröinnit
 
-A bilingual (Finnish and English) web app for exploring first registrations of passenger cars in
-Finland: how fuel types shift towards electric, and how makes, models and corporate groups develop
-month by month. I built it alone, from data pipeline to cloud infrastructure.
+A bilingual (Finnish and English) hobby project for exploring first registrations of passenger cars
+in Finland: how fuel types shift towards electric, and how makes, models and corporate groups
+develop month by month.
 
 A scheduled Azure Function fetches open data from [Traficom](https://trafi2.stat.fi/PXWeb/pxweb/fi/TraFi/TraFi__Ensirekisteroinnit/)
 and [Statistics Finland](https://stat.fi/en), validates it and publishes versioned JSON. A React
-single-page app reads those files. There is no database and no API server.
+single-page app reads those files. There is no database and no API server. The project is
+independent and not affiliated with Traficom or Statistics Finland.
 
 ## What it does
 
@@ -20,6 +21,8 @@ single-page app reads those files. There is no database and no API server.
 - **Compare:** two to four makes, models or groups side by side, with the choices kept in the URL
   so a comparison can be shared.
 - **Areas:** a map and table of registrations by region and municipality (data from 2021).
+- **Car fleet:** the cars in traffic on one day: the electric share by municipality on a map, the
+  makes with their average age, and the electric share of the whole fleet since 2008.
 - **Accessibility:** charts work with the keyboard and screen readers, fuel types differ in shape as
   well as colour, and there are light and dark themes.
 
@@ -82,15 +85,15 @@ npm run dev         # web app on http://localhost:5173
 ```
 
 `npm test`, `npm run typecheck`, `npm run lint` and `npm run build` run the quality checks. Other
-datasets load with `npm run ingest -- --dataset used|prices|stock|regional`.
+datasets load with `npm run ingest -- --dataset used|prices|stock|fleet|regional`.
 
 ## Deployment
 
-The infrastructure is in [`infra/`](infra) (Bicep) and ships from GitHub Actions with OpenID
-Connect, so no credentials are stored. The frontend is a static website on a storage account rather
-than Azure Static Web Apps, because that service is available in few regions and some subscriptions
-restrict regions by policy. The templates have only been checked with `what-if`, so review the first
-deployment.
+To run your own copy on Azure you need a subscription and a fork of this repository. The
+infrastructure is in [`infra/`](infra) (Bicep) and ships from GitHub Actions with OpenID Connect, so
+no credentials are stored. The frontend is a static website on a storage account rather than Azure
+Static Web Apps, because that service is available in few regions and some subscriptions restrict
+regions by policy.
 
 1. Provision the resources (Sweden Central is closest to Finland):
 
@@ -153,13 +156,13 @@ container is public on purpose (open data, CORS limited to the site); `raw` is p
 ## Data notes
 
 - Monthly data starts in January 2014; regional data starts in 2021.
-- The counts are first registrations. The cars in traffic are a separate dataset, quarterly since
-  2008 and by fuel only, with no make or model. The current year is incomplete and the UI marks it.
+- The counts are first registrations. The cars in traffic are separate datasets: quarterly since
+  2008 by fuel only, and one snapshot by municipality and make that the source replaces each
+  quarter (every release keeps its day). Neither has models. The current year is incomplete and the
+  UI marks it.
 - The source excludes Åland and has a separate fuel category only for plug-in hybrids.
 - Used imports are known by make only. Corporate groups follow today's ownership.
 - Fuel prices are nominal monthly averages.
-
-Next on the list is the car stock by make, with the average age, from Traficom's stock tables.
 
 ## Licence
 

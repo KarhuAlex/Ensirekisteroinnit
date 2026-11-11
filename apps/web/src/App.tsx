@@ -8,6 +8,7 @@ import { Compare } from './pages/Compare';
 import { ModelDetail } from './pages/ModelDetail';
 import { Models } from './pages/Models';
 import { NotFound } from './pages/NotFound';
+import { Fleet } from './pages/Fleet';
 import { Overview } from './pages/Overview';
 import { Review } from './pages/Review';
 import { TablePage } from './pages/TablePage';
@@ -36,6 +37,7 @@ export function App() {
                 <Route path="models" element={<Models />} />
                 <Route path="models/:id" element={<ModelDetail />} />
                 <Route path="compare" element={<Compare />} />
+                <Route path="stock" element={<Fleet />} />
                 <Route path="table" element={<TablePage />} />
                 <Route path="about" element={<About />} />
                 <Route path="*" element={<NotFound />} />

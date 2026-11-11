@@ -7,10 +7,10 @@ import { FuelPriceSection } from '../components/FuelPriceSection';
 import { RollingChart } from '../components/RollingChart';
 import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
-import { StockSection } from '../components/StockSection';
 import { Facts, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
+import { useFleetPublished } from '../data/fleet';
 import { useStock } from '../data/stock';
 import { useTimeAxis } from '../data/useTimeAxis';
 import { useI18n } from '../i18n';
@@ -29,6 +29,7 @@ export function Overview() {
 
   const axis = useTimeAxis();
   const stockState = useStock();
+  const fleetPublished = useFleetPublished();
   const carStock = dataOf(stockState);
   const latestCarStock = useMemo(() => (carStock ? latestStock(carStock) : null), [carStock]);
 
@@ -71,6 +72,7 @@ export function Overview() {
             month={monthLabel}
             stock={latestCarStock}
             stockPending={stockState.status === 'loading'}
+            fleetLink={fleetPublished}
           />
 
           <Section
@@ -157,7 +159,6 @@ export function Overview() {
             </Section>
           </div>
 
-          <StockSection />
           <FuelPriceSection
             months={manifest.months}
             bev={view.bevSeries}

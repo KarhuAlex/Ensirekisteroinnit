@@ -3,7 +3,7 @@ import { useI18n, type MessageKey } from '../i18n';
 interface Props {
   source: { name: string; licence: string; updated: string };
   /** The sentence of the credit; it takes the name, the licence and the data version. */
-  message: Extract<MessageKey, 'prices.source' | 'stock.source'>;
+  message: Extract<MessageKey, 'prices.source' | 'stock.source' | 'fleet.source'>;
 }
 
 /** The credit a dataset's licence asks for: who published it, under what licence, and when. */

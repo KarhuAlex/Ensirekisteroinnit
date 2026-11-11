@@ -3,9 +3,11 @@ import { parseArgs } from 'node:util';
 import { TraficomPxWebAdapter } from './adapters/traficom-pxweb/adapter.js';
 import { TraficomRegionalAdapter } from './adapters/traficom-pxweb/regional-adapter.js';
 import { StatFinFuelPriceAdapter } from './adapters/statfin/fuel-prices-adapter.js';
+import { TraficomFleetAdapter } from './adapters/traficom-pxweb/fleet-adapter.js';
 import { TraficomStockAdapter } from './adapters/traficom-pxweb/stock-adapter.js';
 import { TraficomUsedImportAdapter } from './adapters/traficom-pxweb/used-adapter.js';
 import { pricesPipeline } from './pipeline/prices.js';
+import { fleetPipeline } from './pipeline/fleet.js';
 import { regionalPipeline } from './pipeline/regional.js';
 import { usedImportsPipeline } from './pipeline/registrations.js';
 import { runIngest, runPipeline, type IngestResult, type PipelineOptions } from './pipeline/run.js';
@@ -29,7 +31,7 @@ const { values } = parseArgs({
 });
 
 if (values.help) {
-  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used|prices|stock] [--force]
+  console.log(`Usage: regs-ingest [--out <dir> | --azure <account url>] [--dataset registrations|regional|used|prices|stock|fleet] [--force]
 
 Fetches the latest data and writes a release to <dir>/published (raw responses go to <dir>/raw).
   --out          Output directory (default: .data)
@@ -37,7 +39,8 @@ Fetches the latest data and writes a release to <dir>/published (raw responses g
                  https://<account>.blob.core.windows.net (uses your az login)
   --dataset      registrations (national, default), regional (per municipality),
                  used (cars imported used, by make), prices (pump prices of petrol and diesel)
-                 or stock (passenger cars in traffic, by quarter)
+                 stock (passenger cars in traffic, by quarter) or fleet (the cars in traffic on
+                 one day, by municipality and make)
   --from-year    First year of the regional data (default: 2021)
   --concurrency  Parallel requests for the regional data (default: 4)
   --force        Publish a new release even if the source has not changed
@@ -78,6 +81,10 @@ const SMALL_DATASETS: Readonly<
   prices: {
     prefix: 'prices/',
     run: (options) => runPipeline(pricesPipeline(new StatFinFuelPriceAdapter()), options),
+  },
+  fleet: {
+    prefix: 'fleet/',
+    run: (options) => runPipeline(fleetPipeline(new TraficomFleetAdapter()), options),
   },
   stock: {
     prefix: 'stock/',
