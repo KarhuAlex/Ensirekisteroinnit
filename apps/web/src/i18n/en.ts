@@ -14,6 +14,8 @@ export const en: Record<MessageKey, string> = {
   'nav.stockShort': 'Fleet',
   'nav.aboutShort': 'About',
   'nav.main': 'Main navigation',
+  'meta.description':
+    'First registrations and the car fleet of passenger cars in Finland: fuel type shares, makes, models and the electric share by municipality.',
   'lang.switch': 'Suomeksi',
   'lang.switchLabel': 'Vaihda suomeksi',
   'theme.toggle': 'Toggle theme',

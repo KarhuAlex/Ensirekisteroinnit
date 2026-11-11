@@ -1,4 +1,4 @@
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   buildRobots,
@@ -6,10 +6,13 @@ import {
   emptySitemap,
   normalizeBase,
   pagePaths,
+  releaseDay,
   sitemapEntityIds,
+  withHeadTags,
 } from './seo.mjs';
 
-// Writes sitemap.xml and robots.txt into the build folder from the site address, so each publisher
+// Writes sitemap.xml and robots.txt into the build folder, and adds sharing and structured data
+// tags to its index.html, from the site address, so each publisher
 // gets files for their own domain. Without SITE_URL the robots.txt has no sitemap line and the
 // sitemap is empty, so a file from an earlier deploy cannot go stale.
 // Usage: SITE_URL=https://example.org DATA_BASE_URL=... node apps/web/scripts/write-seo-files.mjs [dist]
@@ -23,17 +26,24 @@ async function readJson(url) {
   return res.json();
 }
 
-/** Ids of the makes and models in the latest release, or none when the data cannot be read. */
-async function entityIds() {
-  if (!dataBase) return [];
+/** The makes and models of the latest release and the day it was published; none if unreadable. */
+async function readCatalog() {
+  if (!dataBase) return { ids: [] };
   try {
-    const { release } = await readJson(`${dataBase}/latest.json`);
+    const { release, generatedAt } = await readJson(`${dataBase}/latest.json`);
     const entities = await readJson(`${dataBase}/${release}/entities.json`);
-    return sitemapEntityIds(entities);
+    return { ids: sitemapEntityIds(entities), lastmod: releaseDay(generatedAt) };
   } catch (error) {
     console.warn(`Model pages left out of the sitemap: ${error.message}`);
-    return [];
+    return { ids: [] };
   }
+}
+
+/** Adds the sharing and structured data tags to the page every URL is served from. */
+function writeHeadTags(outDir, base) {
+  const file = join(outDir, 'index.html');
+  if (!existsSync(file)) return console.warn(`No ${file} to add head tags to.`);
+  writeFileSync(file, withHeadTags(readFileSync(file, 'utf8'), base));
 }
 
 function writeSeoFiles(outDir, { robots, sitemap }) {
@@ -53,10 +63,12 @@ async function main() {
     return;
   }
   const base = normalizeBase(siteUrl);
-  const paths = pagePaths(await entityIds());
-  writeSeoFiles(outDir, { robots: buildRobots(base), sitemap: buildSitemap(base, paths) });
+  const { ids, lastmod } = await readCatalog();
+  const paths = pagePaths(ids);
+  writeSeoFiles(outDir, { robots: buildRobots(base), sitemap: buildSitemap(base, paths, lastmod) });
+  writeHeadTags(outDir, base);
   console.log(
-    `Wrote sitemap.xml (${paths.length} pages in each language) and robots.txt for ${base}.`,
+    `Wrote sitemap.xml (${paths.length} pages in each language), robots.txt and head tags for ${base}.`,
   );
 }
 

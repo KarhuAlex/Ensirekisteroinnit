@@ -4,11 +4,15 @@ import {
   buildRobots,
   buildSitemap,
   emptySitemap,
+  headTags,
   LANGS,
   normalizeBase,
+  OG_IMAGE,
   PAGES,
   pagePaths,
+  releaseDay,
   sitemapEntityIds,
+  withHeadTags,
 } from '../scripts/seo.mjs';
 
 describe('normalizeBase', () => {
@@ -98,5 +102,92 @@ describe('page list', () => {
       expect(declared.has(page.slice(1))).toBe(true);
     }
     expect(declared.has('models/:id')).toBe(true);
+  });
+});
+
+describe('sitemap lastmod', () => {
+  it('dates every page with the day of the release when it is known', () => {
+    const xml = buildSitemap('https://example.org', ['', '/about'], '2026-11-09');
+    expect(xml.split('<lastmod>2026-11-09</lastmod>')).toHaveLength(5);
+  });
+
+  it('leaves the date out when it is not known', () => {
+    expect(buildSitemap('https://example.org', [''])).not.toContain('lastmod');
+  });
+});
+
+describe('releaseDay', () => {
+  it('takes the day of a release timestamp and nothing from anything else', () => {
+    expect(releaseDay('2026-11-09T11:05:41.531Z')).toBe('2026-11-09');
+    expect(releaseDay('yesterday')).toBeUndefined();
+    expect(releaseDay(undefined)).toBeUndefined();
+  });
+});
+
+const PAGE = `<!doctype html><html lang="fi"><head>
+    <title>Kauppa-sivusto | esimerkki</title>
+    <meta name="application-name" content="Kauppa &amp; Kumppanit" />
+    <meta name="description" content="Kuvaus &amp; lisää" />
+  </head><body></body></html>`;
+
+describe('headTags', () => {
+  const tags = headTags('https://example.org', PAGE);
+
+  it('takes the title, description and site name from the page, as written', () => {
+    expect(tags).toContain('property="og:title" content="Kauppa-sivusto | esimerkki"');
+    expect(tags).toContain('property="og:description" content="Kuvaus &amp; lisää"');
+    expect(tags).toContain('property="og:site_name" content="Kauppa &amp; Kumppanit"');
+  });
+
+  it('gives the share image a size and a description', () => {
+    expect(tags).toContain(`property="og:image:width" content="${OG_IMAGE.width}"`);
+    expect(tags).toContain(`property="og:image:height" content="${OG_IMAGE.height}"`);
+    expect(tags).toContain(`property="og:image:alt" content="${OG_IMAGE.alt}"`);
+  });
+
+  it('points the image at the site address', () => {
+    expect(tags).toContain('property="og:image" content="https://example.org/og.png"');
+    expect(tags).toContain('name="twitter:card" content="summary_large_image"');
+  });
+
+  it('describes the site and its data as JSON-LD that cannot close its script tag', () => {
+    const start = tags.indexOf('>', tags.indexOf('application/ld+json')) + 1;
+    const json = tags.slice(start, tags.indexOf('</script>', start));
+    const data = JSON.parse(json);
+    expect(data['@graph'].map((n: { '@type': string }) => n['@type'])).toEqual([
+      'WebSite',
+      'Dataset',
+    ]);
+    expect(data['@graph'][1].license).toBe('https://creativecommons.org/licenses/by/4.0/');
+    expect(json).not.toContain('</');
+  });
+
+  it('writes characters, not character references, into the structured data', () => {
+    const json = tags.slice(tags.indexOf('application/ld+json'));
+    expect(json).toContain('"name":"Kauppa & Kumppanit"');
+    expect(json).toContain('"description":"Kuvaus & lisää"');
+    expect(json).not.toContain('&amp;');
+  });
+
+  it('refuses a page without a title, description or site name', () => {
+    expect(() => headTags('https://example.org', '<html></html>')).toThrow();
+    const noName = PAGE.replace(/<meta name="application-name"[^>]*>/, '');
+    expect(() => headTags('https://example.org', noName)).toThrow(/application-name/);
+  });
+});
+
+describe('withHeadTags', () => {
+  it('adds the tags before the end of the head, once', () => {
+    const once = withHeadTags(PAGE, 'https://example.org');
+    expect(once.indexOf('og:type')).toBeLessThan(once.indexOf('</head>'));
+    expect(withHeadTags(once, 'https://example.org')).toBe(once);
+  });
+});
+
+describe('the share image', () => {
+  it('has the size the tags declare', () => {
+    // A PNG starts with an 8 byte signature and the header chunk, whose width and height follow.
+    const png = readFileSync(new URL(`../public${OG_IMAGE.path}`, import.meta.url));
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([OG_IMAGE.width, OG_IMAGE.height]);
   });
 });

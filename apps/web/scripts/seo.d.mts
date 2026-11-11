@@ -7,5 +7,9 @@ export function sitemapEntityIds(
 ): string[];
 export function emptySitemap(): string;
 export function pagePaths(entityIds?: string[]): string[];
-export function buildSitemap(base: string, paths: readonly string[]): string;
+export function buildSitemap(base: string, paths: readonly string[], lastmod?: string): string;
+export function releaseDay(generatedAt: unknown): string | undefined;
+export function headTags(base: string, html: string): string;
+export function withHeadTags(html: string, base: string): string;
 export function buildRobots(base: string | null): string;
+export const OG_IMAGE: { path: string; width: number; height: number; alt: string };

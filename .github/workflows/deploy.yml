@@ -98,7 +98,7 @@ jobs:
           --content-cache-control "public, max-age=86400"
       - name: Upload pages and icons
         run: |
-          for pattern in '*.html' '*.svg' 'site.config.json' 'robots.txt' 'sitemap.xml'; do
+          for pattern in '*.html' '*.svg' '*.png' 'site.config.json' 'robots.txt' 'sitemap.xml'; do
             az storage blob upload-batch --account-name "$WEB_STORAGE_ACCOUNT" --auth-mode login --overwrite \
               -d '$web' -s apps/web/dist --pattern "$pattern" \
               --content-cache-control "public, max-age=0, must-revalidate"

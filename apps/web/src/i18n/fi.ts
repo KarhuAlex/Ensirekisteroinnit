@@ -12,6 +12,8 @@ export const fi = {
   'nav.stockShort': 'Kanta',
   'nav.aboutShort': 'Tietoa',
   'nav.main': 'Päävalikko',
+  'meta.description':
+    'Henkilöautojen ensirekisteröinnit ja autokanta Suomessa: käyttövoimien osuudet, merkit, mallit ja sähköautojen osuus kunnittain.',
   'lang.switch': 'English',
   'lang.switchLabel': 'Switch to English',
   'theme.toggle': 'Vaihda teemaa',
