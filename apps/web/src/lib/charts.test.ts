@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { compareLinesChart, priceLinesChart, shareAxisMax, shareLinesChart } from './charts';
+import {
+  areaMapOption,
+  compareLinesChart,
+  priceLinesChart,
+  shareAxisMax,
+  shareLinesChart,
+} from './charts';
 import { makeFormatters } from './format';
 import type { ThemeColors } from './theme';
 
@@ -164,5 +170,25 @@ describe('shareAxisMax', () => {
       series: [{ name: 'bev', color: '#0a0', values: [1, 2, 3] }],
     }) as unknown as { yAxis: { max: number; interval: number } };
     expect(chart.yAxis).toMatchObject({ max: 20, interval: 5 });
+  });
+});
+
+describe('areaMapOption', () => {
+  /** Mainland Finland spans about 11 degrees of longitude and 10 degrees of latitude. */
+  const SPAN = { longitude: 11.1, latitude: 10.3 };
+
+  it('draws Finland taller than wide, the way it is', () => {
+    const option = areaMapOption({
+      colors,
+      mapName: 'area',
+      data: [],
+      scale: { min: 0, max: 10 },
+      diverging: false,
+      formatValue: String,
+      noDataColor: '#ddd',
+    }) as unknown as { series: { aspectScale: number }[] };
+    const drawnWidth = SPAN.longitude * option.series[0]!.aspectScale;
+    expect(drawnWidth / SPAN.latitude).toBeLessThan(0.55);
+    expect(drawnWidth / SPAN.latitude).toBeGreaterThan(0.35);
   });
 });

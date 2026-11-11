@@ -378,6 +378,13 @@ interface MapOptions {
 const escapeHtml = (text: string): string =>
   text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
+/**
+ * Width of a degree of longitude against a degree of latitude: cos(latitude), at Finland's 65°.
+ * The boundaries are in degrees, and ECharts assumes 0.75 unless told otherwise, which draws
+ * Finland nearly twice as wide as it is.
+ */
+export const MAP_ASPECT = Math.cos((65 * Math.PI) / 180);
+
 /** A choropleth where areas without a value keep a neutral colour. */
 export function areaMapOption(o: MapOptions): EChartsCoreOption {
   const tooltips = new Map(o.data.map((d) => [d.id, d.tooltip]));
@@ -413,6 +420,7 @@ export function areaMapOption(o: MapOptions): EChartsCoreOption {
         type: 'map',
         map: o.mapName,
         nameProperty: 'id',
+        aspectScale: MAP_ASPECT,
         roam: false,
         selectedMode: false,
         label: { show: false },
