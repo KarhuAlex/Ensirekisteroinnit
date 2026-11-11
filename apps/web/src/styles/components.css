@@ -644,6 +644,13 @@ mark {
   }
 }
 
+/* On the narrowest phones two plates side by side do not fit a long Finnish label. */
+@media (max-width: 360px) {
+  .plates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .chart-focus {
   border-radius: var(--r-2);
 }

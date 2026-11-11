@@ -1,7 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchableTable } from '../../components/SearchableTable';
+import { ShareValue } from '../../components/ShareValue';
 import { useCatalog } from '../../data/DataProvider';
 import { useI18n } from '../../i18n';
 import type { FleetMakeRow } from '../../lib/fleet';
@@ -17,7 +18,7 @@ export function FleetMakeTable({ rows }: { rows: FleetMakeRow[] }) {
     const numeric = (
       id: NumericColumn,
       header: string,
-      text: (value: number | null) => string,
+      text: (value: number | null) => ReactNode,
     ): ColumnDef<FleetMakeRow> => ({
       id,
       header,
@@ -41,7 +42,7 @@ export function FleetMakeTable({ rows }: { rows: FleetMakeRow[] }) {
       },
       numeric('cars', t('fleet.col.cars'), (v) => fmt.int(v ?? 0)),
       numeric('fleetShare', t('fleet.col.fleetShare'), fmt.pct),
-      numeric('bevShare', t('fleet.col.bevShare'), fmt.pct),
+      numeric('bevShare', t('fleet.col.bevShare'), (v) => <ShareValue share={v} />),
       numeric('meanAge', t('fleet.col.age'), (v) => (v === null ? '–' : fmt.decimal(v))),
     ];
   }, [t, fmt, lang, byId]);

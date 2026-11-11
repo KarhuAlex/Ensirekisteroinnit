@@ -78,7 +78,7 @@ export function Section({
 
 export interface Fact {
   label: string;
-  value: string;
+  value: ReactNode;
   note?: string;
   tone?: 'positive' | 'negative' | 'neutral';
 }

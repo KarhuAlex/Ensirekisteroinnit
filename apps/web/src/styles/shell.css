@@ -185,16 +185,25 @@
     position: fixed;
     inset: auto 0 0 0;
     z-index: 30;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
     height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--ground);
     border-top: 1px solid var(--rule);
   }
 
+  .tabbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* A tab is at least a thumb wide and never shrinks below its label; when they do not all fit,
+     the bar scrolls instead of widening the page. */
   .tabbar a {
+    flex: 1 0 auto;
+    min-width: 44px;
     display: flex;
     flex-direction: column;
     align-items: center;

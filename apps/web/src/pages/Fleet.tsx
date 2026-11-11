@@ -1,5 +1,6 @@
 import type { CarFleet } from '@regs/core';
 import { useMemo, useState } from 'react';
+import { ShareValue } from '../components/ShareValue';
 import { SourceCredit } from '../components/SourceCredit';
 import { StockSection } from '../components/StockSection';
 import {
@@ -82,7 +83,7 @@ function FleetContent({ fleet, geo }: { fleet: CarFleet; geo: Geo }) {
       <Facts
         items={[
           { label: t('fleet.cars'), value: fmt.int(summary.cars) },
-          { label: t('fleet.bevShare'), value: fmt.pct(summary.bevShare) },
+          { label: t('fleet.bevShare'), value: <ShareValue share={summary.bevShare} /> },
           {
             label: t('fleet.meanAge'),
             value:

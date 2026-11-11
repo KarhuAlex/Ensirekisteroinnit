@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useDataState } from '../data/DataProvider';
 import { useI18n, type Lang, type MessageKey } from '../i18n';
@@ -20,10 +20,11 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { path: '', label: 'nav.overview', icon: 'overview', end: true },
+  { path: '', label: 'nav.overview', short: 'nav.overviewShort', icon: 'overview', end: true },
   { path: '/review', label: 'nav.review', icon: 'review', end: false },
   { path: '/models', label: 'nav.models', short: 'nav.modelsShort', icon: 'models', end: false },
   { path: '/compare', label: 'nav.compare', icon: 'compare', end: false },
+  { path: '/stock', label: 'nav.stock', short: 'nav.stockShort', icon: 'fleet', end: false },
   { path: '/table', label: 'nav.table', icon: 'table', end: false },
   { path: '/about', label: 'nav.about', short: 'nav.aboutShort', icon: 'info', end: false },
 ];
@@ -38,10 +39,24 @@ function Brand({ className }: { className?: string }) {
   );
 }
 
+/** The tab bar can scroll, so the current tab is brought into view when the page changes. */
+function useCurrentTabInView(enabled: boolean) {
+  const { pathname } = useLocation();
+  const nav = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!enabled) return;
+    nav.current
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  }, [enabled, pathname]);
+  return nav;
+}
+
 function NavList({ variant }: { variant: 'rail' | 'tabs' }) {
   const { lang, t } = useI18n();
+  const nav = useCurrentTabInView(variant === 'tabs');
   return (
-    <nav aria-label={t('nav.main')} className={variant === 'rail' ? 'nav' : 'tabbar'}>
+    <nav ref={nav} aria-label={t('nav.main')} className={variant === 'rail' ? 'nav' : 'tabbar'}>
       {NAV.map((item) => (
         <NavLink key={item.path} to={`/${lang}${item.path}`} end={item.end}>
           <Icon name={item.icon} size={variant === 'rail' ? 20 : 22} />

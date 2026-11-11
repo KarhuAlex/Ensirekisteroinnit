@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { SearchableTable } from '../../components/SearchableTable';
+import { ShareValue } from '../../components/ShareValue';
 import { useI18n } from '../../i18n';
 import { MIN_MUNICIPALITY_CARS, type FleetAreaRow } from '../../lib/fleet';
 
@@ -15,7 +16,7 @@ export function FleetAreaTable({ rows }: { rows: FleetAreaRow[] }) {
       accessorFn: (row) => (row.reliable ? (row[id] ?? undefined) : undefined),
       cell: ({ row }) =>
         row.original.reliable ? (
-          fmt.pct(row.original[id])
+          <ShareValue share={row.original[id]} />
         ) : (
           <span
             className="muted"

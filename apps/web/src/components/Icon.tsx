@@ -15,6 +15,7 @@ const PATHS = {
   arrowUp: 'M12 19V5m-6 6 6-6 6 6',
   arrowDown: 'M12 5v14m-6-6 6 6 6-6',
   compare: 'M8 4v16m0 0-3-3m3 3 3-3M16 20V4m0 0-3 3m3-3 3 3',
+  fleet: 'M3.5 16.5h17v-4.2l-2.1-4.3H5.6l-2.1 4.3ZM3.5 12.3h17M7 16.5v2.2m10-2.2v2.2',
   review: 'M4 5.5h16v14H4ZM4 10h16M8.5 3.5v4M15.5 3.5v4',
   sortNone: 'm8 9 4-4 4 4M8 15l4 4 4-4',
   sortAsc: 'm7 14 5-5 5 5',
