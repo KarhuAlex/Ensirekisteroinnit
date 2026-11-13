@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { RangeId } from './stats';
 
 /** Subscribes to a CSS media query (for values that must reach JS, such as chart sizes). */
@@ -16,6 +16,31 @@ export function useMediaQuery(query: string): boolean {
 
 export const useReducedMotion = (): boolean => useMediaQuery('(prefers-reduced-motion: reduce)');
 export const useNarrow = (): boolean => useMediaQuery('(max-width: 640px)');
+
+/** How far from the screen an element still counts as near it, so that its data is in time. */
+const NEAR_SCREEN = '400px';
+
+/**
+ * Tells once an element has come near the screen, and then stays true. Use it to hold back data
+ * for something far down a page. Where the browser cannot tell, the element counts as seen.
+ */
+export function useSeen<T extends Element>(): { ref: (element: T | null) => void; seen: boolean } {
+  const [element, setElement] = useState<T | null>(null);
+  const [seen, setSeen] = useState(() => typeof IntersectionObserver === 'undefined');
+  const ref = useCallback((next: T | null) => setElement(next), []);
+  useEffect(() => {
+    if (seen || !element) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setSeen(true);
+      },
+      { rootMargin: NEAR_SCREEN },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [element, seen]);
+  return { ref, seen };
+}
 
 /** What charts over the same months share: the visible range and the month under the pointer. */
 export interface Timeline {

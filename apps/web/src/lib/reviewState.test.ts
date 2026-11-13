@@ -5,6 +5,7 @@ import {
   effectiveLevel,
   levelAvailable,
   parseState,
+  entityAreasPath,
   reviewPath,
   reviewSearch,
   toSearchParams,
@@ -158,5 +159,26 @@ describe('rankingToCsv', () => {
       '1,"Model, ""X""",Acme,2026-03,150,12.35,100,50.00,100,0,50,0,0',
       '2,Plain,,2026-03,5,,,,5,0,0,0,0',
     ]);
+  });
+});
+
+describe('entityAreasPath', () => {
+  const span = { from: '2025-12', to: '2026-03' };
+
+  it('opens the area view of a make or model over a span, by municipality', () => {
+    const path = entityAreasPath('fi', months, 'make-a', span);
+    const params = new URL(path ?? '', 'https://example.org').searchParams;
+    expect(path?.startsWith('/fi/review?')).toBe(true);
+    expect(parseState(params, months)).toMatchObject({
+      level: 'area',
+      areaLevel: 'municipality',
+      entity: 'make-a',
+      compare: 'none',
+      range: { from: months.indexOf('2025-12'), to: months.indexOf('2026-03') },
+    });
+  });
+
+  it('has no path for a span the months do not have', () => {
+    expect(entityAreasPath('fi', months, 'make-a', { from: '2019-01', to: '2026-03' })).toBeNull();
   });
 });

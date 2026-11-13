@@ -121,6 +121,27 @@ export function reviewPath(lang: Lang, months: readonly string[], period: string
   return range ? `/${lang}/review${reviewSearch(months, range)}` : null;
 }
 
+/** The review's area view for one make or model, over a span of the table's months. */
+export function entityAreasPath(
+  lang: Lang,
+  months: readonly string[],
+  entityId: string,
+  span: { from: string; to: string },
+): string | null {
+  const from = months.indexOf(span.from);
+  const to = months.indexOf(span.to);
+  if (from < 0 || to < 0) return null;
+  const state: ReviewState = {
+    ...defaultState(months.length),
+    range: { from, to },
+    level: 'area',
+    areaLevel: 'municipality',
+    compare: 'none',
+    entity: entityId,
+  };
+  return `/${lang}/review?${toSearchParams(state, months)}`;
+}
+
 /** The corporate group level does nothing when the data has no groups; fall back to models. */
 export function withAvailableLevel(state: ReviewState, hasCorporateGroups: boolean): ReviewState {
   return state.level === 'corporategroup' && !hasCorporateGroups

@@ -487,6 +487,10 @@ mark {
   text-align: left;
   white-space: nowrap;
 }
+/* A column of words that may break onto two lines, so that a table fits a phone. */
+.data-table .wrap {
+  white-space: normal;
+}
 .data-table tbody tr:last-child td {
   border-bottom: 0;
 }

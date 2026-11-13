@@ -8,6 +8,7 @@ import {
   fleetMakeOptions,
   groupCellsByMake,
   hasFewCars,
+  hasFleetMake,
   isFuelFilter,
   makeScaleTop,
   shareRank,
@@ -148,6 +149,14 @@ describe('makeScaleTop', () => {
 
   it('leaves the areas that are not coloured out of the scale', () => {
     expect(makeScaleTop([row(2), row(40, false)])).toBe(2);
+  });
+});
+
+describe('hasFleetMake', () => {
+  it('is true for a make of the release, and false for other rows and unknown ids', () => {
+    expect(hasFleetMake(fleet, 'alfa')).toBe(true);
+    expect(hasFleetMake(fleet, 'muut')).toBe(false);
+    expect(hasFleetMake(fleet, 'gone')).toBe(false);
   });
 });
 

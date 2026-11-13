@@ -102,6 +102,32 @@ export const en: Record<MessageKey, string> = {
   'model.kpiBev': 'Battery-electric share, 12 mo',
   'model.chartTitle': 'Registrations by fuel type',
   'model.fuelBreakdown': 'Fuel types in detail',
+  'model.areas.title': 'Where it is registered',
+  'model.areas.lede':
+    "The period is {from} to {to}. The share is how large a part of the area's first registrations are of this; in the whole country it is {share}.",
+  'model.areas.caption':
+    "First registrations by region, and the share of all the area's first registrations",
+  'model.areas.col.region': 'Region',
+  'model.areas.col.count': 'Count',
+  'model.areas.col.share': 'Share',
+  'model.areas.col.standing': 'Vs. country',
+  'model.areas.standing.far-above': 'well above',
+  'model.areas.standing.above': 'above',
+  'model.areas.standing.level': 'about the same',
+  'model.areas.standing.below': 'below',
+  'model.areas.few': 'too few',
+  'model.areas.showAll': 'Show all regions',
+  'model.areas.showTop': 'Show only the top five',
+  'model.areas.tooFew':
+    'There were under {min} first registrations in the latest months, so nothing can be said about how they are spread.',
+  'model.areas.thin':
+    'The first registrations are spread so thinly that no region has {min} or more of them, so nothing can be said about the shares.',
+  'model.areas.note':
+    'The figure follows the municipality of registration: company and leasing cars often gather in the capital region, so it does not show what residents choose.',
+  'model.areas.noteSmall':
+    'Regions with under {min} first registrations are at the end of the table, without a share.',
+  'model.areas.review': 'See all areas and municipalities in the Review',
+  'model.areas.stock': "See the make's share of the car fleet by municipality",
   'model.col.fuel': 'Fuel type',
   'model.sameMake': 'Other models of the same make',
   'model.modelsOfMake': 'Models of this make',

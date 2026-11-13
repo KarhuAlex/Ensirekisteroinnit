@@ -15,6 +15,7 @@ import {
   usePageTitle,
 } from '../components/ui';
 import { SourceNote } from '../components/SourceNote';
+import { ModelAreas } from './model/ModelAreas';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
 import { useTimeAxis } from '../data/useTimeAxis';
@@ -273,6 +274,10 @@ export function ModelDetail() {
               </Section>
             )}
           </div>
+
+          {(entity.kind === 'make' || entity.kind === 'model' || entity.kind === 'group') && (
+            <ModelAreas entity={{ id: entity.id, kind: entity.kind }} months={manifest.months} />
+          )}
         </>
       )}
     </>

@@ -41,4 +41,5 @@ const loadGeo = once(async (): Promise<Geo> => {
   };
 });
 
-export const useGeo = (): Remote<Geo> => useRemote(loadGeo);
+/** Nothing is fetched while `enabled` is false. */
+export const useGeo = (enabled = true): Remote<Geo> => useRemote(enabled ? loadGeo : null);

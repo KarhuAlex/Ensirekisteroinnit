@@ -44,6 +44,10 @@ export const chosenMake = (options: readonly MakeOption[], id: string | null): M
 export const cellsNeeded = (make: MakeOption | null, area: string | null): boolean =>
   make !== null || area !== null;
 
+/** Whether the release has the make, which is what the Autokanta page can be opened on. */
+export const hasFleetMake = (fleet: CarFleet, id: string): boolean =>
+  fleet.makes.some((make) => make.kind === 'make' && make.id === id);
+
 /** The cells of each make, so that a make's cells are found without going through all of them. */
 export function groupCellsByMake(cells: readonly FleetCell[]): Map<string, FleetCell[]> {
   const byMake = new Map<string, FleetCell[]>();

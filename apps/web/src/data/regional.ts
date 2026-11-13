@@ -47,6 +47,9 @@ export function regionalLoad(wanted: readonly string[]): () => Promise<RegionalV
   return load;
 }
 
-/** The regional data is split by year, so a page asks only for the years it shows. */
-export const useRegional = (wanted: readonly string[]): Remote<RegionalView> =>
-  useRemote(regionalLoad(wanted));
+/**
+ * The regional data is split by year, so a page asks only for the years it shows. Nothing is
+ * fetched while `enabled` is false.
+ */
+export const useRegional = (wanted: readonly string[], enabled = true): Remote<RegionalView> =>
+  useRemote(enabled ? regionalLoad(wanted) : null);

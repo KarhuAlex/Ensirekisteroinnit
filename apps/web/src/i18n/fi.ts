@@ -100,6 +100,32 @@ export const fi = {
   'model.kpiBev': 'Täyssähköosuus, 12 kk',
   'model.chartTitle': 'Rekisteröinnit käyttövoimittain',
   'model.fuelBreakdown': 'Käyttövoimat tarkemmin',
+  'model.areas.title': 'Missä rekisteröidään',
+  'model.areas.lede':
+    'Ajanjakso {from}–{to}. Osuus kertoo, kuinka suuri osa alueen ensirekisteröinneistä on tätä; koko maassa osuus on {share}.',
+  'model.areas.caption':
+    'Ensirekisteröinnit maakunnittain ja osuus alueen kaikista ensirekisteröinneistä',
+  'model.areas.col.region': 'Maakunta',
+  'model.areas.col.count': 'Määrä',
+  'model.areas.col.share': 'Osuus',
+  'model.areas.col.standing': 'Koko maahan',
+  'model.areas.standing.far-above': 'selvästi yli',
+  'model.areas.standing.above': 'yli',
+  'model.areas.standing.level': 'samalla tasolla',
+  'model.areas.standing.below': 'alle',
+  'model.areas.few': 'liian vähän',
+  'model.areas.showAll': 'Näytä kaikki maakunnat',
+  'model.areas.showTop': 'Näytä vain viisi kärjessä',
+  'model.areas.tooFew':
+    'Viimeisten kuukausien aikana ensirekisteröintejä on alle {min}, joten alueittaisesta jakaumasta ei voi sanoa mitään.',
+  'model.areas.thin':
+    'Ensirekisteröinnit jakautuvat niin ohuesti, ettei yhdessäkään maakunnassa ole vähintään {min} niistä. Osuuksista ei voi sanoa mitään.',
+  'model.areas.note':
+    'Luku perustuu rekisteröintikuntaan: yritys- ja leasing-autot kasautuvat usein pääkaupunkiseudulle, joten se ei kerro asukkaiden valinnoista.',
+  'model.areas.noteSmall':
+    'Maakunnat, joissa on alle {min} ensirekisteröintiä, ovat taulukon lopussa ilman osuutta.',
+  'model.areas.review': 'Katso kaikki alueet ja kunnat Katsauksessa',
+  'model.areas.stock': 'Katso merkin osuus autokannasta kunnittain',
   'model.col.fuel': 'Käyttövoima',
   'model.sameMake': 'Saman merkin muut mallit',
   'model.modelsOfMake': 'Merkin mallit',

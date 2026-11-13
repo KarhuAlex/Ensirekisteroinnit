@@ -4,7 +4,9 @@ import { once, oncePerKey, useRemote, type Remote } from './remote';
 
 const loadFleetOnce = once(loadFleet);
 
-export const useFleet = (): Remote<CarFleet> => useRemote(loadFleetOnce);
+/** Nothing is fetched while `enabled` is false. */
+export const useFleet = (enabled = true): Remote<CarFleet> =>
+  useRemote(enabled ? loadFleetOnce : null);
 
 const loadPointerOnce = once(loadFleetPointer);
 
