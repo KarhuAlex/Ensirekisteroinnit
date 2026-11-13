@@ -510,6 +510,25 @@ mark {
 .data-table td a:hover {
   text-decoration-color: var(--accent);
 }
+.data-table tbody tr.is-selected {
+  background: var(--ground-3);
+}
+/* A name that chooses its row looks like the links of the other tables. */
+.data-table td .link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  cursor: pointer;
+}
+.data-table td .link-button:hover {
+  text-decoration-color: var(--accent);
+}
 .th-button {
   display: inline-flex;
   align-items: center;
@@ -818,6 +837,53 @@ mark {
 
 .area-map {
   cursor: default;
+}
+/* A zoomed-in map is dragged with a finger, so the page does not take the drag. */
+.area-map.is-zoomed {
+  cursor: grab;
+  touch-action: none;
+}
+.map-frame {
+  position: relative;
+}
+.map-frame:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.map-hint {
+  margin: 4px 0 0;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+.map-zoom {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.map-zoom-button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--ground);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.map-zoom-button:hover:not([aria-disabled='true']) {
+  border-color: var(--accent);
+}
+.map-zoom-button[aria-disabled='true'] {
+  color: var(--ink-3);
+  cursor: default;
+}
+.map-zoom-reset {
+  font-size: 0.8rem;
 }
 .review-controls .field-input {
   min-width: 240px;

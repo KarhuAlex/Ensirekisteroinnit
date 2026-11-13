@@ -22,6 +22,8 @@ interface Props<T> {
   toolbar?: ReactNode;
   /** Shown instead of the table when nothing matches. */
   empty?: ReactNode;
+  /** Marks the row of the chosen item. */
+  isSelected?: (data: T) => boolean;
 }
 
 /**
@@ -35,6 +37,7 @@ export function SearchableTable<T>({
   defaultSort,
   toolbar,
   empty,
+  isSelected,
 }: Props<T>) {
   const { t, fmt } = useI18n();
   const [query, setQuery] = useState('');
@@ -72,7 +75,11 @@ export function SearchableTable<T>({
       >
         {toolbar}
       </TableToolbar>
-      {shown === 0 && empty ? empty : <DataTable table={table} limit={limit} caption={caption} />}
+      {shown === 0 && empty ? (
+        empty
+      ) : (
+        <DataTable table={table} limit={limit} caption={caption} isSelected={isSelected} />
+      )}
       {shown > limit && (
         <button type="button" className="button" onClick={() => setLimit((l) => l + PAGE_SIZE)}>
           {t('models.showMore')}

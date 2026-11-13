@@ -79,6 +79,12 @@ export const fi = {
   'models.filterModels': 'Mallit',
   'models.filterGroups': 'Konsernit',
   'models.showMore': 'Näytä lisää',
+  'map.zoom': 'Kartan zoomaus',
+  'map.zoomIn': 'Lähennä karttaa',
+  'map.zoomOut': 'Loitonna karttaa',
+  'map.zoomReset': 'Koko maa',
+  'map.hint':
+    'Zoomaa painikkeilla tai pitämällä Ctrl- tai Cmd-näppäintä pohjassa ja vierittämällä. Zoomattua karttaa voi siirtää vetämällä tai nuolinäppäimillä, kun kartta on valittuna.',
   'models.count': 'Tuloksia: {n}',
   'models.col.name': 'Nimi',
   'models.col.type': 'Tyyppi',
@@ -168,11 +174,14 @@ export const fi = {
   'fleet.meanAge': 'Keski-ikä (noin)',
   'fleet.years': '{n} vuotta',
   'fleet.metric': 'Osuus autokannasta',
-  'fleet.map.title': 'Sähköautojen osuus kunnittain, {date}',
+  'fleet.map.title': 'Sähköautojen osuus alueittain, {date}',
+  'fleet.map.noteSmall':
+    'Harmaalla ovat kunnat, joissa on alle {min} autoa, koska pienessä kunnassa osuus muuttuu muutamasta autosta.',
   'fleet.map.note':
-    'Harmaalla ovat kunnat, joissa on alle {min} autoa, koska pienessä kunnassa osuus muuttuu muutamasta autosta. Luku perustuu rekisteröintikuntaan: yritys- ja leasing-autot kasautuvat usein pääkaupunkiseudulle, joten se ei kerro asukkaiden valinnoista.',
-  'fleet.areas.title': 'Kunnat',
-  'fleet.areas.caption': 'Liikennekäytössä olevat henkilöautot kunnittain',
+    'Luku perustuu rekisteröintikuntaan: yritys- ja leasing-autot kasautuvat usein pääkaupunkiseudulle, joten se ei kerro asukkaiden valinnoista.',
+  'fleet.card.hint': 'Valitse alue kartalta tai taulukosta, niin sen luvut näkyvät tässä.',
+  'fleet.card.label': 'Valittu alue: {name}',
+  'fleet.areas.caption': 'Liikennekäytössä olevat henkilöautot alueittain',
   'fleet.makes.title': 'Merkit',
   'fleet.makes.caption': 'Liikennekäytössä olevat henkilöautot merkeittäin',
   'fleet.makes.note':

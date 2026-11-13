@@ -81,6 +81,12 @@ export const en: Record<MessageKey, string> = {
   'models.filterModels': 'Models',
   'models.filterGroups': 'Corporate groups',
   'models.showMore': 'Show more',
+  'map.zoom': 'Map zoom',
+  'map.zoomIn': 'Zoom in',
+  'map.zoomOut': 'Zoom out',
+  'map.zoomReset': 'Whole country',
+  'map.hint':
+    'Zoom with the buttons, or hold Ctrl or Cmd and scroll. Drag a zoomed-in map, or move it with the arrow keys once it has focus.',
   'models.count': 'Results: {n}',
   'models.col.name': 'Name',
   'models.col.type': 'Type',
@@ -169,11 +175,14 @@ export const en: Record<MessageKey, string> = {
   'fleet.meanAge': 'Average age (approx.)',
   'fleet.years': '{n} years',
   'fleet.metric': 'Share of the fleet',
-  'fleet.map.title': 'Share of electric cars by municipality, {date}',
+  'fleet.map.title': 'Share of electric cars by area, {date}',
+  'fleet.map.noteSmall':
+    'Municipalities with fewer than {min} cars are grey, because in a small municipality the share moves by a few cars.',
   'fleet.map.note':
-    'Municipalities with fewer than {min} cars are grey, because in a small municipality the share moves by a few cars. The figure follows the municipality of registration: company and leasing cars often gather in the capital region, so it does not show what residents choose.',
-  'fleet.areas.title': 'Municipalities',
-  'fleet.areas.caption': 'Passenger cars in traffic by municipality',
+    'The figure follows the municipality of registration: company and leasing cars often gather in the capital region, so it does not show what residents choose.',
+  'fleet.card.hint': 'Choose an area on the map or in the table to see its figures here.',
+  'fleet.card.label': 'Chosen area: {name}',
+  'fleet.areas.caption': 'Passenger cars in traffic by area',
   'fleet.makes.title': 'Makes',
   'fleet.makes.caption': 'Passenger cars in traffic by make',
   'fleet.makes.note':

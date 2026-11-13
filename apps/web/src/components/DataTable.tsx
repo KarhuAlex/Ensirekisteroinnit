@@ -36,10 +36,13 @@ export function DataTable<T>({
   table,
   limit,
   caption,
+  isSelected,
 }: {
   table: Table<T>;
   limit?: number;
   caption: string;
+  /** Marks the row of the chosen item. */
+  isSelected?: (data: T) => boolean;
 }) {
   const rows = table.getRowModel().rows;
   const visible = limit === undefined ? rows : rows.slice(0, limit);
@@ -58,7 +61,7 @@ export function DataTable<T>({
         </thead>
         <tbody>
           {visible.map((row) => (
-            <tr key={row.id}>
+            <tr key={row.id} className={isSelected?.(row.original) ? 'is-selected' : undefined}>
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}

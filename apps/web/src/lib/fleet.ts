@@ -1,4 +1,12 @@
-import { sumCounts, type CarFleet, type FleetAge, type GroupCounts } from '@regs/core';
+import {
+  emptyGroupCounts,
+  FUEL_GROUP_IDS,
+  sumCounts,
+  type CarFleet,
+  type FleetAge,
+  type GroupCounts,
+} from '@regs/core';
+import { areaGroupOf, type RegionMapping } from './areaGrouping';
 import { percent } from './stats';
 
 /** A municipality with fewer cars has a share that moves by a few cars, so it is not coloured. */
@@ -28,21 +36,38 @@ export interface FleetAreaRow {
   reliable: boolean;
 }
 
+function areaRow(id: string, name: string, counts: GroupCounts): FleetAreaRow {
+  const cars = sumCounts(counts);
+  return {
+    id,
+    name,
+    cars,
+    bevShare: electricShare(counts, 'bev'),
+    plugShare: electricShare(counts, 'plug'),
+    reliable: cars >= MIN_MUNICIPALITY_CARS,
+  };
+}
+
 /** The municipalities. Cars abroad or without a known place are not an area on the map. */
 export function fleetAreaRows(fleet: CarFleet): FleetAreaRow[] {
   return fleet.areas
     .filter((area) => area.kind === 'municipality')
-    .map((area) => {
-      const cars = sumCounts(area.counts);
-      return {
-        id: area.id,
-        name: area.name,
-        cars,
-        bevShare: electricShare(area.counts, 'bev'),
-        plugShare: electricShare(area.counts, 'plug'),
-        reliable: cars >= MIN_MUNICIPALITY_CARS,
-      };
-    });
+    .map((area) => areaRow(area.id, area.name, area.counts));
+}
+
+/** The regions, each the sum of its municipalities. A municipality of no known region is left out. */
+export function fleetRegionRows(fleet: CarFleet, mapping: RegionMapping): FleetAreaRow[] {
+  const regionOf = areaGroupOf('region', mapping);
+  const regions = new Map<string, { name: string; counts: GroupCounts }>();
+  for (const area of fleet.areas) {
+    if (area.kind !== 'municipality') continue;
+    const region = regionOf(area);
+    if (region.kind !== 'region') continue;
+    const total = regions.get(region.id) ?? { name: region.name, counts: emptyGroupCounts() };
+    for (const group of FUEL_GROUP_IDS) total.counts[group] += area.counts[group];
+    regions.set(region.id, total);
+  }
+  return [...regions].map(([id, { name, counts }]) => areaRow(id, name, counts));
 }
 
 export interface FleetMakeRow {

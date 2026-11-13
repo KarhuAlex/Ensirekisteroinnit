@@ -1,6 +1,7 @@
 import { totalSeries, type FuelGroupId, type GroupedSeries } from '@regs/core';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { Formatters } from './format';
+import { isZoomedIn, type MapView } from './mapView';
 import { STACK_ORDER } from './stats';
 import type { ThemeColors } from './theme';
 
@@ -373,6 +374,8 @@ interface MapOptions {
   diverging: boolean;
   formatValue: (value: number) => string;
   noDataColor: string;
+  /** The id of the area to outline as chosen. */
+  selectedId?: string | null;
 }
 
 const escapeHtml = (text: string): string =>
@@ -384,6 +387,20 @@ const escapeHtml = (text: string): string =>
  * Finland nearly twice as wide as it is.
  */
 export const MAP_ASPECT = Math.cos((65 * Math.PI) / 180);
+
+/**
+ * One datum per area. The chosen area has a darker outline and comes last, so its outline is drawn
+ * over the borders of its neighbours.
+ */
+function mapData(o: MapOptions) {
+  const chosen = (d: MapDatum) => d.id === o.selectedId;
+  const datum = (d: MapDatum) => ({
+    name: d.id,
+    value: d.value,
+    ...(chosen(d) ? { itemStyle: { borderColor: o.colors.ink, borderWidth: 2.5 } } : {}),
+  });
+  return [...o.data.filter((d) => !chosen(d)), ...o.data.filter(chosen)].map(datum);
+}
 
 /** A choropleth where areas without a value keep a neutral colour. */
 export function areaMapOption(o: MapOptions): EChartsCoreOption {
@@ -422,15 +439,24 @@ export function areaMapOption(o: MapOptions): EChartsCoreOption {
         nameProperty: 'id',
         aspectScale: MAP_ASPECT,
         roam: false,
-        selectedMode: false,
         label: { show: false },
         itemStyle: { areaColor: o.noDataColor, borderColor: o.colors.rule, borderWidth: 0.5 },
         emphasis: {
           label: { show: false },
           itemStyle: { borderColor: o.colors.ink, borderWidth: 1.5 },
         },
-        data: o.data.map((d) => ({ name: d.id, value: d.value })),
+        data: mapData(o),
       },
     ],
+  };
+}
+
+/**
+ * The part of a map that is shown. A map that is not zoomed in stays put; a zoomed-in one can be
+ * dragged. Merged into the map's option, since the option itself starts from the whole map.
+ */
+export function mapViewOption(view: MapView): EChartsCoreOption {
+  return {
+    series: [{ roam: isZoomedIn(view) ? 'move' : false, zoom: view.zoom, center: view.center }],
   };
 }

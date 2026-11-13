@@ -4,6 +4,7 @@ import {
   electricShare,
   fleetAreaRows,
   fleetMakeRows,
+  fleetRegionRows,
   fleetSummary,
   mapScaleTop,
   meanAge,
@@ -127,5 +128,39 @@ describe('mapScaleTop', () => {
     expect(mapScaleTop(rows, 'bev')).toBe(34);
     const small = rows.map((r) => ({ ...r, reliable: false }));
     expect(mapScaleTop(small, 'bev')).toBe(1);
+  });
+});
+
+describe('fleetRegionRows', () => {
+  const mapping = {
+    regionOfMunicipality: new Map([
+      ['091', '01'],
+      ['049', '01'],
+      ['999', '02'],
+    ]),
+    regionName: new Map([
+      ['01', 'Uusimaa'],
+      ['02', 'Lappi'],
+    ]),
+  };
+  const withEspoo: CarFleet = {
+    ...fleet,
+    areas: [
+      ...fleet.areas,
+      { id: '049', name: 'Espoo', kind: 'municipality', counts: counts({ petrol: 500, bev: 500 }) },
+      { id: '000', name: 'Tuntematon kunta', kind: 'municipality', counts: counts({ petrol: 50 }) },
+    ],
+  };
+
+  it('adds the municipalities of each region together', () => {
+    const rows = fleetRegionRows(withEspoo, mapping);
+    const uusimaa = rows.find((r) => r.id === '01');
+    expect(uusimaa).toMatchObject({ name: 'Uusimaa', cars: 5500, bevShare: (2000 / 5500) * 100 });
+    expect(rows.find((r) => r.id === '02')).toMatchObject({ name: 'Lappi', cars: 100 });
+  });
+
+  it('leaves out cars abroad and municipalities of no known region', () => {
+    const ids = fleetRegionRows(withEspoo, mapping).map((r) => r.id);
+    expect(ids.sort()).toEqual(['01', '02']);
   });
 });

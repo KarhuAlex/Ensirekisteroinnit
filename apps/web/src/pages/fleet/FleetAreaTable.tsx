@@ -5,8 +5,15 @@ import { ShareValue } from '../../components/ShareValue';
 import { useI18n } from '../../i18n';
 import { MIN_MUNICIPALITY_CARS, type FleetAreaRow } from '../../lib/fleet';
 
-/** The municipalities. A share of too few cars is greyed out and starred. */
-export function FleetAreaTable({ rows }: { rows: FleetAreaRow[] }) {
+interface Props {
+  rows: FleetAreaRow[];
+  /** The id of the chosen area, whose row is marked. */
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}
+
+/** The areas. A share of too few cars is greyed out and starred; a name chooses its area. */
+export function FleetAreaTable({ rows, selectedId, onSelect }: Props) {
   const { t, fmt } = useI18n();
 
   const columns = useMemo<ColumnDef<FleetAreaRow>[]>(() => {
@@ -31,7 +38,20 @@ export function FleetAreaTable({ rows }: { rows: FleetAreaRow[] }) {
       sortUndefined: 'last',
     });
     return [
-      { accessorKey: 'name', header: t('review.col.area') },
+      {
+        accessorKey: 'name',
+        header: t('review.col.area'),
+        cell: ({ row }) => (
+          <button
+            type="button"
+            className="link-button"
+            aria-pressed={row.original.id === selectedId}
+            onClick={() => onSelect(row.original.id)}
+          >
+            {row.original.name}
+          </button>
+        ),
+      },
       {
         accessorKey: 'cars',
         header: t('fleet.col.cars'),
@@ -43,7 +63,7 @@ export function FleetAreaTable({ rows }: { rows: FleetAreaRow[] }) {
       share('bevShare', t('fleet.col.bevShare')),
       share('plugShare', t('fleet.col.plugShare')),
     ];
-  }, [t, fmt]);
+  }, [t, fmt, selectedId, onSelect]);
 
   return (
     <SearchableTable
@@ -51,6 +71,7 @@ export function FleetAreaTable({ rows }: { rows: FleetAreaRow[] }) {
       columns={columns}
       caption={t('fleet.areas.caption')}
       defaultSort={[{ id: 'cars', desc: true }]}
+      isSelected={(row) => row.id === selectedId}
     />
   );
 }

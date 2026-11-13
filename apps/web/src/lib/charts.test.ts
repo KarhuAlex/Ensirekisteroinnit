@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 import {
   areaMapOption,
   compareLinesChart,
+  mapViewOption,
   priceLinesChart,
   shareAxisMax,
   shareLinesChart,
 } from './charts';
 import { makeFormatters } from './format';
+import type { MapView } from './mapView';
 import type { ThemeColors } from './theme';
 
 const colors: ThemeColors = {
@@ -190,5 +192,61 @@ describe('areaMapOption', () => {
     const drawnWidth = SPAN.longitude * option.series[0]!.aspectScale;
     expect(drawnWidth / SPAN.latitude).toBeLessThan(0.55);
     expect(drawnWidth / SPAN.latitude).toBeGreaterThan(0.35);
+  });
+});
+
+describe('areaMapOption, the chosen area', () => {
+  const build = (selectedId?: string | null) =>
+    areaMapOption({
+      colors,
+      mapName: 'area',
+      data: [
+        { id: 'a', value: 1, tooltip: [] },
+        { id: 'b', value: 2, tooltip: [] },
+        { id: 'c', value: 3, tooltip: [] },
+      ],
+      scale: { min: 0, max: 10 },
+      diverging: false,
+      formatValue: String,
+      noDataColor: '#ddd',
+      ...(selectedId === undefined ? {} : { selectedId }),
+    }) as unknown as {
+      series: { data: { name: string; itemStyle?: { borderWidth: number } }[] }[];
+    };
+
+  it('outlines the chosen area and draws it last, over its neighbours', () => {
+    const data = build('a').series[0]!.data;
+    expect(data.map((d) => d.name)).toEqual(['b', 'c', 'a']);
+    expect(data.filter((d) => d.itemStyle)).toHaveLength(1);
+    expect(data.at(-1)?.itemStyle?.borderWidth).toBeGreaterThan(1);
+  });
+
+  it('outlines nothing when no area is chosen', () => {
+    for (const selectedId of [undefined, null]) {
+      const data = build(selectedId).series[0]!.data;
+      expect(data.map((d) => d.name)).toEqual(['a', 'b', 'c']);
+      expect(data.some((d) => d.itemStyle)).toBe(false);
+    }
+  });
+});
+
+describe('mapViewOption', () => {
+  const series = (view: MapView) =>
+    (mapViewOption(view) as unknown as { series: Record<string, unknown>[] }).series[0];
+
+  it('keeps the whole map in place', () => {
+    expect(series({ zoom: 1, center: [25, 65] })).toEqual({
+      roam: false,
+      zoom: 1,
+      center: [25, 65],
+    });
+  });
+
+  it('lets a zoomed-in map be dragged', () => {
+    expect(series({ zoom: 2.5, center: [27, 63] })).toEqual({
+      roam: 'move',
+      zoom: 2.5,
+      center: [27, 63],
+    });
   });
 });
