@@ -1,9 +1,9 @@
-import type { FuelGroupId } from './fuels.js';
+import { FUEL_GROUP_IDS, type FuelGroupId } from './fuels.js';
 import type { Area } from './regional.js';
 import type { SCHEMA_VERSION } from './types.js';
 
 /** Bumped when the fleet release gains or changes files, which forces a rebuild. */
-export const FLEET_FORMAT = 1;
+export const FLEET_FORMAT = 2;
 
 /** Cars per fuel group. */
 export type GroupCounts = Record<FuelGroupId, number>;
@@ -31,7 +31,16 @@ export interface FleetMake {
   age: FleetAge;
 }
 
-/** Passenger cars in traffic on one day, by municipality and by make. */
+/** The cars of one make in one municipality; a pair that has no cars has no cell. */
+export interface FleetCell {
+  /** The municipality's id, as in `FleetArea`. */
+  area: string;
+  /** The make's id, as in `FleetMake`. */
+  make: string;
+  counts: GroupCounts;
+}
+
+/** Passenger cars in traffic on one day, by municipality and by make, and by both together. */
 export interface FleetDataset {
   sourceId: string;
   sourceName: string;
@@ -45,6 +54,7 @@ export interface FleetDataset {
   total: { counts: GroupCounts; age: FleetAge };
   areas: FleetArea[];
   makes: FleetMake[];
+  cells: FleetCell[];
 }
 
 /** The published `fleet.json`: public and versioned like the rest of the data contract. */
@@ -57,6 +67,60 @@ export interface CarFleet {
   total: FleetDataset['total'];
   areas: FleetArea[];
   makes: FleetMake[];
+}
+
+/**
+ * The published `fleet-cells.json`: the cells in parallel arrays, which keep the file small. Cell
+ * `i` is the make `makes[make[i]]` in the municipality `areas[area[i]]`, with `counts[group][i]` cars
+ * of each fuel group.
+ */
+export interface CarFleetCells {
+  schemaVersion: typeof SCHEMA_VERSION;
+  release: string;
+  /** The day the cars were counted; the same as in `fleet.json` of the release. */
+  date: string;
+  areas: string[];
+  makes: string[];
+  area: number[];
+  make: number[];
+  counts: Record<FuelGroupId, number[]>;
+}
+
+const sorted = (ids: Iterable<string>): string[] => [...new Set(ids)].sort();
+
+/** The cells as the file that is published, in an order that does not depend on the source's. */
+export function encodeCells(
+  cells: readonly FleetCell[],
+  head: Pick<CarFleetCells, 'schemaVersion' | 'release' | 'date'>,
+): CarFleetCells {
+  const areas = sorted(cells.map((c) => c.area));
+  const makes = sorted(cells.map((c) => c.make));
+  const areaIndex = new Map(areas.map((id, i) => [id, i]));
+  const makeIndex = new Map(makes.map((id, i) => [id, i]));
+  const ordered = [...cells].sort(
+    (a, b) =>
+      areaIndex.get(a.area)! - areaIndex.get(b.area)! ||
+      makeIndex.get(a.make)! - makeIndex.get(b.make)!,
+  );
+  return {
+    ...head,
+    areas,
+    makes,
+    area: ordered.map((c) => areaIndex.get(c.area)!),
+    make: ordered.map((c) => makeIndex.get(c.make)!),
+    counts: Object.fromEntries(
+      FUEL_GROUP_IDS.map((group) => [group, ordered.map((c) => c.counts[group])]),
+    ) as CarFleetCells['counts'],
+  };
+}
+
+/** The cells of a published file. */
+export function decodeCells(file: CarFleetCells): FleetCell[] {
+  return file.area.map((areaIndex, i) => {
+    const counts = emptyGroupCounts();
+    for (const group of FUEL_GROUP_IDS) counts[group] = file.counts[group][i] ?? 0;
+    return { area: file.areas[areaIndex]!, make: file.makes[file.make[i]!]!, counts };
+  });
 }
 
 export const sumCounts = (counts: GroupCounts): number =>

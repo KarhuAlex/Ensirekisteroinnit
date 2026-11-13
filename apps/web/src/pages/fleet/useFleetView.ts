@@ -1,11 +1,14 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { ElectricShare } from '../../lib/fleet';
+import type { FuelFilter } from '../../lib/fleetMakes';
 import {
   parseFleetView,
   toFleetParams,
   withArea,
+  withFuel,
   withLevel,
+  withMake,
   withShare,
   type FleetView,
 } from '../../lib/fleetView';
@@ -15,6 +18,8 @@ export interface FleetViewControls {
   view: FleetView;
   setLevel: (level: AreaLevel) => void;
   setShare: (share: ElectricShare) => void;
+  setMake: (make: string | null) => void;
+  setFuel: (fuel: FuelFilter) => void;
   /** Chooses an area, or clears the choice if it is already the chosen one. */
   chooseArea: (id: string) => void;
 }
@@ -30,11 +35,15 @@ export function useFleetView(): FleetViewControls {
     (next: FleetView) => setParams(toFleetParams(next), { replace: true }),
     [setParams],
   );
-  const setLevel = useCallback((level: AreaLevel) => show(withLevel(view, level)), [show, view]);
-  const setShare = useCallback(
-    (share: ElectricShare) => show(withShare(view, share)),
-    [show, view],
+  return useMemo(
+    () => ({
+      view,
+      setLevel: (level) => show(withLevel(view, level)),
+      setShare: (share) => show(withShare(view, share)),
+      setMake: (make) => show(withMake(view, make)),
+      setFuel: (fuel) => show(withFuel(view, fuel)),
+      chooseArea: (id) => show(withArea(view, id)),
+    }),
+    [view, show],
   );
-  const chooseArea = useCallback((id: string) => show(withArea(view, id)), [show, view]);
-  return { view, setLevel, setShare, chooseArea };
 }

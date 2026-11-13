@@ -3,6 +3,7 @@ import {
   sumCounts,
   type FleetAge,
   type FleetArea,
+  type FleetCell,
   type FleetDataset,
   type FleetMake,
   type FleetMakeKind,
@@ -39,6 +40,8 @@ export interface TraficomFleetOptions {
   baseUrl?: string;
   databasePath?: string;
   tableId?: string;
+  /** How many cells one request may ask for; the source's own limit is 110 000. */
+  cellsPerRequest?: number;
 }
 
 const DEFAULTS = {
@@ -53,12 +56,36 @@ const item = (code: string, values: string[]) => ({
 });
 const every = (code: string) => ({ code, selection: { filter: 'all' as const, values: ['*'] } });
 
-/** The three questions put to the table: cars by area, cars by make, and the years of the makes. */
+/** The source answers at most 110 000 cells at a time; this leaves room to spare. */
+const DEFAULT_CELLS_PER_REQUEST = 100_000;
+
+/** The questions put to the table: cars by area, cars by make, and the years of the makes. */
 const QUESTIONS = {
   areas: [every(VAR_AREA), item(VAR_MAKE, [ALL]), item(VAR_YEAR, [ALL]), every(VAR_FUEL)],
   makes: [item(VAR_AREA, [AREA_MAINLAND]), every(VAR_MAKE), item(VAR_YEAR, [ALL]), every(VAR_FUEL)],
   ages: [item(VAR_AREA, [AREA_MAINLAND]), every(VAR_MAKE), every(VAR_YEAR), item(VAR_FUEL, [ALL])],
 } satisfies Record<string, PxQuery['query']>;
+
+/** The table's cars of some makes in every municipality, by fuel. */
+const cellQuestion = (municipalities: string[], makes: string[]): PxQuery['query'] => [
+  item(VAR_AREA, municipalities),
+  item(VAR_MAKE, makes),
+  item(VAR_YEAR, [ALL]),
+  every(VAR_FUEL),
+];
+
+/** Makes in groups that keep each request within the source's limit. */
+export function makeGroups(
+  makes: string[],
+  municipalities: number,
+  fuels: number,
+  cellsPerRequest = DEFAULT_CELLS_PER_REQUEST,
+): string[][] {
+  const size = Math.max(1, Math.floor(cellsPerRequest / (municipalities * fuels)));
+  return Array.from({ length: Math.ceil(makes.length / size) }, (_, i) =>
+    makes.slice(i * size, (i + 1) * size),
+  );
+}
 
 interface Variables {
   area: PxVariable;
@@ -108,12 +135,14 @@ export class TraficomFleetAdapter implements SourceAdapter<FleetDataset> {
   private readonly client: PxApi;
   private readonly databasePath: string;
   private readonly tableId: string;
+  private readonly cellsPerRequest: number;
 
   constructor(options: TraficomFleetOptions = {}) {
     this.client =
       options.client ?? new PxWebClient({ baseUrl: options.baseUrl ?? DEFAULTS.baseUrl });
     this.databasePath = options.databasePath ?? DEFAULTS.databasePath;
     this.tableId = options.tableId ?? DEFAULTS.tableId;
+    this.cellsPerRequest = options.cellsPerRequest ?? DEFAULT_CELLS_PER_REQUEST;
   }
 
   private async listing(): Promise<{ updated: string; date: string }> {
@@ -137,6 +166,17 @@ export class TraficomFleetAdapter implements SourceAdapter<FleetDataset> {
     const areaDoc = await ask(QUESTIONS.areas);
     const makeDoc = await ask(QUESTIONS.makes);
     const ageDoc = await ask(QUESTIONS.ages);
+    const municipalities = variables.area.values.filter((c) => c.startsWith(MUNICIPALITY_PREFIX));
+    const makeCodes = variables.make.values.filter((code) => code !== ALL);
+    const cellDocs: { doc: JsonStatDoc; raw: string }[] = [];
+    for (const group of makeGroups(
+      makeCodes,
+      municipalities.length,
+      variables.fuel.values.length,
+      this.cellsPerRequest,
+    )) {
+      cellDocs.push(await ask(cellQuestion(municipalities, group)));
+    }
 
     return {
       dataset: {
@@ -152,11 +192,16 @@ export class TraficomFleetAdapter implements SourceAdapter<FleetDataset> {
           { areas: areaDoc.doc, makes: makeDoc.doc, ages: ageDoc.doc },
           date,
         ),
+        cells: readCells(
+          cellDocs.map((d) => d.doc),
+          makeIds(variables.make),
+        ),
       },
       rawFiles: [
         raw('fleet-areas.json', areaDoc.raw),
         raw('fleet-makes.json', makeDoc.raw),
         raw('fleet-ages.json', ageDoc.raw),
+        ...cellDocs.map((d, i) => raw(`fleet-cells-${i + 1}.json`, d.raw)),
       ],
     };
   }
@@ -172,12 +217,18 @@ export function dayOf(title: string): string {
   return `${year}-${month?.padStart(2, '0')}-${day?.padStart(2, '0')}`;
 }
 
-/** Cars per fuel group for each value of `rowVariable`, checked against the source's own total. */
-export function readCounts(doc: JsonStatDoc, rowVariable: string): Map<string, GroupCounts> {
+/**
+ * Cars per fuel group for each row, a row being whatever `rowOf` makes of a cell's coordinates.
+ * Every row is checked against the source's own total.
+ */
+function countRows(
+  doc: JsonStatDoc,
+  rowOf: (coords: Record<string, string>) => string,
+): Map<string, GroupCounts> {
   const rows = new Map<string, GroupCounts>();
   const own = new Map<string, number>();
   for (const { coords, value } of iterateCells(doc)) {
-    const row = coords[rowVariable] ?? '';
+    const row = rowOf(coords);
     const fuel = coords[VAR_FUEL] ?? '';
     if (fuel === FUEL_TOTAL_CODE) {
       own.set(row, value ?? 0);
@@ -196,6 +247,39 @@ export function readCounts(doc: JsonStatDoc, rowVariable: string): Map<string, G
     }
   }
   return rows;
+}
+
+/** Cars per fuel group for each value of `rowVariable`, checked against the source's own total. */
+export const readCounts = (doc: JsonStatDoc, rowVariable: string): Map<string, GroupCounts> =>
+  countRows(doc, (coords) => coords[rowVariable] ?? '');
+
+/** Joins the area and make codes into one row key; the source's codes never contain it. */
+const CELL_KEY_SEPARATOR = '|';
+
+/**
+ * The cars of each make in each municipality, from the answers to the cell questions. A pair
+ * without cars is left out, and each pair is checked against the source's own total.
+ */
+export function readCells(
+  docs: readonly JsonStatDoc[],
+  makeIdOf: ReadonlyMap<string, string>,
+): FleetCell[] {
+  const cells: FleetCell[] = [];
+  for (const doc of docs) {
+    const pairs = countRows(doc, (coords) =>
+      [coords[VAR_AREA] ?? '', coords[VAR_MAKE] ?? ''].join(CELL_KEY_SEPARATOR),
+    );
+    for (const [key, counts] of pairs) {
+      if (sumCounts(counts) === 0) continue;
+      const [areaCode = '', makeCode = ''] = key.split(CELL_KEY_SEPARATOR);
+      const make = makeIdOf.get(makeCode);
+      if (!areaCode.startsWith(MUNICIPALITY_PREFIX) || !make) {
+        throw new Error(`Unexpected cell in the source: ${areaCode} ${makeCode}`);
+      }
+      cells.push({ area: areaCode.slice(MUNICIPALITY_PREFIX.length), make, counts });
+    }
+  }
+  return cells;
 }
 
 /** How many cars each make has and the sum of their ages, from the year the cars came into use. */
@@ -250,23 +334,34 @@ function buildAreas(variable: PxVariable, counts: ReadonlyMap<string, GroupCount
 const makeKind = (code: string): FleetMakeKind =>
   code === MAKE_OTHERS ? 'others' : code === MAKE_MOTORHOMES ? 'motorhomes' : 'make';
 
+/** The id of each make, by the source's code for it. */
+export function makeIds(variable: PxVariable): Map<string, string> {
+  const used = new Set<string>();
+  const ids = new Map<string, string>();
+  for (const code of variable.values.filter((c) => c !== ALL)) {
+    const name = nameOf(variable, code);
+    // Two makes can share a name once it is made into an id; the source code tells them apart.
+    let id = slugify(name);
+    if (!id || used.has(id)) id = `${id ? `${id}-` : ''}${slugify(code) || 'x'}`;
+    used.add(id);
+    ids.set(code, id);
+  }
+  return ids;
+}
+
+const nameOf = (variable: PxVariable, code: string): string =>
+  (variable.valueTexts[variable.values.indexOf(code)] ?? code).trim();
+
 function buildMakes(
   variable: PxVariable,
   counts: ReadonlyMap<string, GroupCounts>,
   ages: ReadonlyMap<string, FleetAge>,
 ): FleetMake[] {
-  const used = new Set<string>();
-  return variable.values
-    .filter((code) => code !== ALL)
-    .map((code) => {
-      const row = counts.get(code);
-      const age = ages.get(code);
-      if (!row || !age) throw new Error(`The source has no cars for the make ${code}`);
-      const name = (variable.valueTexts[variable.values.indexOf(code)] ?? code).trim();
-      // Two makes can share a name once it is made into an id; the source code tells them apart.
-      let id = slugify(name);
-      if (!id || used.has(id)) id = `${id ? `${id}-` : ''}${slugify(code) || 'x'}`;
-      used.add(id);
-      return { id, name, kind: makeKind(code), counts: row, age };
-    });
+  const ids = makeIds(variable);
+  return [...ids].map(([code, id]) => {
+    const row = counts.get(code);
+    const age = ages.get(code);
+    if (!row || !age) throw new Error(`The source has no cars for the make ${code}`);
+    return { id, name: nameOf(variable, code), kind: makeKind(code), counts: row, age };
+  });
 }

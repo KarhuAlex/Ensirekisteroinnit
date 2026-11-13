@@ -1,5 +1,6 @@
 import type {
   CarFleet,
+  CarFleetCells,
   CarStock,
   EntitySeries,
   EntitySummary,
@@ -85,6 +86,10 @@ export async function loadFleet(): Promise<CarFleet> {
   const latest = await loadFleetPointer();
   return getJson<CarFleet>(`${folderUrl('fleet')}/${latest.release}/fleet.json`);
 }
+
+/** The cars of each make in each municipality, from the same release as `fleet.json`. */
+export const loadFleetCells = (release: string): Promise<CarFleetCells> =>
+  getJson<CarFleetCells>(`${folderUrl('fleet')}/${release}/fleet-cells.json`);
 
 export function loadSeries(release: string, id: string): Promise<EntitySeries> {
   return getJson<EntitySeries>(`${DATA_BASE}/${release}/entities/${encodeURIComponent(id)}.json`);

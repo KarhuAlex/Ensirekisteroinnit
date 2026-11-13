@@ -4,6 +4,7 @@ import { SearchableTable } from '../../components/SearchableTable';
 import { ShareValue } from '../../components/ShareValue';
 import { useI18n } from '../../i18n';
 import { MIN_MUNICIPALITY_CARS, type FleetAreaRow } from '../../lib/fleet';
+import { areaNameColumn } from './areaColumns';
 
 interface Props {
   rows: FleetAreaRow[];
@@ -38,20 +39,7 @@ export function FleetAreaTable({ rows, selectedId, onSelect }: Props) {
       sortUndefined: 'last',
     });
     return [
-      {
-        accessorKey: 'name',
-        header: t('review.col.area'),
-        cell: ({ row }) => (
-          <button
-            type="button"
-            className="link-button"
-            aria-pressed={row.original.id === selectedId}
-            onClick={() => onSelect(row.original.id)}
-          >
-            {row.original.name}
-          </button>
-        ),
-      },
+      areaNameColumn<FleetAreaRow>(t('review.col.area'), selectedId, onSelect),
       {
         accessorKey: 'cars',
         header: t('fleet.col.cars'),

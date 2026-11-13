@@ -755,6 +755,7 @@ mark {
   color: var(--ink-2);
   font-size: var(--step--1);
 }
+.field select,
 .period-picker select {
   height: 44px;
   padding: 0 10px;
@@ -764,6 +765,7 @@ mark {
   color: var(--ink);
   font: inherit;
 }
+.field select:focus-visible,
 .period-picker select:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;

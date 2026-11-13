@@ -1,7 +1,10 @@
 import {
+  decodeCells,
   emptyGroupCounts,
   sumCounts,
+  type CarFleetCells,
   type FleetArea,
+  type FleetCell,
   type FleetDataset,
   type FleetMake,
   type GroupCounts,
@@ -11,7 +14,9 @@ import type { PxApi } from '../src/adapters/pxweb/api.js';
 import type { JsonStatDoc } from '../src/adapters/pxweb/jsonstat.js';
 import {
   dayOf,
+  makeGroups,
   readAges,
+  readCells,
   readCounts,
   TraficomFleetAdapter,
 } from '../src/adapters/traficom-pxweb/fleet-adapter.js';
@@ -51,6 +56,8 @@ const FUELS = ['YH', '01', '04', '39'];
 const AREAS = ['MA1', 'KU005', 'KU020', '200', 'X'];
 const MAKES = ['YH', 'AUD', 'MUUT', 'MATK'];
 const YEARS = ['YH', '2026', '2020', '9999'];
+const MUNICIPALITIES_OF_SOURCE = ['KU005', 'KU020'];
+const CELL_MAKES = ['AUD', 'MUUT', 'MATK'];
 
 // Rows are areas or makes, columns the fuels: all, petrol, electric, plug-in hybrid.
 const AREA_ROWS = [
@@ -72,6 +79,17 @@ const AGE_ROWS = [
   [70, 10, 40, 20],
   [20, 0, 10, 10],
   [10, 0, 0, 10],
+];
+
+// Rows are a municipality and a make, columns the fuels: all, petrol, electric, plug-in hybrid.
+// The makes of each municipality add up to its row above.
+const CELL_ROWS = [
+  [30, 18, 9, 3],
+  [12, 8, 3, 1],
+  [8, 4, 3, 1],
+  [24, 12, 9, 3],
+  [10, 6, 3, 1],
+  [6, 2, 3, 1],
 ];
 
 function fakeApi(over: { fuels?: string[]; title?: string; areaRows?: number[][] } = {}): PxApi {
@@ -111,8 +129,25 @@ function fakeApi(over: { fuels?: string[]; title?: string; areaRows?: number[][]
     }),
     query: async (_path, { query }) => {
       const filterOf = (code: string) => query.find((q) => q.code === code)?.selection.filter;
-      const result =
-        filterOf('Alue') === 'all'
+      const asksForCells = query.some(
+        (q) => q.code === 'Alue' && q.selection.values.includes('KU005'),
+      );
+      const askedMakes = query.find((q) => q.code === 'Merkki')?.selection.values ?? [];
+      const result = asksForCells
+        ? doc(
+            {
+              Alue: MUNICIPALITIES_OF_SOURCE,
+              Merkki: askedMakes,
+              Käyttöönottovuosi: ['YH'],
+              Käyttövoima: FUELS,
+            },
+            MUNICIPALITIES_OF_SOURCE.flatMap((_, municipality) =>
+              askedMakes.flatMap(
+                (make) => CELL_ROWS[municipality * CELL_MAKES.length + CELL_MAKES.indexOf(make)]!,
+              ),
+            ),
+          )
+        : filterOf('Alue') === 'all'
           ? doc(
               { Alue: AREAS, Merkki: ['YH'], Käyttöönottovuosi: ['YH'], Käyttövoima: FUELS },
               (over.areaRows ?? AREA_ROWS).flat(),
@@ -162,6 +197,55 @@ describe('readCounts', () => {
   });
 });
 
+describe('makeGroups', () => {
+  it('keeps every request within the limit of the source', () => {
+    const makes = Array.from({ length: 102 }, (_, i) => String(i));
+    const groups = makeGroups(makes, 292, 19);
+    expect(groups.flat()).toEqual(makes);
+    for (const group of groups) expect(group.length * 292 * 19).toBeLessThanOrEqual(110_000);
+    expect(groups.length).toBeGreaterThan(1);
+  });
+
+  it('asks for at least one make at a time', () => {
+    expect(makeGroups(['a', 'b'], 100_000, 19)).toEqual([['a'], ['b']]);
+  });
+});
+
+describe('readCells', () => {
+  const cellDoc = (rows: number[][]) =>
+    doc(
+      { Alue: ['KU005'], Merkki: ['AUD', 'MUUT'], Käyttöönottovuosi: ['YH'], Käyttövoima: FUELS },
+      rows.flat(),
+    );
+  const ids = new Map([
+    ['AUD', 'audi'],
+    ['MUUT', 'muut'],
+  ]);
+  const EMPTY = [0, 0, 0, 0];
+
+  it('reads the cars of each make in each municipality and leaves out empty pairs', () => {
+    expect(readCells([cellDoc([[30, 18, 9, 3], EMPTY])], ids)).toEqual([
+      { area: '005', make: 'audi', counts: { petrol: 18, diesel: 0, bev: 9, phev: 3, other: 0 } },
+    ]);
+  });
+
+  it('fails when the fuels of a pair do not add up to its total', () => {
+    expect(() => readCells([cellDoc([[31, 18, 9, 3], EMPTY])], ids)).toThrow(/do not add up/);
+  });
+
+  it('fails on a make or an area it has no id or place for', () => {
+    const rows = [[3, 3, 0, 0], EMPTY];
+    expect(() => readCells([cellDoc(rows)], new Map([['MUUT', 'muut']]))).toThrow(
+      /Unexpected cell/,
+    );
+    const abroad = doc(
+      { Alue: ['200'], Merkki: ['AUD'], Käyttöönottovuosi: ['YH'], Käyttövoima: FUELS },
+      [3, 3, 0, 0],
+    );
+    expect(() => readCells([abroad], ids)).toThrow(/Unexpected cell/);
+  });
+});
+
 describe('readAges', () => {
   it('sums the ages from the year of first use and gives the oldest row the age of 1959', () => {
     const ages = readAges(
@@ -199,8 +283,43 @@ describe('TraficomFleetAdapter', () => {
       ['muut-merkit-yhteensa', 'others'],
       ['matkailuautot-yhteensa', 'motorhomes'],
     ]);
-    expect(rawFiles).toHaveLength(3);
+    expect(dataset.cells).toHaveLength(6);
+    expect(dataset.cells[0]).toEqual({
+      area: '005',
+      make: 'audi',
+      counts: { petrol: 18, diesel: 0, bev: 9, phev: 3, other: 0 },
+    });
+    expect(rawFiles.map((f) => f.path)).toEqual([
+      'fleet-areas.json',
+      'fleet-makes.json',
+      'fleet-ages.json',
+      'fleet-cells-1.json',
+    ]);
     expect(() => validateFleet(dataset)).toThrow(/fewer than/);
+  });
+
+  it('puts the answers to several requests together, and keeps each one as a raw file', async () => {
+    // Two municipalities and four fuels make eight cells a make, so one make fits a request.
+    const { dataset, rawFiles } = await new TraficomFleetAdapter({
+      client: fakeApi(),
+      tableId: '010.px',
+      cellsPerRequest: 8,
+    }).fetch();
+    expect(dataset.cells).toHaveLength(6);
+    const pairs = dataset.cells.map((c) => `${c.area} ${c.make}`).sort();
+    expect(pairs).toEqual([
+      '005 audi',
+      '005 matkailuautot-yhteensa',
+      '005 muut-merkit-yhteensa',
+      '020 audi',
+      '020 matkailuautot-yhteensa',
+      '020 muut-merkit-yhteensa',
+    ]);
+    expect(rawFiles.map((f) => f.path).slice(3)).toEqual([
+      'fleet-cells-1.json',
+      'fleet-cells-2.json',
+      'fleet-cells-3.json',
+    ]);
   });
 
   it('fails on a fuel class it does not know and on a title without a day', async () => {
@@ -223,10 +342,10 @@ const spread = (total: number): GroupCounts => ({
 });
 
 const MUNICIPALITIES = 260;
-const MAKE_COUNT = 60;
+const MAKE_COUNT = 50;
 const TOTAL = MUNICIPALITIES * 10_000;
 
-/** A dataset big enough to pass validation: 260 municipalities and 60 makes that share the cars. */
+/** A dataset big enough to pass validation: 260 municipalities and 50 makes that share the cars. */
 function dataset(over: Partial<FleetDataset> = {}): FleetDataset {
   const areas: FleetArea[] = Array.from({ length: MUNICIPALITIES }, (_, i) => ({
     id: String(i).padStart(3, '0'),
@@ -245,6 +364,11 @@ function dataset(over: Partial<FleetDataset> = {}): FleetDataset {
       age: { cars, years: cars * 10 },
     };
   });
+  // Each municipality has the same cars of every make, so the makes add up to the municipality.
+  const each = TOTAL / MUNICIPALITIES / MAKE_COUNT;
+  const cells: FleetCell[] = areas.flatMap((area) =>
+    makes.map((make) => ({ area: area.id, make: make.id, counts: spread(each) })),
+  );
   return {
     sourceId: 's',
     sourceName: 'name',
@@ -256,6 +380,7 @@ function dataset(over: Partial<FleetDataset> = {}): FleetDataset {
     total: { counts: spread(TOTAL), age: { cars: TOTAL, years: TOTAL * 10 } },
     areas,
     makes,
+    cells,
     ...over,
   };
 }
@@ -300,6 +425,42 @@ describe('validateFleet', () => {
     expect(() => validateFleet(half)).toThrow(/whole number/);
   });
 
+  it('rejects cells of an unknown make, and repeated cells', () => {
+    const unknown = dataset();
+    unknown.cells[0]!.make = 'nobody';
+    expect(() => validateFleet(unknown)).toThrow(/unknown area or make/);
+    const repeated = dataset();
+    repeated.cells[1] = { ...repeated.cells[0]! };
+    expect(() => validateFleet(repeated)).toThrow(/repeated cells/);
+  });
+
+  it('rejects a municipality whose makes do not add up to its cars', () => {
+    const short = dataset();
+    short.cells[0]!.counts.petrol -= 1;
+    expect(() => validateFleet(short)).toThrow(/municipality 000 do not add up/);
+  });
+
+  it('rejects a municipality that has cars but no cells at all', () => {
+    const missing = dataset();
+    missing.cells = missing.cells.filter((c) => c.area !== '000');
+    expect(() => validateFleet(missing)).toThrow(/municipality 000 do not add up/);
+  });
+
+  it('rejects a make with more cars in its municipalities than in all', () => {
+    const many = dataset();
+    many.makes[5]!.counts.petrol = 1;
+    expect(() => validateFleet(many)).toThrow(/more cars in its municipalities/);
+  });
+
+  it('rejects a thin list of cells and a cell that is not a whole number', () => {
+    const thin = dataset();
+    thin.cells = thin.cells.slice(0, 100);
+    expect(() => validateFleet(thin)).toThrow(/fewer than 5000 cells/);
+    const half = dataset();
+    half.cells[0]!.counts.other = 0.5;
+    expect(() => validateFleet(half)).toThrow(/cell count is not a whole number/);
+  });
+
   it('adds the groups up through sumCounts', () => {
     expect(sumCounts(dataset().total.counts)).toBe(TOTAL);
   });
@@ -312,7 +473,7 @@ describe('car fleet pipeline', () => {
     fetch: async () => ({ dataset: dataset(), rawFiles: [] }),
   };
 
-  it('publishes one file under its own prefix, pointer last, and skips an unchanged source', async () => {
+  it('publishes its files under its own prefix, pointer last, and skips an unchanged source', async () => {
     const published = new MemoryStore();
     const run = () =>
       runPipeline(fleetPipeline(adapter), {
@@ -324,13 +485,24 @@ describe('car fleet pipeline', () => {
     const keys = [...published.files.keys()];
     expect(keys.at(-1)).toBe(`fleet/${LATEST_POINTER_PATH}`);
     expect(keys.some((k) => k.endsWith('/fleet.json'))).toBe(true);
+    expect(keys.some((k) => k.endsWith('/fleet-cells.json'))).toBe(true);
     expect((await run()).status).toBe('skipped');
   });
 
-  it('builds a release whose file names its own release id and the day counted', () => {
+  it('builds a release whose files name their own release id and the day counted', () => {
     const release = buildFleetRelease(dataset(), new Date('2026-11-10T08:00:00Z'));
     expect(release.id).toBe('20261110T080000Z');
-    const file = JSON.parse(release.files[0]!.body);
-    expect(file).toMatchObject({ release: release.id, date: '2026-09-30' });
+    const [fleet, cells] = release.files.map((file) => JSON.parse(file.body));
+    expect(fleet).toMatchObject({ release: release.id, date: '2026-09-30' });
+    expect(cells).toMatchObject({ release: release.id, date: '2026-09-30' });
+  });
+
+  it('publishes cells that decode to the cells of the dataset', () => {
+    const source = dataset();
+    const release = buildFleetRelease(source, new Date('2026-11-10T08:00:00Z'));
+    const file = JSON.parse(release.files[1]!.body) as CarFleetCells;
+    const byKey = (a: FleetCell, b: FleetCell) =>
+      `${a.area} ${a.make}`.localeCompare(`${b.area} ${b.make}`);
+    expect(decodeCells(file).sort(byKey)).toEqual([...source.cells].sort(byKey));
   });
 });

@@ -21,8 +21,9 @@ independent and not affiliated with Traficom or Statistics Finland.
 - **Compare:** two to four makes, models or groups side by side, with the choices kept in the URL
   so a comparison can be shared.
 - **Areas:** a map and table of registrations by region and municipality (data from 2021).
-- **Car fleet:** the cars in traffic on one day: the electric share by municipality on a map, the
-  makes with their average age, and the electric share of the whole fleet since 2008.
+- **Car fleet:** the cars in traffic on one day: the electric share by municipality on a map, or
+  the share of one make (and fuel) in each area, the makes with their average age, and the electric
+  share of the whole fleet since 2008.
 - **Accessibility:** charts work with the keyboard and screen readers, fuel types differ in shape as
   well as colour, and there are light and dark themes.
 
