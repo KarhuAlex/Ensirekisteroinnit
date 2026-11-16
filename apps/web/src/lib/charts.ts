@@ -460,3 +460,135 @@ export function mapViewOption(view: MapView): EChartsCoreOption {
     series: [{ roam: isZoomedIn(view) ? 'move' : false, zoom: view.zoom, center: view.center }],
   };
 }
+
+export interface ForecastChartOptions extends TimeAxisOptions {
+  fmt: Formatters;
+  /** The values below are for each of `months`, `null` where there is none. */
+  actual: (number | null)[];
+  /** The scenario; it starts from the last month of `actual`, so the two lines meet. */
+  path: (number | null)[];
+  low: (number | null)[];
+  high: (number | null)[];
+  /** Forecasts made earlier, drawn quietly under the rest. */
+  past?: { name: string; values: (number | null)[] }[];
+  /** A ceiling under 100 percent, drawn as a line. */
+  ceiling?: { percent: number; label: string };
+  /** Where the facts end and the scenario begins; left out where there is no scenario. */
+  boundary?: { month: string; label: string };
+  names: { actual: string; path: string; band: string };
+}
+
+const BAND_OPACITY = 0.18;
+const BAND_BASE = 'band-base';
+
+/** The band as two stacked lines: an invisible one up to the low edge, and one as tall as the band. */
+function bandSeries(o: ForecastChartOptions, color: string) {
+  const width = o.high.map((high, i) => {
+    const low = o.low[i];
+    return high === null || low === null || low === undefined ? null : high - low;
+  });
+  const hidden = { opacity: 0 };
+  const common = { type: 'line', stack: BAND_BASE, symbol: 'none', silent: true } as const;
+  return [
+    { ...common, name: `${o.names.band} (low)`, data: o.low, lineStyle: hidden, areaStyle: hidden },
+    {
+      ...common,
+      name: o.names.band,
+      data: width,
+      lineStyle: hidden,
+      areaStyle: { color, opacity: BAND_OPACITY },
+    },
+  ];
+}
+
+/**
+ * Facts as a solid line and a scenario as a dashed one, with a band around it. The two must not
+ * look alike: the dashes, the band and a line at the boundary say that what follows is not a fact.
+ */
+export function forecastChart(o: ForecastChartOptions): EChartsCoreOption {
+  const color = o.colors.fuel.bev;
+  const markLine = (data: object[], lineColor: string, dash: string) => ({
+    silent: true,
+    symbol: 'none',
+    animation: false,
+    lineStyle: { color: lineColor, type: dash, width: 1.25 },
+    data,
+  });
+  return {
+    ...timeChartBase(o),
+    yAxis: {
+      type: 'value',
+      min: 0,
+      max: 100,
+      interval: 25,
+      ...quietAxis(o.colors),
+      axisLabel: yLabels(o.colors, (v) => `${v} %`),
+    },
+    series: [
+      ...(o.past ?? []).map((p) => ({
+        name: p.name,
+        type: 'line',
+        data: p.values,
+        symbol: 'none',
+        connectNulls: false,
+        silent: true,
+        lineStyle: { width: 1.5, color: o.colors.faint, type: 'dotted' },
+        itemStyle: { color: o.colors.faint },
+        emphasis: { disabled: true },
+      })),
+      ...bandSeries(o, color),
+      {
+        name: o.names.path,
+        type: 'line',
+        data: o.path,
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 2.75, color, type: 'dashed' },
+        itemStyle: { color },
+        emphasis: { disabled: true },
+        markLine: markLine(
+          o.ceiling
+            ? [
+                {
+                  yAxis: o.ceiling.percent,
+                  label: {
+                    formatter: o.ceiling.label,
+                    color: o.colors.faint,
+                    position: 'insideEndTop',
+                  },
+                },
+              ]
+            : [],
+          o.colors.faint,
+          'dashed',
+        ),
+      },
+      {
+        name: o.names.actual,
+        type: 'line',
+        data: o.actual,
+        symbol: 'none',
+        connectNulls: false,
+        lineStyle: { width: 2.75, color },
+        itemStyle: { color },
+        emphasis: { disabled: true },
+        markLine: markLine(
+          o.boundary
+            ? [
+                {
+                  xAxis: o.boundary.month,
+                  label: {
+                    formatter: o.boundary.label,
+                    color: o.colors.faint,
+                    position: 'insideEndTop',
+                  },
+                },
+              ]
+            : [],
+          o.colors.faint,
+          'solid',
+        ),
+      },
+    ],
+  };
+}

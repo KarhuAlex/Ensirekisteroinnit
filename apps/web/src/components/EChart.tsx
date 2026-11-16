@@ -2,6 +2,7 @@ import { BarChart, LineChart } from 'echarts/charts';
 import {
   AriaComponent,
   DataZoomComponent,
+  MarkLineComponent,
   GridComponent,
   TooltipComponent,
 } from 'echarts/components';
@@ -17,6 +18,7 @@ echarts.use([
   GridComponent,
   TooltipComponent,
   DataZoomComponent,
+  MarkLineComponent,
   AriaComponent,
   LegacyGridContainLabel,
   CanvasRenderer,

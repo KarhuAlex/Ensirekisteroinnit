@@ -148,7 +148,11 @@ export function Overview() {
                 ariaLabel={t('chart.annualTitle')}
               />
             </Section>
-            <Section id="rolling-title" title={t('chart.electrifiedTitle')}>
+            <Section
+              id="rolling-title"
+              title={t('chart.electrifiedTitle')}
+              footnote={<Link to={`/${lang}/forecast`}>{t('forecast.link')}</Link>}
+            >
               <RollingChart
                 months={manifest.months}
                 bev={view.bevSeries}

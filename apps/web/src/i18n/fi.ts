@@ -61,6 +61,50 @@ export const fi = {
   'chart.shareTitle': 'Käyttövoimien osuus ensirekisteröinneistä',
   'chart.annualTitle': 'Ensirekisteröinnit vuosittain',
   'chart.electrifiedTitle': 'Sähköautojen osuus, liukuva 12 kk',
+  'forecast.title': 'Täyssähkön osuus: skenaario',
+  'forecast.lede':
+    'Mitä osuudelle voisi tapahtua, jos viimeisten kahden vuoden kehitys jatkuu mutta hidastuu. Tämä on skenaario, ei ennuste.',
+  'forecast.link': 'Entä jatkossa? Katso skenaario',
+  'forecast.chartTitle': 'Täyssähköautojen osuus ensirekisteröinneistä, liukuva 12 kk',
+  'forecast.aria': 'Täyssähköautojen osuus ensirekisteröinneistä ja skenaario kolmeksi vuodeksi',
+  'forecast.ceiling': 'Kyllästymisraja',
+  'forecast.actual': 'Toteutunut',
+  'forecast.scenario': 'Skenaario',
+  'forecast.band': 'Väli',
+  'forecast.past': 'Aiemmat skenaariot',
+  'forecast.pastName': 'Skenaario, {month}',
+  'forecast.boundary': 'Tästä eteenpäin skenaario',
+  'forecast.ceilingLine': 'Kyllästymisraja {ceiling} %',
+  'forecast.notEnough': 'Tietoa ei ole vielä tarpeeksi skenaarioon.',
+  'forecast.tableCaption': 'Skenaarion arvot 12, 24 ja 36 kuukauden päästä',
+  'forecast.col.when': 'Ajankohta',
+  'forecast.col.value': 'Skenaario',
+  'forecast.col.range': 'Väli',
+  'forecast.reach.title': 'Milloin osuus ylittää tason?',
+  'forecast.reach.hint':
+    'Jos nykyinen trendi jatkuu mutta hidastuu. Aikaisin kuukausi on välin yläreunan mukaan, viimeisin alareunan.',
+  'forecast.reach.none':
+    '{level} %: ei ylity {years} vuoden sisällä (kyllästymisraja {ceiling} %).',
+  'forecast.reach.open':
+    '{level} %: aikaisin ylitys {earliest}, viimeisin ylitys ei ole varmasti {years} vuoden sisällä (kyllästymisraja {ceiling} %).',
+  'forecast.reach.window':
+    '{level} %: aikaisin ylitys {earliest}, viimeisin {latest} (kyllästymisraja {ceiling} %).',
+  'forecast.past.title': 'Mitä menetelmä olisi sanonut aiemmin',
+  'forecast.past.lede':
+    'Pisteviivat ovat samalla menetelmällä aiemmin tehtyjä skenaarioita, kun tiedossa oli vain lähtökuukauteen asti. Niitä voi verrata siihen, mitä oikeasti tapahtui.',
+  'forecast.past.aria': 'Täyssähköautojen osuus ensirekisteröinneistä ja aiemmin tehdyt skenaariot',
+  'forecast.coverage':
+    'Kun väli tehtiin vain silloin tiedossa olleilla luvuilla, {months} kuukautta myöhempi osuus osui väliin {held}/{tried} kerrasta ja viimeisten kahden vuoden aikana {recentHeld}/{recentTried} kerrasta.',
+  'forecast.method.title': 'Oletukset ja rajoitukset',
+  'forecast.method.how':
+    'Menetelmä sovittaa liukuvaan {months} kuukauden osuuteen suoran niin, että osuus pysyy nollan ja kyllästymisrajan välissä. Suoran kulma jatkuu mutta vaimenee kuukausi kuukaudelta. Väli on yhtä leveä kuin menetelmän aiemmat virheet samalla etäisyydellä, levennettynä {margin} %:lla. Kyllästymisraja on oletus, jota aineisto ei pysty määrittämään.',
+  'forecast.method.limits':
+    'Skenaario ei tiedä verotuksesta, tuista, hinnoista eikä mallitarjonnasta. Vuonna 2024 osuus kääntyi laskuun, eikä mikään kokeilluista menetelmistä olisi osannut ennakoida sitä.',
+  'forecast.method.scope':
+    'Skenaario koskee uusien autojen ensirekisteröintejä. Koko autokannan sähköosuus on paljon pienempi ja muuttuu hitaammin, eikä sitä ole tässä ennustettu.',
+  'forecast.method.disclaimer':
+    'Sivusto on harrasteprojekti. Skenaario ei ole sijoitus- tai liikeneuvontaa eikä lupaus siitä, mitä tapahtuu.',
+  'forecast.method.back': 'Takaisin yleiskuvaan',
   'chart.modeShare': 'Osuus',
   'chart.modeCount': 'Määrä',
   'chart.monthly': 'Kuukausittain',
@@ -126,6 +170,16 @@ export const fi = {
     'Maakunnat, joissa on alle {min} ensirekisteröintiä, ovat taulukon lopussa ilman osuutta.',
   'model.areas.review': 'Katso kaikki alueet ja kunnat Katsauksessa',
   'model.areas.stock': 'Katso merkin osuus autokannasta kunnittain',
+  'model.fleet.title': 'Liikenteessä nyt',
+  'model.fleet.lede': 'Merkin {name} henkilöautot liikennekäytössä {date}.',
+  'model.fleet.cars': 'Autoja liikenteessä',
+  'model.fleet.share': 'Osuus kaikista henkilöautoista',
+  'model.fleet.compare': 'Ensirekisteröityjä vuodesta {since}: {registered}. Liikenteessä: {cars}.',
+  'model.fleet.note':
+    'Liikenteessä on myös vanhempia ja käytettynä tuotuja autoja, ja osa ensirekisteröidyistä autoista on poistunut, joten luvut eivät ole toistensa osia.',
+  'model.fleet.link': 'Katso merkin autokanta alueittain',
+  'model.fleet.onlyMakes':
+    'Liikenteessä olevien autojen määrä on saatavilla vain merkeittäin, ei malleittain:',
   'model.col.fuel': 'Käyttövoima',
   'model.sameMake': 'Saman merkin muut mallit',
   'model.modelsOfMake': 'Merkin mallit',
@@ -166,6 +220,8 @@ export const fi = {
     'Mallikohtaiset luvut ovat mallisarjatasoisia: lähde on voinut yhdistää samaan sarjaan useita malleja.',
   'about.caveat6':
     'Käytettynä maahan tuodut autot eivät ole mukana ensirekisteröinneissä, koska lähde tilastoi ne erikseen. Katsauksessa ne näkyvät valinnalla Käytettynä tuodut, mutta vain merkeittäin.',
+  'about.caveat7':
+    'Skenaariosivun osuudet ovat oletuksiin perustuvia skenaarioita, eivät ennusteita.',
   'about.priceSourceLink': 'Avaa hintojen lähde Tilastokeskuksen tietokannassa',
   'about.sourceNotesTitle': 'Lähteen omat huomautukset',
 
@@ -231,7 +287,7 @@ export const fi = {
   'fleet.makes.title': 'Merkit',
   'fleet.makes.caption': 'Liikennekäytössä olevat henkilöautot merkeittäin',
   'fleet.makes.note':
-    'Lähde ei erottele malleja, joten kanta on vain merkeittäin. Keski-ikä lasketaan käyttöönottovuodesta, joten se on likimääräinen. Täyssähköosuutta ei näytetä merkeille, joilla on alle {min} autoa. Taulukossa eivät ole matkailuautot ({motorhomes}) eikä luokka ”muut merkit” ({others}).',
+    'Lähde ei erottele malleja, joten kanta on vain merkeittäin. Keski-ikä lasketaan käyttöönottovuodesta, joten se on likimääräinen. Täyssähköosuutta ja keski-ikää ei näytetä merkeille, joilla on alle {min} autoa. Taulukossa eivät ole matkailuautot ({motorhomes}) eikä luokka ”muut merkit” ({others}).',
   'fleet.col.cars': 'Autoja',
   'fleet.col.bevShare': 'Täyssähkö',
   'fleet.col.plugShare': 'Täyssähkö ja ladattava hybridi',

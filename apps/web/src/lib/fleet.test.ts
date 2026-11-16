@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import {
   electricShare,
   fleetAreaRows,
+  fleetMakeRow,
   fleetMakeRows,
+  modelFleetView,
   fleetRegionRows,
   fleetSummary,
   mapScaleTop,
@@ -105,7 +107,7 @@ describe('fleetMakeRows', () => {
 
   it('gives no share to a make with few cars but still counts them', () => {
     const rare = fleetMakeRows(fleet)[1];
-    expect(rare).toMatchObject({ cars: 50, bevShare: null });
+    expect(rare).toMatchObject({ cars: 50, bevShare: null, meanAge: null });
     expect(MIN_MAKE_CARS).toBeGreaterThan(50);
   });
 });
@@ -162,5 +164,44 @@ describe('fleetRegionRows', () => {
   it('leaves out cars abroad and municipalities of no known region', () => {
     const ids = fleetRegionRows(withEspoo, mapping).map((r) => r.id);
     expect(ids.sort()).toEqual(['01', '02']);
+  });
+});
+
+describe('fleetMakeRow', () => {
+  it('is the row of a make of the release, the same as in the list of makes', () => {
+    const row = fleetMakeRow(fleet, 'toyota');
+    expect(row).toEqual(fleetMakeRows(fleet).find((r) => r.id === 'toyota'));
+    expect(row?.cars).toBe(5100);
+  });
+
+  it('is nothing for a row that is not a make, and for an id the release does not have', () => {
+    expect(fleetMakeRow(fleet, 'muut-merkit-yhteensa')).toBeNull();
+    expect(fleetMakeRow(fleet, 'matkailuautot-yhteensa')).toBeNull();
+    expect(fleetMakeRow(fleet, 'gone')).toBeNull();
+  });
+});
+
+describe('modelFleetView', () => {
+  it('gives a make its own row', () => {
+    const view = modelFleetView(fleet, { id: 'toyota', kind: 'make' });
+    expect(view).toEqual({ kind: 'make', row: fleetMakeRow(fleet, 'toyota') });
+  });
+
+  it('points a model to the row of its make, not to a number of its own', () => {
+    const view = modelFleetView(fleet, { id: 'toyota-yaris', kind: 'model', makeId: 'toyota' });
+    expect(view).toEqual({ kind: 'note', row: fleetMakeRow(fleet, 'toyota') });
+  });
+
+  it('shows nothing for a make the release does not have, or a model of one', () => {
+    expect(modelFleetView(fleet, { id: 'gone', kind: 'make' })).toBeNull();
+    expect(modelFleetView(fleet, { id: 'x', kind: 'model', makeId: 'gone' })).toBeNull();
+  });
+
+  it('shows nothing for a model with no make, a group of models and the total', () => {
+    expect(modelFleetView(fleet, { id: 'x', kind: 'model' })).toBeNull();
+    expect(
+      modelFleetView(fleet, { id: 'toyota-muut', kind: 'group', makeId: 'toyota' }),
+    ).toBeNull();
+    expect(modelFleetView(fleet, { id: 'total', kind: 'total' })).toBeNull();
   });
 });

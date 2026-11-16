@@ -63,6 +63,50 @@ export const en: Record<MessageKey, string> = {
   'chart.shareTitle': 'Share of first registrations by fuel type',
   'chart.annualTitle': 'First registrations per year',
   'chart.electrifiedTitle': 'Share of electric cars, rolling 12 months',
+  'forecast.title': 'Electric share: a scenario',
+  'forecast.lede':
+    'What could happen to the share if the last two years carry on but slow down. This is a scenario, not a forecast.',
+  'forecast.link': 'What next? See the scenario',
+  'forecast.chartTitle': 'Battery-electric share of first registrations, rolling 12 months',
+  'forecast.aria': 'Battery-electric share of first registrations and a three-year scenario',
+  'forecast.ceiling': 'Saturation level',
+  'forecast.actual': 'Actual',
+  'forecast.scenario': 'Scenario',
+  'forecast.band': 'Range',
+  'forecast.past': 'Earlier scenarios',
+  'forecast.pastName': 'Scenario, {month}',
+  'forecast.boundary': 'Scenario from here',
+  'forecast.ceilingLine': 'Saturation level {ceiling}%',
+  'forecast.notEnough': 'There is not yet enough data for a scenario.',
+  'forecast.tableCaption': 'The scenario 12, 24 and 36 months ahead',
+  'forecast.col.when': 'When',
+  'forecast.col.value': 'Scenario',
+  'forecast.col.range': 'Range',
+  'forecast.reach.title': 'When does the share pass a level?',
+  'forecast.reach.hint':
+    'If the current trend carries on but slows down. The earliest month is by the top of the range, the latest by the bottom.',
+  'forecast.reach.none':
+    '{level}%: not passed within {years} years when the saturation level is {ceiling}%.',
+  'forecast.reach.open':
+    '{level}%: could be passed from {earliest} at the earliest, but not necessarily within {years} years, when the saturation level is {ceiling}%.',
+  'forecast.reach.window':
+    '{level}%: passed from {earliest} at the earliest and by {latest} at the latest, when the saturation level is {ceiling}%.',
+  'forecast.past.title': 'What the method would have said before',
+  'forecast.past.lede':
+    'The dotted lines are scenarios made earlier with the same method, when only the months up to the start were known. They can be compared with what really happened.',
+  'forecast.past.aria': 'Battery-electric share of first registrations and scenarios made earlier',
+  'forecast.coverage':
+    'When the range was made with only the figures known at the time, the share {months} months later fell inside it {held} times out of {tried}, and {recentHeld} out of {recentTried} in the last two years.',
+  'forecast.method.title': 'Assumptions and limits',
+  'forecast.method.how':
+    "The method fits a line to the rolling {months}-month share so that the share stays between zero and the saturation level. The slope of the line carries on but fades month by month. The range is as wide as the method's past errors at the same distance, made {margin}% wider. The saturation level is an assumption that the data cannot settle.",
+  'forecast.method.limits':
+    'The scenario knows nothing of taxes, subsidies, prices or the supply of models. In 2024 the share turned down, and none of the methods tried would have seen it coming.',
+  'forecast.method.scope':
+    'The scenario is for first registrations of new cars. The electric share of the whole fleet is much smaller and changes more slowly, and it is not projected here.',
+  'forecast.method.disclaimer':
+    'The site is a hobby project. The scenario is not investment or business advice, nor a promise of what will happen.',
+  'forecast.method.back': 'Back to the overview',
   'chart.modeShare': 'Share',
   'chart.modeCount': 'Count',
   'chart.monthly': 'Monthly',
@@ -128,6 +172,15 @@ export const en: Record<MessageKey, string> = {
     'Regions with under {min} first registrations are at the end of the table, without a share.',
   'model.areas.review': 'See all areas and municipalities in the Review',
   'model.areas.stock': "See the make's share of the car fleet by municipality",
+  'model.fleet.title': 'On the road now',
+  'model.fleet.lede': 'Passenger cars of {name} in traffic on {date}.',
+  'model.fleet.cars': 'Cars in traffic',
+  'model.fleet.share': 'Share of all passenger cars',
+  'model.fleet.compare': 'First registered since {since}: {registered}. In traffic: {cars}.',
+  'model.fleet.note':
+    'The cars in traffic also include older cars and cars imported used, and some of the cars first registered have left traffic, so the figures are not parts of each other.',
+  'model.fleet.link': "See the make's car fleet by area",
+  'model.fleet.onlyMakes': 'The number of cars in traffic is available by make only, not by model:',
   'model.col.fuel': 'Fuel type',
   'model.sameMake': 'Other models of the same make',
   'model.modelsOfMake': 'Models of this make',
@@ -167,6 +220,8 @@ export const en: Record<MessageKey, string> = {
     'Model figures are at model-series level: the source may have combined several models into one series.',
   'about.caveat6':
     'Cars imported used are not part of the first registrations, because the source counts them separately. In the review they appear under Used imports, by make only.',
+  'about.caveat7':
+    'The shares on the scenario page rest on assumptions: they are scenarios, not forecasts.',
   'about.priceSourceLink': "Open the price source in Statistics Finland's database",
   'about.sourceNotesTitle': 'Notes from the source (in Finnish)',
 
@@ -232,7 +287,7 @@ export const en: Record<MessageKey, string> = {
   'fleet.makes.title': 'Makes',
   'fleet.makes.caption': 'Passenger cars in traffic by make',
   'fleet.makes.note':
-    'The source does not split the fleet by model, so it is by make only. The average age is counted from the year of first use, so it is approximate. The battery-electric share is not shown for makes with fewer than {min} cars. The table leaves out motorhomes ({motorhomes}) and the class "other makes" ({others}).',
+    'The source does not split the fleet by model, so it is by make only. The average age is counted from the year of first use, so it is approximate. The battery-electric share and the average age are not shown for makes with fewer than {min} cars. The table leaves out motorhomes ({motorhomes}) and the class "other makes" ({others}).',
   'fleet.col.cars': 'Cars',
   'fleet.col.bevShare': 'Battery electric',
   'fleet.col.plugShare': 'Battery electric and plug-in hybrid',

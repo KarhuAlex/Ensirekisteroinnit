@@ -24,6 +24,10 @@ independent and not affiliated with Traficom or Statistics Finland.
 - **Car fleet:** the cars in traffic on one day: the electric share by municipality on a map, or
   the share of one make (and fuel) in each area, the makes with their average age, and the electric
   share of the whole fleet since 2008.
+- **Scenario:** where the electric share of first registrations could go over the next three
+  years if the last two years carry on but slow down, for a chosen saturation level. It is a
+  scenario, not a forecast: the range around it is how far the same method was off in the past,
+  and the page shows earlier scenarios beside what happened and how often the range held.
 - **Accessibility:** charts work with the keyboard and screen readers, fuel types differ in shape as
   well as colour, and there are light and dark themes.
 

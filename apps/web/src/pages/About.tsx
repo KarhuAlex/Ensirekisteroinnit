@@ -65,6 +65,7 @@ export function About() {
           <li>{t('about.caveat4')}</li>
           <li>{t('about.caveat5')}</li>
           <li>{t('about.caveat6')}</li>
+          <li>{t('about.caveat7')}</li>
         </ul>
       </section>
 

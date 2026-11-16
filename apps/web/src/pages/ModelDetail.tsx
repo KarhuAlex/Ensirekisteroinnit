@@ -16,6 +16,7 @@ import {
 } from '../components/ui';
 import { SourceNote } from '../components/SourceNote';
 import { ModelAreas } from './model/ModelAreas';
+import { ModelFleet } from './model/ModelFleet';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
 import { useTimeAxis } from '../data/useTimeAxis';
@@ -274,6 +275,17 @@ export function ModelDetail() {
               </Section>
             )}
           </div>
+
+          <ModelFleet
+            entity={{
+              id: entity.id,
+              kind: entity.kind,
+              ...(entity.makeId ? { makeId: entity.makeId } : {}),
+            }}
+            name={name}
+            registered={view.total}
+            since={manifest.months[0] ?? ''}
+          />
 
           {(entity.kind === 'make' || entity.kind === 'model' || entity.kind === 'group') && (
             <ModelAreas entity={{ id: entity.id, kind: entity.kind }} months={manifest.months} />

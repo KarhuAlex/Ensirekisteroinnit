@@ -3,7 +3,9 @@ import {
   FUEL_GROUP_IDS,
   sumCounts,
   type CarFleet,
+  type EntityKind,
   type FleetAge,
+  type FleetMake,
   type GroupCounts,
 } from '@regs/core';
 import { areaGroupOf, type RegionMapping } from './areaGrouping';
@@ -11,7 +13,7 @@ import { percent } from './stats';
 
 /** A municipality with fewer cars has a share that moves by a few cars, so it is not coloured. */
 export const MIN_MUNICIPALITY_CARS = 2000;
-/** A make with fewer cars gets no share. */
+/** A make with fewer cars gets no electric share and no average age. */
 export const MIN_MAKE_CARS = 100;
 
 /** Which electric share is shown: battery electric alone, or with the plug-in hybrids. */
@@ -81,22 +83,51 @@ export interface FleetMakeRow {
   meanAge: number | null;
 }
 
+function makeRow(make: FleetMake, all: number): FleetMakeRow {
+  const cars = sumCounts(make.counts);
+  return {
+    id: make.id,
+    name: make.name,
+    cars,
+    fleetShare: percent(cars, all),
+    bevShare: cars >= MIN_MAKE_CARS ? electricShare(make.counts, 'bev') : null,
+    meanAge: cars >= MIN_MAKE_CARS ? meanAge(make.age) : null,
+  };
+}
+
 /** The makes. Motorhomes and "other makes" are rows of the source that are not a make. */
 export function fleetMakeRows(fleet: CarFleet): FleetMakeRow[] {
   const all = sumCounts(fleet.total.counts);
-  return fleet.makes
-    .filter((make) => make.kind === 'make')
-    .map((make) => {
-      const cars = sumCounts(make.counts);
-      return {
-        id: make.id,
-        name: make.name,
-        cars,
-        fleetShare: percent(cars, all),
-        bevShare: cars >= MIN_MAKE_CARS ? electricShare(make.counts, 'bev') : null,
-        meanAge: meanAge(make.age),
-      };
-    });
+  return fleet.makes.filter((make) => make.kind === 'make').map((make) => makeRow(make, all));
+}
+
+/**
+ * What the page of a make or model shows of the fleet. Only a make has cars in traffic of its own;
+ * a model is pointed to its make, and anything else, such as a group of models, shows nothing. A
+ * make the release does not have shows nothing either.
+ */
+export type ModelFleetView =
+  { kind: 'make'; row: FleetMakeRow } | { kind: 'note'; row: FleetMakeRow } | null;
+
+export function modelFleetView(
+  fleet: CarFleet,
+  entity: { id: string; kind: EntityKind; makeId?: string },
+): ModelFleetView {
+  if (entity.kind === 'make') {
+    const row = fleetMakeRow(fleet, entity.id);
+    return row ? { kind: 'make', row } : null;
+  }
+  if (entity.kind === 'model' && entity.makeId) {
+    const row = fleetMakeRow(fleet, entity.makeId);
+    return row ? { kind: 'note', row } : null;
+  }
+  return null;
+}
+
+/** One make of the fleet, or `null` where the release does not have it. */
+export function fleetMakeRow(fleet: CarFleet, id: string): FleetMakeRow | null {
+  const make = fleet.makes.find((m) => m.kind === 'make' && m.id === id);
+  return make ? makeRow(make, sumCounts(fleet.total.counts)) : null;
 }
 
 /** The cars of the rows that are not a make, which the make table leaves out. */

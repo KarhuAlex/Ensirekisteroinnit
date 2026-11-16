@@ -1123,3 +1123,43 @@ mark {
   height: 20px;
   accent-color: var(--accent);
 }
+
+/* The key of the scenario chart: a solid line for facts, a dashed one for the scenario. */
+.forecast-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: var(--step--1);
+}
+.forecast-legend .swatch {
+  display: inline-block;
+  width: 24px;
+  height: 0;
+  margin-right: 6px;
+  border-top: 3px solid var(--fuel-bev);
+  vertical-align: middle;
+}
+.forecast-legend .swatch--scenario {
+  border-top-style: dashed;
+}
+.forecast-legend .swatch--band {
+  height: 12px;
+  border: 0;
+  background: var(--fuel-bev);
+  opacity: 0.25;
+}
+.forecast-legend .swatch--past {
+  border-top: 2px dotted var(--ink-3);
+}
+
+/* Sentences in a list, each a statement of its own. */
+.statement-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 0 1.25em;
+}

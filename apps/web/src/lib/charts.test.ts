@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   areaMapOption,
   compareLinesChart,
+  forecastChart,
+  type ForecastChartOptions,
   mapViewOption,
   priceLinesChart,
   shareAxisMax,
@@ -248,5 +250,76 @@ describe('mapViewOption', () => {
       zoom: 2.5,
       center: [27, 63],
     });
+  });
+});
+
+describe('forecastChart', () => {
+  const months = ['2026-01', '2026-02', '2026-03', '2026-04'];
+  const base: ForecastChartOptions = {
+    colors,
+    fmt: makeFormatters('fi'),
+    months,
+    startIndex: 0,
+    reducedMotion: true,
+    actual: [10, 20, null, null],
+    path: [null, 20, 30, 40],
+    low: [null, 20, 25, 30],
+    high: [null, 20, 35, 50],
+    boundary: { month: '2026-02', label: 'Boundary' },
+    names: { actual: 'Facts', path: 'Scenario', band: 'Band' },
+  };
+  type Series = {
+    name: string;
+    type: string;
+    data: (number | null)[];
+    stack?: string;
+    lineStyle?: { type?: string };
+    markLine?: { data: { xAxis?: string; yAxis?: number }[] };
+  };
+  const seriesOf = (o: ForecastChartOptions) =>
+    (forecastChart(o) as unknown as { series: Series[] }).series;
+
+  it('draws the facts solid and the scenario dashed, so they differ without colour', () => {
+    const series = seriesOf(base);
+    expect(series.find((s) => s.name === 'Facts')?.lineStyle?.type).toBeUndefined();
+    expect(series.find((s) => s.name === 'Scenario')?.lineStyle?.type).toBe('dashed');
+  });
+
+  it('makes the band of two stacked lines, the upper as tall as the band', () => {
+    const band = seriesOf(base).filter((s) => s.stack === 'band-base');
+    expect(band).toHaveLength(2);
+    expect(band[0]?.data).toEqual(base.low);
+    expect(band[1]?.data).toEqual([null, 0, 10, 20]);
+  });
+
+  it('marks the boundary at the last month of the facts', () => {
+    const facts = seriesOf(base).find((s) => s.name === 'Facts');
+    expect(facts?.markLine?.data).toEqual([expect.objectContaining({ xAxis: '2026-02' })]);
+  });
+
+  it('draws no boundary where there is no scenario to begin', () => {
+    const withoutBoundary: ForecastChartOptions = { ...base };
+    delete withoutBoundary.boundary;
+    const facts = seriesOf(withoutBoundary).find((s) => s.name === 'Facts');
+    expect(facts?.markLine?.data).toEqual([]);
+  });
+
+  it('draws a ceiling line only when there is a ceiling under the whole', () => {
+    const scenario = (o: ForecastChartOptions) => seriesOf(o).find((s) => s.name === 'Scenario');
+    expect(scenario(base)?.markLine?.data).toEqual([]);
+    const withCeiling = { ...base, ceiling: { percent: 70, label: 'Ceiling' } };
+    expect(scenario(withCeiling)?.markLine?.data).toEqual([expect.objectContaining({ yAxis: 70 })]);
+  });
+
+  it('draws earlier forecasts first, so the rest lies over them', () => {
+    const past = [{ name: 'Earlier', values: [null, 12, 18, 25] }];
+    const names = seriesOf({ ...base, past }).map((s) => s.name);
+    expect(names[0]).toBe('Earlier');
+    expect(names.at(-1)).toBe('Facts');
+  });
+
+  it('shows the whole scale of shares', () => {
+    const option = forecastChart(base) as unknown as { yAxis: { min: number; max: number } };
+    expect(option.yAxis).toMatchObject({ min: 0, max: 100 });
   });
 });
