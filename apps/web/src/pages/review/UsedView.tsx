@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { StatusPanel } from '../../components/ui';
 import { useCatalog } from '../../data/DataProvider';
 import { useUsedImports } from '../../data/used';
@@ -24,6 +24,12 @@ export function UsedView({ state, periodLabel, partialYear, fileStem }: Props) {
     (id: string) => nationalById.get(id)?.kind === 'make',
     [nationalById],
   );
+  // A new range object would rebuild the ranking and reset its table to page 1.
+  const usedMonths = used.status === 'ready' ? used.data.matrix.months : null;
+  const range = useMemo(
+    () => usedMonths && translateRange(manifest.months, usedMonths, state.range),
+    [manifest.months, usedMonths, state.range],
+  );
 
   if (used.status === 'unavailable') {
     return (
@@ -43,7 +49,6 @@ export function UsedView({ state, periodLabel, partialYear, fileStem }: Props) {
     <p className="footnote">{t('review.used.lag', { month: fmt.month(latestUsed) })}</p>
   );
 
-  const range = translateRange(manifest.months, matrix.months, state.range);
   if (!range) {
     return (
       <>

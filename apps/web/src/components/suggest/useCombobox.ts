@@ -1,5 +1,12 @@
 import { useId, useReducer, type KeyboardEvent } from 'react';
-import { CLOSED, comboboxReducer, enterChoice, isArrowKey } from '../../lib/combobox';
+import {
+  CLOSED,
+  comboboxReducer,
+  enterChoice,
+  isArrowKey,
+  type ComboboxEvent,
+  type ComboboxState,
+} from '../../lib/combobox';
 
 interface Options {
   count: number;
@@ -10,10 +17,22 @@ interface Options {
 }
 
 /** Wires the combobox state machine (`lib/combobox`) to a text field and its suggestion list. */
-export function useCombobox({ count, typed, onChoose }: Options) {
+export function useCombobox(options: Options) {
+  const [state, dispatch] = useReducer(comboboxReducer, CLOSED);
+  return useComboboxBindings(state, dispatch, options);
+}
+
+/**
+ * The same wiring for a list whose state is part of a larger machine (see `lib/picker`), so that
+ * one reducer owns the list together with the text.
+ */
+export function useComboboxBindings(
+  state: ComboboxState,
+  dispatch: (event: ComboboxEvent) => void,
+  { count, typed, onChoose }: Options,
+) {
   const listId = useId();
   const inputId = `${listId}-input`;
-  const [state, dispatch] = useReducer(comboboxReducer, CLOSED);
   const openList = () => dispatch({ type: 'open' });
   const closeList = () => dispatch({ type: 'close' });
   const active = state.open ? state.active : 0;

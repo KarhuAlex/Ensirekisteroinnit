@@ -1,15 +1,9 @@
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table';
-import { useState, type ReactNode } from 'react';
+import type { ColumnDef, SortingState } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 import { useI18n } from '../i18n';
 import { DataTable } from './DataTable';
 import { TableToolbar } from './TableToolbar';
+import { useTableView } from './useTableView';
 
 const PAGE_SIZE = 50;
 
@@ -40,37 +34,20 @@ export function SearchableTable<T>({
   isSelected,
 }: Props<T>) {
   const { t, fmt } = useI18n();
-  const [query, setQuery] = useState('');
-  const [limit, setLimit] = useState(PAGE_SIZE);
-  const [sorting, setSorting] = useState<SortingState>(defaultSort);
-  const [limitedFor, setLimitedFor] = useState(data);
-  if (limitedFor !== data) {
-    setLimitedFor(data);
-    setLimit(PAGE_SIZE);
-  }
-
-  const table = useReactTable({
+  const { table, rows, query, setQuery, limit, more, showMore } = useTableView({
     data,
     columns,
-    state: { sorting, globalFilter: query },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: (value: string) => {
-      setQuery(value);
-      setLimit(PAGE_SIZE);
-    },
-    globalFilterFn: 'includesString',
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    defaultSort,
+    pageSize: PAGE_SIZE,
   });
-  const shown = table.getRowModel().rows.length;
+  const shown = rows.length;
 
   return (
     <>
       <TableToolbar
         searchLabel={t('models.filter')}
         query={query}
-        onQueryChange={(value) => table.setGlobalFilter(value)}
+        onQueryChange={setQuery}
         countText={t('models.count', { n: fmt.int(shown) })}
       >
         {toolbar}
@@ -80,8 +57,8 @@ export function SearchableTable<T>({
       ) : (
         <DataTable table={table} limit={limit} caption={caption} isSelected={isSelected} />
       )}
-      {shown > limit && (
-        <button type="button" className="button" onClick={() => setLimit((l) => l + PAGE_SIZE)}>
+      {more && (
+        <button type="button" className="button" onClick={showMore}>
           {t('models.showMore')}
         </button>
       )}

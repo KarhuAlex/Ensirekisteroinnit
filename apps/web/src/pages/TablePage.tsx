@@ -1,18 +1,12 @@
 import { TOTAL_ENTITY_ID, type FuelGroupId } from '@regs/core';
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 import { DataTable } from '../components/DataTable';
 import { FuelMark } from '../components/FuelMark';
 import { PeriodLink } from '../components/PeriodLink';
 import { ShareValue } from '../components/ShareValue';
 import { TableToolbar } from '../components/TableToolbar';
+import { useTableView } from '../components/useTableView';
 import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
@@ -24,6 +18,8 @@ import { STACK_ORDER } from '../lib/stats';
 
 type Granularity = 'month' | 'year';
 
+const NEWEST_FIRST = [{ id: 'period', desc: true }];
+
 export function TablePage() {
   const { t, fmt } = useI18n();
   const { manifest } = useCatalog();
@@ -31,8 +27,6 @@ export function TablePage() {
   const series = dataOf(seriesState);
   const failed = hasFailed(seriesState);
   const [granularity, setGranularity] = useState<Granularity>('month');
-  const [query, setQuery] = useState('');
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'period', desc: true }]);
   usePageTitle(`${t('table.title')} – ${t('app.title')}`);
 
   const data = useMemo<PeriodRow[]>(() => {
@@ -89,19 +83,12 @@ export function TablePage() {
     ];
   }, [t, fmt, granularity]);
 
-  const table = useReactTable({
+  const { table, rows, query, setQuery } = useTableView({
     data,
     columns,
-    state: { sorting, globalFilter: query },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setQuery,
-    globalFilterFn: 'includesString',
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    defaultSort: NEWEST_FIRST,
   });
-
-  const rowCount = table.getRowModel().rows.length;
+  const rowCount = rows.length;
 
   return (
     <>
@@ -113,10 +100,7 @@ export function TablePage() {
         onQueryChange={setQuery}
         canDownload={rowCount > 0}
         onDownload={() =>
-          downloadCsv(
-            `registrations-${granularity}.csv`,
-            toCsv(table.getRowModel().rows.map((r) => r.original)),
-          )
+          downloadCsv(`registrations-${granularity}.csv`, toCsv(rows.map((r) => r.original)))
         }
         countText={t('table.rows', { n: fmt.int(rowCount) })}
       >

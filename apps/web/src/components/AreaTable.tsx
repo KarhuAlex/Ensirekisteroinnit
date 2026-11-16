@@ -1,12 +1,5 @@
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import type { ColumnDef, SortingState } from '@tanstack/react-table';
+import { useMemo } from 'react';
 import { useI18n } from '../i18n';
 import { areaToCsv, type AreaCsvRow } from '../lib/areaCsv';
 import { downloadCsv } from '../lib/download';
@@ -14,12 +7,14 @@ import type { AreaMetric } from '../lib/reviewState';
 import { DataTable } from './DataTable';
 import { FuelMix } from './FuelMix';
 import { TableToolbar } from './TableToolbar';
+import { useTableView } from './useTableView';
 
-const SORT_COLUMN: Record<AreaMetric, string> = {
-  share: 'share',
-  index: 'index',
-  count: 'count',
-  change: 'shareChange',
+const byColumn = (id: string): SortingState => [{ id, desc: true }];
+const DEFAULT_SORT: Record<AreaMetric, SortingState> = {
+  share: byColumn('share'),
+  index: byColumn('index'),
+  count: byColumn('count'),
+  change: byColumn('shareChange'),
 };
 
 /** Counts are always meaningful; shares, indexes and changes are not for areas with few cars. */
@@ -48,13 +43,6 @@ export function AreaTable({
   period: string;
 }) {
   const { t, fmt } = useI18n();
-  const [query, setQuery] = useState('');
-  const [sorting, setSorting] = useState<SortingState>([{ id: SORT_COLUMN[metric], desc: true }]);
-  const [sortedFor, setSortedFor] = useState(metric);
-  if (sortedFor !== metric) {
-    setSortedFor(metric);
-    setSorting([{ id: SORT_COLUMN[metric], desc: true }]);
-  }
 
   const columns = useMemo<ColumnDef<AreaTableRow>[]>(() => {
     const numeric = (
@@ -140,18 +128,13 @@ export function AreaTable({
     ];
   }, [t, fmt, showChange, showRegion]);
 
-  const table = useReactTable({
-    data: rows,
-    columns,
-    state: { sorting, globalFilter: query },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setQuery,
-    globalFilterFn: 'includesString',
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-  });
-  const shown = table.getRowModel().rows;
+  // Switching the metric sorts the table by that metric's column again.
+  const {
+    table,
+    rows: shown,
+    query,
+    setQuery,
+  } = useTableView({ data: rows, columns, defaultSort: DEFAULT_SORT[metric] });
 
   return (
     <>

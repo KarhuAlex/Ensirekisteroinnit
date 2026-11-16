@@ -1,12 +1,5 @@
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n';
 import { downloadCsv } from '../lib/download';
@@ -16,10 +9,12 @@ import { ChangeCell } from './ChangeCell';
 import { DataTable } from './DataTable';
 import { FuelMix } from './FuelMix';
 import { TableToolbar } from './TableToolbar';
+import { useTableView } from './useTableView';
 
 const PAGE_SIZE = 25;
 /** A stable default, so the column definitions are not rebuilt on every render. */
 const LINK_ALL = () => true;
+const BY_COUNT = [{ id: 'count', desc: true }];
 
 export function RankingTable({
   rows,
@@ -38,9 +33,6 @@ export function RankingTable({
   isLinked?: ((id: string) => boolean) | undefined;
 }) {
   const { lang, t, fmt } = useI18n();
-  const [query, setQuery] = useState('');
-  const [limit, setLimit] = useState(PAGE_SIZE);
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'count', desc: true }]);
 
   const columns = useMemo<ColumnDef<NamedRow>[]>(() => {
     const numeric = (id: string, header: string, cell: ColumnDef<NamedRow>['cell']) =>
@@ -99,29 +91,22 @@ export function RankingTable({
     ];
   }, [t, fmt, lang, showChange, countHeader, isLinked]);
 
-  const table = useReactTable({
-    data: rows,
-    columns,
-    state: { sorting, globalFilter: query },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: (value: string) => {
-      setQuery(value);
-      setLimit(PAGE_SIZE);
-    },
-    globalFilterFn: 'includesString',
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-  });
-
-  const shown = table.getRowModel().rows;
+  const {
+    table,
+    rows: shown,
+    query,
+    setQuery,
+    limit,
+    more,
+    showMore,
+  } = useTableView({ data: rows, columns, defaultSort: BY_COUNT, pageSize: PAGE_SIZE });
 
   return (
     <>
       <TableToolbar
         searchLabel={t('models.filter')}
         query={query}
-        onQueryChange={(value) => table.setGlobalFilter(value)}
+        onQueryChange={setQuery}
         canDownload={shown.length > 0}
         onDownload={() =>
           downloadCsv(
@@ -135,8 +120,8 @@ export function RankingTable({
         countText={t('models.count', { n: fmt.int(shown.length) })}
       />
       <DataTable table={table} limit={limit} caption={caption} />
-      {shown.length > limit && (
-        <button type="button" className="button" onClick={() => setLimit((l) => l + PAGE_SIZE)}>
+      {more && (
+        <button type="button" className="button" onClick={showMore}>
           {t('models.showMore')}
         </button>
       )}

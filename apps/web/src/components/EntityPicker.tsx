@@ -1,13 +1,14 @@
 import type { EntitySummary } from '@regs/core';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useReducer, useRef } from 'react';
 import { useI18n } from '../i18n';
 import { entityOptions } from '../lib/entityOptions';
+import { PICKER_IDLE, pickerReducer, shownText } from '../lib/picker';
 import { MAX_SUGGESTIONS, rankSuggestions, searchTokens } from '../lib/suggestions';
 import { Icon } from './Icon';
 import { ClearButton } from './suggest/ClearButton';
 import { NoMatchStatus } from './suggest/NoMatchStatus';
 import { SuggestionList } from './suggest/SuggestionList';
-import { useCombobox } from './suggest/useCombobox';
+import { useComboboxBindings } from './suggest/useCombobox';
 
 interface Props {
   entities: readonly EntitySummary[];
@@ -27,12 +28,8 @@ export function EntityPicker({ entities, value, onChange, label, placeholder }: 
     [entities, t],
   );
   const nameOf = (id: string | null) => (id ? (names.get(id) ?? '') : '');
-  const [text, setText] = useState(nameOf(value));
-  const [shownFor, setShownFor] = useState(value);
-  if (shownFor !== value) {
-    setShownFor(value);
-    setText(nameOf(value));
-  }
+  const [picker, dispatch] = useReducer(pickerReducer<string | null>, PICKER_IDLE);
+  const text = shownText(picker, value, nameOf(value));
 
   const tokens = useMemo(() => searchTokens(text), [text]);
   const results = useMemo(
@@ -40,21 +37,20 @@ export function EntityPicker({ entities, value, onChange, label, placeholder }: 
     [entities, tokens],
   );
 
-  const combobox = useCombobox({
+  const combobox = useComboboxBindings(picker.list, dispatch, {
     count: results.length,
     // The name of the current selection is not an edit, so Enter leaves the selection alone.
     typed: tokens.length > 0 && text !== nameOf(value),
     onChoose: (index) => {
       const hit = results[index];
       if (!hit) return;
-      setText(nameOf(hit.id));
+      dispatch({ type: 'choose', over: value, name: nameOf(hit.id) });
       onChange(hit.id);
     },
   });
 
   const edit = (next: string) => {
-    setText(next);
-    combobox.textChanged();
+    dispatch({ type: 'edit', over: value, text: next });
     if (next === '') onChange(null);
   };
 
@@ -71,10 +67,7 @@ export function EntityPicker({ entities, value, onChange, label, placeholder }: 
           placeholder={placeholder ?? t('review.entityPlaceholder')}
           onChange={(e) => edit(e.target.value)}
           // Text that was not chosen is dropped, so the field always shows what is selected.
-          onBlur={() => {
-            combobox.inputProps.onBlur();
-            setText(nameOf(value));
-          }}
+          onBlur={() => dispatch({ type: 'leave' })}
         />
         {text && (
           <ClearButton
