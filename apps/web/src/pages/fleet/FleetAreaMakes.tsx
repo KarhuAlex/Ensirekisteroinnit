@@ -6,6 +6,7 @@ import type { RegionMapping } from '../../lib/areaGrouping';
 import { fleetAreaMakeRows } from '../../lib/fleetMakes';
 import { useI18n } from '../../i18n';
 import type { AreaLevel } from '../../lib/reviewState';
+import { TableFrame } from '../../components/TableFrame';
 
 interface Props {
   fleet: CarFleet;
@@ -33,35 +34,32 @@ export function FleetAreaMakes({ fleet, mapping, level, area, cells }: Props) {
   return (
     <div>
       <h4 className="panel-title">{caption}</h4>
-      <div className="table-wrap" tabIndex={0} role="region" aria-label={caption}>
-        <table className="data-table">
-          <caption className="sr-only">{caption}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{t('fleet.make')}</th>
-              <th scope="col" className="num">
-                {t('fleet.col.cars')}
-              </th>
-              <th scope="col" className="num">
-                {t('fleet.col.areaShare')}
-              </th>
-              <th scope="col" className="num">
-                {t('fleet.col.bevOfMake')}
-              </th>
+      <TableFrame caption={caption}>
+        <thead>
+          <tr>
+            <th scope="col">{t('fleet.make')}</th>
+            <th scope="col" className="num">
+              {t('fleet.col.cars')}
+            </th>
+            <th scope="col" className="num">
+              {t('fleet.col.areaShare')}
+            </th>
+            <th scope="col" className="num">
+              {t('fleet.col.bevOfMake')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              <th scope="row">{row.name}</th>
+              <td className="num">{fmt.int(row.cars)}</td>
+              <td className="num">{fmt.pct(row.share)}</td>
+              <td className="num">{fmt.pct(row.bevShare)}</td>
             </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td className="num">{fmt.int(row.cars)}</td>
-                <td className="num">{fmt.pct(row.share)}</td>
-                <td className="num">{fmt.pct(row.bevShare)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </TableFrame>
     </div>
   );
 }

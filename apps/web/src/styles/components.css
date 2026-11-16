@@ -326,7 +326,7 @@ mark {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 var(--s-6);
 }
-@media (max-width: 899px) {
+@media (width < 56.25em) {
   .two-up {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -371,7 +371,7 @@ mark {
 .fact-note.is-negative {
   color: var(--neg);
 }
-@media (max-width: 599px) {
+@media (width < 37.5em) {
   .facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -477,7 +477,9 @@ mark {
 }
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  /* Separate borders move with the sticky row headers; only bottom borders are drawn. */
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: var(--step-0);
 }
 .data-table th,
@@ -491,10 +493,10 @@ mark {
 .data-table .wrap {
   white-space: normal;
 }
-.data-table tbody tr:last-child td {
+.data-table tbody tr:last-child > * {
   border-bottom: 0;
 }
-.data-table th {
+.data-table thead th {
   background: var(--ground-2);
   color: var(--ink-2);
   font-size: var(--step--1);
@@ -503,22 +505,37 @@ mark {
 .data-table .num {
   text-align: right;
 }
-.data-table tbody tr:hover {
+/* Row headers read like the other cells and stay in view while the table scrolls sideways. */
+.data-table tbody th {
+  font-weight: inherit;
+}
+.data-table thead th:first-child,
+.data-table tbody th[scope='row'] {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+}
+.data-table tbody th[scope='row'] {
+  background: var(--ground);
+}
+.data-table tbody tr:hover,
+.data-table tbody tr:hover > th[scope='row'] {
   background: var(--ground-2);
 }
-.data-table td a {
+.data-table tbody a {
   color: var(--ink);
   font-weight: 700;
   text-decoration-color: var(--rule-strong);
 }
-.data-table td a:hover {
+.data-table tbody a:hover {
   text-decoration-color: var(--accent);
 }
-.data-table tbody tr.is-selected {
+.data-table tbody tr.is-selected,
+.data-table tbody tr.is-selected > th[scope='row'] {
   background: var(--ground-3);
 }
 /* A name that chooses its row looks like the links of the other tables. */
-.data-table td .link-button {
+.data-table tbody .link-button {
   padding: 0;
   border: 0;
   background: none;
@@ -530,7 +547,7 @@ mark {
   text-decoration-color: var(--rule-strong);
   cursor: pointer;
 }
-.data-table td .link-button:hover {
+.data-table tbody .link-button:hover {
   text-decoration-color: var(--accent);
 }
 .th-button {
@@ -559,24 +576,6 @@ mark {
   align-items: center;
   gap: 8px;
 }
-@media (max-width: 719px) {
-  .data-table [data-col='kind'],
-  .data-table [data-col='make'],
-  .data-table th:nth-child(2):not(.num),
-  .data-table th:nth-child(3):not(.num) {
-    display: none;
-  }
-  .data-table td:first-child,
-  .data-table th:first-child {
-    position: sticky;
-    left: 0;
-    background: var(--ground);
-  }
-  .data-table th:first-child {
-    background: var(--ground-2);
-  }
-}
-
 /* States */
 .status {
   display: grid;
@@ -608,7 +607,9 @@ mark {
   border-radius: var(--r-2);
   background: linear-gradient(90deg, var(--ground-2), var(--ground-3), var(--ground-2));
   background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: shimmer 1.4s linear infinite;
+  }
 }
 @keyframes shimmer {
   to {
@@ -652,7 +653,7 @@ mark {
   text-decoration-color: var(--accent);
 }
 
-@media (max-width: 599px) {
+@media (width < 37.5em) {
   .plates {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -668,7 +669,7 @@ mark {
 }
 
 /* On the narrowest phones two plates side by side do not fit a long Finnish label. */
-@media (max-width: 360px) {
+@media (width <= 22.5em) {
   .plates {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -686,7 +687,7 @@ mark {
   margin-bottom: 0;
 }
 
-@media (max-width: 599px) {
+@media (width < 37.5em) {
   .segmented button {
     min-width: 36px;
     padding: 0 8px;
@@ -935,8 +936,10 @@ mark {
 }
 .donut-seg {
   stroke-linecap: butt;
-  animation: donut-in 900ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
-  animation-delay: calc(var(--i) * 140ms);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: donut-in 900ms cubic-bezier(0.22, 0.8, 0.3, 1) both;
+    animation-delay: calc(var(--i) * 140ms);
+  }
 }
 .donut-seg--bev {
   stroke: var(--fuel-bev);
@@ -1025,7 +1028,7 @@ mark {
 .bev-hero-legend strong {
   font-variant-numeric: tabular-nums;
 }
-@media (max-width: 720px) {
+@media (width <= 45em) {
   .bev-hero {
     grid-template-columns: 1fr;
     justify-items: center;
@@ -1064,7 +1067,7 @@ mark {
   border-radius: 3px;
   vertical-align: -1px;
 }
-@media (max-width: 599px) {
+@media (width < 37.5em) {
   /* Model names are long, so each plate gets its own row. */
   .compare-plates {
     grid-template-columns: minmax(0, 1fr);

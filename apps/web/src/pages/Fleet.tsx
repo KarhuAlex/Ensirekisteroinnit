@@ -3,7 +3,15 @@ import { useMemo } from 'react';
 import { ShareValue } from '../components/ShareValue';
 import { SourceCredit } from '../components/SourceCredit';
 import { StockSection } from '../components/StockSection';
-import { Facts, PageHeader, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
+import {
+  Facts,
+  Loading,
+  PageHeader,
+  Section,
+  Skeleton,
+  StatusPanel,
+  usePageTitle,
+} from '../components/ui';
 import { useFleet } from '../data/fleet';
 import { useGeo, type Geo } from '../data/geo';
 import { hasFailed } from '../data/remote';
@@ -40,10 +48,10 @@ export function Fleet() {
     return (
       <>
         <PageHeader title={t('fleet.title')} />
-        <div className="loading" role="status" aria-label={t('status.loading')}>
+        <Loading>
           <Skeleton height={72} />
           <Skeleton height={420} />
-        </div>
+        </Loading>
       </>
     );
   }

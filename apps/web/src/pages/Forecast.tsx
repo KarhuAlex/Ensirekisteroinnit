@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { ForecastChart } from '../components/ForecastChart';
 import { SourceNote } from '../components/SourceNote';
 import {
+  Loading,
   PageHeader,
   Section,
   Segmented,
@@ -82,9 +83,9 @@ export function Forecast() {
   if (!history) {
     return (
       <ForecastPage>
-        <div className="loading" role="status" aria-label={t('status.loading')}>
+        <Loading>
           <Skeleton height={420} />
-        </div>
+        </Loading>
       </ForecastPage>
     );
   }

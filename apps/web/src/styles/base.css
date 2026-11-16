@@ -6,7 +6,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scrollbar-color: var(--rule-strong) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 body {
@@ -14,6 +14,10 @@ body {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--font);
+  /* Scales a fallback font to Atkinson Hyperlegible's x-height (0.496 of the font size), so the
+     swap does not shift the layout. A number, not from-font: while the web font is loading,
+     from-font would read the fallback's own metrics and adjust nothing. */
+  font-size-adjust: 0.496;
   font-size: var(--step-0);
   line-height: 1.55;
   caret-color: var(--accent);
@@ -101,13 +105,17 @@ kbd {
   text-wrap: pretty;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+/* Hidden on screen but kept for assistive technology; focusable content shows when focused. */
+.sr-only:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
 }
 
 .skip-link {
@@ -124,14 +132,4 @@ kbd {
 
 .skip-link:focus {
   top: 12px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
 }

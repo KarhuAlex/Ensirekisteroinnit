@@ -7,6 +7,7 @@ import { Icon } from '../components/Icon';
 import { SearchBox } from '../components/SearchBox';
 import {
   Facts,
+  Loading,
   PageHeader,
   Section,
   Segmented,
@@ -26,6 +27,7 @@ import { comparePath } from '../lib/compareState';
 import { displayName } from '../lib/names';
 import { buildSeriesView } from '../lib/seriesView';
 import { MONTHS_PER_YEAR, modelStory, percent, sumRange } from '../lib/stats';
+import { TableFrame } from '../components/TableFrame';
 
 type Granularity = 'monthly' | 'yearly';
 
@@ -148,10 +150,10 @@ export function ModelDetail() {
       {failed ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !view ? (
-        <div className="loading" role="status" aria-label={t('status.loading')}>
+        <Loading>
           <Skeleton height={72} />
           <Skeleton height={400} />
-        </div>
+        </Loading>
       ) : (
         <>
           <Section
@@ -220,41 +222,33 @@ export function ModelDetail() {
 
           <div className="two-up">
             <Section id="fuel-table" title={t('model.fuelBreakdown')}>
-              <div
-                className="table-wrap"
-                tabIndex={0}
-                role="region"
-                aria-label={t('model.fuelCaption')}
-              >
-                <table className="data-table">
-                  <caption className="sr-only">{t('model.fuelCaption')}</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">{t('model.col.fuel')}</th>
-                      <th scope="col" className="num">
-                        {t('models.col.last12')}
+              <TableFrame caption={t('model.fuelCaption')}>
+                <thead>
+                  <tr>
+                    <th scope="col">{t('model.col.fuel')}</th>
+                    <th scope="col" className="num">
+                      {t('models.col.last12')}
+                    </th>
+                    <th scope="col" className="num">
+                      {t('models.col.total')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fuelRows.map((r) => (
+                    <tr key={r.fuel}>
+                      <th scope="row">
+                        <span className="cell-mark">
+                          <FuelMark group={FUEL_GROUP_OF[r.fuel]} />
+                          {t(`fuel.${r.fuel}`)}
+                        </span>
                       </th>
-                      <th scope="col" className="num">
-                        {t('models.col.total')}
-                      </th>
+                      <td className="num">{fmt.int(r.last12)}</td>
+                      <td className="num">{fmt.int(r.total)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {fuelRows.map((r) => (
-                      <tr key={r.fuel}>
-                        <td>
-                          <span className="cell-mark">
-                            <FuelMark group={FUEL_GROUP_OF[r.fuel]} />
-                            {t(`fuel.${r.fuel}`)}
-                          </span>
-                        </td>
-                        <td className="num">{fmt.int(r.last12)}</td>
-                        <td className="num">{fmt.int(r.total)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </TableFrame>
             </Section>
 
             {related.length > 0 && (

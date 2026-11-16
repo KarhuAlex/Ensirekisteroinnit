@@ -15,7 +15,7 @@ export function useMediaQuery(query: string): boolean {
 }
 
 export const useReducedMotion = (): boolean => useMediaQuery('(prefers-reduced-motion: reduce)');
-export const useNarrow = (): boolean => useMediaQuery('(max-width: 640px)');
+export const useNarrow = (): boolean => useMediaQuery('(width <= 40em)');
 
 /** How far from the screen an element still counts as near it, so that its data is in time. */
 const NEAR_SCREEN = '400px';

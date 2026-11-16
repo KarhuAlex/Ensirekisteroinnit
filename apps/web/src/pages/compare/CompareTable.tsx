@@ -1,6 +1,7 @@
 import { ChangeCell } from '../../components/ChangeCell';
 import { SeriesMark } from '../../components/SeriesMark';
 import { useI18n } from '../../i18n';
+import { TableFrame } from '../../components/TableFrame';
 
 export interface CompareRow {
   id: string;
@@ -17,39 +18,44 @@ export interface CompareRow {
 export function CompareTable({ rows }: { rows: CompareRow[] }) {
   const { t, fmt } = useI18n();
   return (
-    <div className="table-wrap" tabIndex={0} role="region" aria-label={t('compare.tableCaption')}>
-      <table className="data-table">
-        <caption className="sr-only">{t('compare.tableCaption')}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{t('compare.col.name')}</th>
-            <th scope="col">{t('compare.col.last12')}</th>
-            <th scope="col">{t('compare.col.share')}</th>
-            <th scope="col">{t('compare.col.change')}</th>
-            <th scope="col">{t('compare.col.bev')}</th>
+    <TableFrame caption={t('compare.tableCaption')}>
+      <thead>
+        <tr>
+          <th scope="col">{t('compare.col.name')}</th>
+          <th scope="col" className="num">
+            {t('compare.col.last12')}
+          </th>
+          <th scope="col" className="num">
+            {t('compare.col.share')}
+          </th>
+          <th scope="col" className="num">
+            {t('compare.col.change')}
+          </th>
+          <th scope="col" className="num">
+            {t('compare.col.bev')}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.id}>
+            <th scope="row">
+              <SeriesMark slot={row.slot} />
+              {row.name}
+            </th>
+            <td className="num">{fmt.int(row.last12)}</td>
+            <td className="num">{fmt.pct(row.share)}</td>
+            <td className="num">
+              {row.yearAgo === null && row.last12 > 0 ? (
+                <span className="muted">{t('compare.new')}</span>
+              ) : (
+                <ChangeCell count={row.last12} previous={row.yearAgo} />
+              )}
+            </td>
+            <td className="num">{fmt.pct(row.bevShare)}</td>
           </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <th scope="row">
-                <SeriesMark slot={row.slot} />
-                {row.name}
-              </th>
-              <td className="num">{fmt.int(row.last12)}</td>
-              <td className="num">{fmt.pct(row.share)}</td>
-              <td className="num">
-                {row.yearAgo === null && row.last12 > 0 ? (
-                  <span className="muted">{t('compare.new')}</span>
-                ) : (
-                  <ChangeCell count={row.last12} previous={row.yearAgo} />
-                )}
-              </td>
-              <td className="num">{fmt.pct(row.bevShare)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </TableFrame>
   );
 }

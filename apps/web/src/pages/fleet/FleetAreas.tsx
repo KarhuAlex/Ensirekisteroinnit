@@ -2,7 +2,7 @@ import { decodeCells, FUEL_GROUP_IDS, type CarFleet, type FleetCell } from '@reg
 import { useCallback, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { SelectField } from '../../components/SelectField';
-import { Section, Segmented, Skeleton, StatusPanel } from '../../components/ui';
+import { Loading, Section, Segmented, Skeleton, StatusPanel } from '../../components/ui';
 import { useFleetCells } from '../../data/fleet';
 import type { Geo } from '../../data/geo';
 import { dataOf, type Remote } from '../../data/remote';
@@ -290,9 +290,9 @@ export function FleetAreas({ fleet, geo }: { fleet: CarFleet; geo: Geo }) {
   return (
     <Section id="fleet-map" title={make.name} tools={tools}>
       {file.status === 'loading' ? (
-        <div className="loading" role="status" aria-label={t('status.loading')}>
+        <Loading>
           <Skeleton height={420} />
-        </div>
+        </Loading>
       ) : (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       )}

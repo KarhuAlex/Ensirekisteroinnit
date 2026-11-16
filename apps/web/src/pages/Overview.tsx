@@ -7,7 +7,7 @@ import { FuelPriceSection } from '../components/FuelPriceSection';
 import { RollingChart } from '../components/RollingChart';
 import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
-import { Facts, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
+import { Facts, Loading, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
 import { useFleetPublished } from '../data/fleet';
@@ -60,11 +60,11 @@ export function Overview() {
       {failed ? (
         <StatusPanel tone="error" title={t('status.error')} hint={t('status.errorHint')} />
       ) : !view ? (
-        <div className="loading" role="status" aria-label={t('status.loading')}>
+        <Loading>
           <Skeleton height={64} />
           <Skeleton height={72} />
           <Skeleton height={420} />
-        </div>
+        </Loading>
       ) : (
         <>
           <BevHero

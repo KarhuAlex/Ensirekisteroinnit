@@ -28,7 +28,10 @@ interface Props {
   onChoose: (index: number) => void;
 }
 
-/** The popup under a text field: matching makes, models and groups with their last 12 months. */
+/**
+ * The popup under a text field: matching makes, models and groups with their last 12 months.
+ * The host field announces an empty result with `NoMatchStatus`.
+ */
 export function SuggestionList({ id, entities, tokens, active, onHover, onChoose }: Props) {
   const { byId } = useCatalog();
   const { t, fmt } = useI18n();
@@ -38,7 +41,7 @@ export function SuggestionList({ id, entities, tokens, active, onHover, onChoose
     <div className="suggest-pop">
       {tokens.length === 0 && <p className="suggest-head">{t('search.popular')}</p>}
       {empty ? (
-        <div className="suggest-empty" role="status">
+        <div className="suggest-empty">
           <p>{t('search.empty')}</p>
           <p className="muted">{t('search.emptyHint')}</p>
         </div>

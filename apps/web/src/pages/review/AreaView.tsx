@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AreaTable } from '../../components/AreaTable';
-import { Skeleton, StatusPanel } from '../../components/ui';
+import { Loading, Skeleton, StatusPanel } from '../../components/ui';
 import { useCatalog } from '../../data/DataProvider';
 import { useGeo, type Geo } from '../../data/geo';
 import { useRegional } from '../../data/regional';
@@ -45,10 +45,10 @@ export function AreaView({ state, months, periodLabel, fileStem }: Props) {
   }
   if (regional.status === 'loading' || geo.status !== 'ready') {
     return (
-      <div className="loading" role="status" aria-label={t('status.loading')}>
+      <Loading>
         <Skeleton height={72} />
         <Skeleton height={420} />
-      </div>
+      </Loading>
     );
   }
   return (

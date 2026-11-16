@@ -2,17 +2,20 @@ import { ShareValue } from '../../components/ShareValue';
 import { Facts } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { MIN_MUNICIPALITY_CARS, type FleetAreaRow } from '../../lib/fleet';
+import { AreaCardFrame } from './AreaCardFrame';
 
 /** The figures of the chosen area, under the map. On a phone this is where a tap on the map lands. */
 export function FleetAreaCard({ row }: { row: FleetAreaRow | null }) {
-  const { t, fmt } = useI18n();
-  if (!row) return <p className="muted">{t('fleet.card.hint')}</p>;
+  return <AreaCardFrame>{row && <AreaFigures row={row} />}</AreaCardFrame>;
+}
 
+function AreaFigures({ row }: { row: FleetAreaRow }) {
+  const { t, fmt } = useI18n();
   // A share of too few cars is shown, but not coloured as if it meant something.
   const share = (value: number | null) =>
     row.reliable ? <ShareValue share={value} /> : <span className="muted">{fmt.pct(value)}</span>;
   return (
-    <section aria-label={t('fleet.card.label', { name: row.name })} aria-live="polite">
+    <section aria-label={t('fleet.card.label', { name: row.name })}>
       <h3 className="panel-title">{row.name}</h3>
       <Facts
         items={[

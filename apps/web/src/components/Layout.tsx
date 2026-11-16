@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useDataState } from '../data/DataProvider';
 import { useI18n, type Lang, type MessageKey } from '../i18n';
 import { STACK_ORDER } from '../lib/stats';
-import { currentTheme, setTheme } from '../lib/theme';
+import { useColorScheme } from '../lib/colorSchemeStore';
 import { FuelMark } from './FuelMark';
 import { CanonicalLink } from './CanonicalLink';
 import { Icon, type IconName } from './Icon';
 import { MetaDescription } from './MetaDescription';
 import { SearchBox } from './SearchBox';
-import { Skeleton, StatusPanel } from './ui';
+import { Loading, Skeleton, StatusPanel } from './ui';
 
 interface NavItem {
   path: string;
@@ -56,14 +56,16 @@ function useCurrentTabInView(enabled: boolean) {
 function NavList({ variant }: { variant: 'rail' | 'tabs' }) {
   const { lang, t } = useI18n();
   const nav = useCurrentTabInView(variant === 'tabs');
+  const links = NAV.map((item) => (
+    <NavLink key={item.path} to={`/${lang}${item.path}`} end={item.end}>
+      <Icon name={item.icon} size={variant === 'rail' ? 20 : 22} />
+      <span>{t(variant === 'tabs' && item.short ? item.short : item.label)}</span>
+    </NavLink>
+  ));
   return (
     <nav ref={nav} aria-label={t('nav.main')} className={variant === 'rail' ? 'nav' : 'tabbar'}>
-      {NAV.map((item) => (
-        <NavLink key={item.path} to={`/${lang}${item.path}`} end={item.end}>
-          <Icon name={item.icon} size={variant === 'rail' ? 20 : 22} />
-          <span>{t(variant === 'tabs' && item.short ? item.short : item.label)}</span>
-        </NavLink>
-      ))}
+      {/* The inner element scrolls and fades; the nav keeps its solid background. */}
+      {variant === 'tabs' ? <div className="tabbar-scroll">{links}</div> : links}
     </nav>
   );
 }
@@ -87,12 +89,7 @@ function FuelKey() {
 
 function ThemeToggle() {
   const { t } = useI18n();
-  const [theme, setLocal] = useState(currentTheme);
-  const toggle = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    setLocal(next);
-  };
+  const { scheme, toggle } = useColorScheme();
   return (
     <button
       type="button"
@@ -101,7 +98,7 @@ function ThemeToggle() {
       aria-label={t('theme.toggle')}
       title={t('theme.toggle')}
     >
-      <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
+      <Icon name={scheme === 'dark' ? 'sun' : 'moon'} />
     </button>
   );
 }
@@ -129,11 +126,11 @@ function DataGate() {
   const { t } = useI18n();
   if (state.status === 'loading') {
     return (
-      <div className="loading" role="status" aria-label={t('status.loading')}>
+      <Loading>
         <Skeleton height={44} />
         <Skeleton height={72} />
         <Skeleton height={360} />
-      </div>
+      </Loading>
     );
   }
   // Without the national catalog there is no site, so "not published" is an error here too.

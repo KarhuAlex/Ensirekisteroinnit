@@ -2,6 +2,7 @@ import { Facts } from '../../components/ui';
 import { useI18n } from '../../i18n';
 import { MIN_MUNICIPALITY_CARS } from '../../lib/fleet';
 import type { FleetMakeAreaRow } from '../../lib/fleetMakes';
+import { AreaCardFrame } from './AreaCardFrame';
 
 interface Props {
   row: FleetMakeAreaRow | null;
@@ -12,12 +13,18 @@ interface Props {
 
 /** The chosen area's cars of the make, under the map. */
 export function FleetMakeAreaCard({ row, makeName, rank }: Props) {
-  const { t, fmt } = useI18n();
-  if (!row) return <p className="muted">{t('fleet.card.hint')}</p>;
+  return (
+    <AreaCardFrame>
+      {row && <MakeAreaFigures row={row} makeName={makeName} rank={rank} />}
+    </AreaCardFrame>
+  );
+}
 
+function MakeAreaFigures({ row, makeName, rank }: Props & { row: FleetMakeAreaRow }) {
+  const { t, fmt } = useI18n();
   const share = fmt.pct(row.share);
   return (
-    <section aria-label={t('fleet.card.label', { name: row.name })} aria-live="polite">
+    <section aria-label={t('fleet.card.label', { name: row.name })}>
       <h3 className="panel-title">{row.name}</h3>
       <Facts
         items={[

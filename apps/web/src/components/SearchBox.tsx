@@ -8,6 +8,7 @@ import { displayName } from '../lib/names';
 import { MAX_SUGGESTIONS, rankSuggestions, searchTokens } from '../lib/suggestions';
 import { Icon } from './Icon';
 import { ClearButton } from './suggest/ClearButton';
+import { NoMatchStatus } from './suggest/NoMatchStatus';
 import { SuggestionList } from './suggest/SuggestionList';
 import { useCombobox } from './suggest/useCombobox';
 
@@ -107,6 +108,7 @@ export function SearchBox({ variant }: { variant: 'hero' | 'compact' }) {
           /
         </kbd>
       )}
+      <NoMatchStatus empty={combobox.open && tokens.length > 0 && results.length === 0} />
       {combobox.open && (
         <SuggestionList
           id={combobox.listId}

@@ -200,6 +200,9 @@ export const fi = {
   'table.plugShare': 'Ladattavat, %',
   'table.download': 'Lataa CSV',
   'table.rows': 'Rivejä: {n}',
+  'table.sortedAsc': 'Lajiteltu: {column}, nouseva järjestys',
+  'table.sortedDesc': 'Lajiteltu: {column}, laskeva järjestys',
+  'table.unsorted': 'Lajittelu poistettu',
 
   'about.title': 'Tietoa palvelusta',
   'about.intro':

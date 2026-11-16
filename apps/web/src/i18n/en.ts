@@ -200,6 +200,9 @@ export const en: Record<MessageKey, string> = {
   'table.plugShare': 'Plug-in, %',
   'table.download': 'Download CSV',
   'table.rows': 'Rows: {n}',
+  'table.sortedAsc': 'Sorted by {column}, ascending',
+  'table.sortedDesc': 'Sorted by {column}, descending',
+  'table.unsorted': 'Sorting removed',
 
   'about.title': 'About',
   'about.intro':

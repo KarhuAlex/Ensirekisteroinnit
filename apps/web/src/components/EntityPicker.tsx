@@ -5,6 +5,7 @@ import { entityOptions } from '../lib/entityOptions';
 import { MAX_SUGGESTIONS, rankSuggestions, searchTokens } from '../lib/suggestions';
 import { Icon } from './Icon';
 import { ClearButton } from './suggest/ClearButton';
+import { NoMatchStatus } from './suggest/NoMatchStatus';
 import { SuggestionList } from './suggest/SuggestionList';
 import { useCombobox } from './suggest/useCombobox';
 
@@ -83,6 +84,7 @@ export function EntityPicker({ entities, value, onChange, label, placeholder }: 
             }}
           />
         )}
+        <NoMatchStatus empty={combobox.open && tokens.length > 0 && results.length === 0} />
         {combobox.open && (
           <SuggestionList
             id={combobox.listId}

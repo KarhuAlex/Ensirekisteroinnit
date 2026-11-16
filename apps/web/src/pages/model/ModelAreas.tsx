@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Section, Skeleton, StatusPanel } from '../../components/ui';
+import { Loading, Section, Skeleton, StatusPanel } from '../../components/ui';
 import { useFleet } from '../../data/fleet';
 import { useGeo } from '../../data/geo';
 import { useRegional } from '../../data/regional';
@@ -72,9 +72,9 @@ export function ModelAreas({ entity, months }: Props) {
             stockPath={stockPath}
           />
         ) : (
-          <div className="loading" role="status" aria-label={t('status.loading')}>
+          <Loading>
             <Skeleton height={260} />
-          </div>
+          </Loading>
         )}
       </Section>
     </div>

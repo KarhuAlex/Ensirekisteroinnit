@@ -1,23 +1,39 @@
 import { flexRender, type Header, type Table } from '@tanstack/react-table';
+import { useState, type MouseEvent } from 'react';
+import { useI18n } from '../i18n';
 import { Icon } from './Icon';
+import { TableFrame } from './TableFrame';
 
 type Sorted = false | 'asc' | 'desc';
 
-const ariaSort = (sorted: Sorted): 'ascending' | 'descending' | 'none' =>
-  sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none';
+const SORTED_MESSAGE = { asc: 'table.sortedAsc', desc: 'table.sortedDesc' } as const;
 
-function HeaderCell<T>({ header }: { header: Header<T, unknown> }) {
-  const sorted = header.column.getIsSorted();
-  const numeric = header.column.columnDef.meta?.numeric;
-  const label = flexRender(header.column.columnDef.header, header.getContext());
+/** Only the sorted column has `aria-sort`. */
+const ariaSort = (sorted: Sorted): 'ascending' | 'descending' | undefined =>
+  sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined;
+
+function HeaderCell<T>({
+  header,
+  onSorted,
+}: {
+  header: Header<T, unknown>;
+  onSorted: (column: string, sorted: Sorted) => void;
+}) {
+  const { column } = header;
+  const sorted = column.getIsSorted();
+  const numeric = column.columnDef.meta?.numeric;
+  const label = flexRender(column.columnDef.header, header.getContext());
+  // A click sorts by this column alone (shift-click multi-sort is off), so only one header ever
+  // has `aria-sort` and the announcement describes the whole order.
+  const sort = (event: MouseEvent<HTMLButtonElement>) => {
+    const next = column.getNextSortingOrder();
+    column.toggleSorting(undefined, false);
+    onSorted(event.currentTarget.textContent?.trim() ?? '', next);
+  };
   return (
     <th scope="col" aria-sort={ariaSort(sorted)} className={numeric ? 'num' : undefined}>
-      {header.column.getCanSort() ? (
-        <button
-          type="button"
-          className="th-button"
-          onClick={header.column.getToggleSortingHandler()}
-        >
+      {column.getCanSort() ? (
+        <button type="button" className="th-button" onClick={sort}>
           {label}
           <Icon
             name={sorted === 'asc' ? 'sortAsc' : sorted === 'desc' ? 'sortDesc' : 'sortNone'}
@@ -32,6 +48,7 @@ function HeaderCell<T>({ header }: { header: Header<T, unknown> }) {
   );
 }
 
+/** A TanStack table in a `TableFrame`; the first column holds the row headers. */
 export function DataTable<T>({
   table,
   limit,
@@ -44,17 +61,22 @@ export function DataTable<T>({
   /** Marks the row of the chosen item. */
   isSelected?: (data: T) => boolean;
 }) {
+  const { t } = useI18n();
+  // Each sort is announced through a status element that stays in the page.
+  const [announcement, setAnnouncement] = useState('');
+  const onSorted = (column: string, sorted: Sorted) =>
+    setAnnouncement(sorted ? t(SORTED_MESSAGE[sorted], { column }) : t('table.unsorted'));
+
   const rows = table.getRowModel().rows;
   const visible = limit === undefined ? rows : rows.slice(0, limit);
   return (
-    <div className="table-wrap" tabIndex={0} role="region" aria-label={caption}>
-      <table className="data-table">
-        <caption className="sr-only">{caption}</caption>
+    <>
+      <TableFrame caption={caption}>
         <thead>
           {table.getHeaderGroups().map((group) => (
             <tr key={group.id}>
               {group.headers.map((header) => (
-                <HeaderCell key={header.id} header={header} />
+                <HeaderCell key={header.id} header={header} onSorted={onSorted} />
               ))}
             </tr>
           ))}
@@ -62,19 +84,25 @@ export function DataTable<T>({
         <tbody>
           {visible.map((row) => (
             <tr key={row.id} className={isSelected?.(row.original) ? 'is-selected' : undefined}>
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className={cell.column.columnDef.meta?.numeric ? 'num' : undefined}
-                  data-col={cell.column.id}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+              {row.getVisibleCells().map((cell, index) => {
+                const Cell = index === 0 ? 'th' : 'td';
+                return (
+                  <Cell
+                    key={cell.id}
+                    scope={index === 0 ? 'row' : undefined}
+                    className={cell.column.columnDef.meta?.numeric ? 'num' : undefined}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Cell>
+                );
+              })}
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </TableFrame>
+      <p className="sr-only" role="status">
+        {announcement}
+      </p>
+    </>
   );
 }

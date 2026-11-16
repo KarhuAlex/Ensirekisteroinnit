@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { useI18n } from '../i18n';
 
 export function usePageTitle(title: string): void {
   useEffect(() => {
@@ -117,13 +118,27 @@ export function PageHeader({
   );
 }
 
+/** A placeholder block. With a label it works on its own as a busy indicator. */
 export function Skeleton({ height, label }: { height: number; label?: string }) {
   return (
     <div
       className="skeleton"
       style={{ height }}
-      {...(label ? { role: 'status', 'aria-label': label } : { 'aria-hidden': true })}
+      {...(label ? { role: 'progressbar', 'aria-label': label } : { 'aria-hidden': true })}
     />
+  );
+}
+
+/**
+ * Skeletons shown while content loads. They are marked as an indeterminate progress bar, not a
+ * live region, so screen readers do not announce the loading.
+ */
+export function Loading({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <div className="loading" role="progressbar" aria-label={t('status.loading')}>
+      {children}
+    </div>
   );
 }
 

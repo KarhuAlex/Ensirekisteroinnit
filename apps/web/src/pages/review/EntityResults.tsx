@@ -1,7 +1,7 @@
 import type { EntitySummary, FuelGroupId, Matrix } from '@regs/core';
 import { useMemo } from 'react';
 import { RankingTable } from '../../components/RankingTable';
-import { Facts, Skeleton, StatusPanel } from '../../components/ui';
+import { Facts, Loading, Skeleton, StatusPanel } from '../../components/ui';
 import { useI18n, type MessageKey } from '../../i18n';
 import { inLevel, type EntityLevel } from '../../lib/entityLevel';
 import { displayName } from '../../lib/names';
@@ -66,12 +66,11 @@ const wordingFor = (source: Source, level: EntityLevel): Wording =>
   source === 'used' ? USED_WORDING : NEW_WORDING[level];
 
 export function ResultsSkeleton() {
-  const { t } = useI18n();
   return (
-    <div className="loading" role="status" aria-label={t('status.loading')}>
+    <Loading>
       <Skeleton height={72} />
       <Skeleton height={360} />
-    </div>
+    </Loading>
   );
 }
 
