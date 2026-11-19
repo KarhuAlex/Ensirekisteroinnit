@@ -1,5 +1,5 @@
 import { SourceCredit } from '../components/SourceCredit';
-import { PageHeader, usePageTitle } from '../components/ui';
+import { PageHeader, usePageHead } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { usePrices } from '../data/prices';
 import { useSiteConfig } from '../data/SiteConfigProvider';
@@ -14,7 +14,7 @@ export function About() {
   const { manifest } = useCatalog();
   const { config, ready } = useSiteConfig();
   const prices = usePrices();
-  usePageTitle(`${t('about.title')} – ${t('app.title')}`);
+  usePageHead({ page: 'about' });
   const { source } = manifest;
 
   return (

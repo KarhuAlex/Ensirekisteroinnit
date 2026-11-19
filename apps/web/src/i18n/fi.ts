@@ -14,6 +14,24 @@ export const fi = {
   'nav.main': 'Päävalikko',
   'meta.description':
     'Henkilöautojen ensirekisteröinnit ja autokanta Suomessa: käyttövoimien osuudet, merkit, mallit ja sähköautojen osuus kunnittain.',
+  'meta.homeTitle': 'henkilöautot ja käyttövoimat Suomessa',
+  'meta.review':
+    'Henkilöautojen ensirekisteröinnit Suomessa: eniten rekisteröidyt mallit, merkit ja konsernit kuukausittain ja vuosittain sekä ensirekisteröinnit alueittain.',
+  'meta.models':
+    'Kaikki Suomessa ensirekisteröidyt henkilöautomerkit ja -mallit: ensirekisteröinnit viimeisen 12 kuukauden aikana ja yhteensä sekä täyssähköautojen osuus.',
+  'meta.compare':
+    'Vertaa merkkien, mallien ja konsernien ensirekisteröintejä Suomessa rinnakkain kuukausittain ja käyttövoimittain.',
+  'meta.stock':
+    'Liikennekäytössä olevat henkilöautot Suomessa: sähköautojen osuus autokannasta alueittain ja yleisimmät merkit.',
+  'meta.forecast':
+    'Skenaario täyssähköautojen osuudesta Suomen ensirekisteröinneissä, jos viimeisten kahden vuoden kehitys jatkuu mutta hidastuu. Skenaario ei ole ennuste.',
+  'meta.table':
+    'Henkilöautojen ensirekisteröinnit Manner-Suomessa käyttövoimittain kuukausittain ja vuosittain taulukkona.',
+  'meta.about':
+    'Mistä palvelun tiedot tulevat, miten ne käsitellään ja mitä niistä kannattaa huomata. Lisäksi tietosuoja ja vastuuvapaus.',
+  'meta.model': '{name}: ensirekisteröinnit Suomessa kuukausittain ja käyttövoimittain. {story}',
+  'meta.linksModels': 'Mallit',
+  'meta.linksMake': 'Merkki',
   'lang.switch': 'English',
   'lang.switchLabel': 'Switch to English',
   'theme.toggle': 'Vaihda teemaa',

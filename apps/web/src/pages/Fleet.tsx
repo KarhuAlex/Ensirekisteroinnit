@@ -10,7 +10,7 @@ import {
   Section,
   Skeleton,
   StatusPanel,
-  usePageTitle,
+  usePageHead,
 } from '../components/ui';
 import { useFleet } from '../data/fleet';
 import { useGeo, type Geo } from '../data/geo';
@@ -25,7 +25,7 @@ export function Fleet() {
   const { t } = useI18n();
   const fleet = useFleet();
   const geo = useGeo();
-  usePageTitle(`${t('fleet.title')} – ${t('app.title')}`);
+  usePageHead({ page: 'stock' });
 
   if (fleet.status === 'unavailable') {
     return (

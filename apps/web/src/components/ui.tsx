@@ -1,10 +1,16 @@
 import { useEffect, type ReactNode } from 'react';
 import { useI18n } from '../i18n';
+import { setMetaDescription } from '../lib/metaDescription';
+import { pageHead, type HeadRoute } from '../lib/pageHead';
 
-export function usePageTitle(title: string): void {
+/** Keeps the tab title and the description in step with the page; the build writes the same text. */
+export function usePageHead(route: HeadRoute): void {
+  const { t, fmt } = useI18n();
+  const { title, description } = pageHead(route, { t, fmt });
   useEffect(() => {
     document.title = title;
-  }, [title]);
+    setMetaDescription(description);
+  }, [title, description]);
 }
 
 export interface SegmentedOption<T extends string> {

@@ -24,6 +24,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* The plain body of each page file (src/lib/staticPage.ts) is for search engines and readers without
+   scripts. Where scripts run, it stays hidden until the app replaces it. */
+@media (scripting: enabled) {
+  .static-page {
+    display: none;
+  }
+}
+
+.static-page {
+  padding: 1rem;
+}
+
 ::selection {
   background: var(--fuel-bev);
   color: #04281b;

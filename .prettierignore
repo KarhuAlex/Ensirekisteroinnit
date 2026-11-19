@@ -1,4 +1,5 @@
 dist/
+dist-node/
 .deploy/
 .data/
 node_modules/

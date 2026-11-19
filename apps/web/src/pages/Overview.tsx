@@ -7,7 +7,7 @@ import { FuelPriceSection } from '../components/FuelPriceSection';
 import { RollingChart } from '../components/RollingChart';
 import { SearchBox } from '../components/SearchBox';
 import { SourceNote } from '../components/SourceNote';
-import { Facts, Loading, Section, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
+import { Facts, Loading, Section, Skeleton, StatusPanel, usePageHead } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
 import { useFleetPublished } from '../data/fleet';
@@ -25,7 +25,7 @@ export function Overview() {
   const seriesState = useEntitySeries(TOTAL_ENTITY_ID);
   const series = dataOf(seriesState);
   const failed = hasFailed(seriesState);
-  usePageTitle(t('app.title'));
+  usePageHead({ page: 'overview' });
 
   const axis = useTimeAxis();
   const stockState = useStock();

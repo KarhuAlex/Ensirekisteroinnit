@@ -7,7 +7,7 @@ import { PeriodLink } from '../components/PeriodLink';
 import { ShareValue } from '../components/ShareValue';
 import { TableToolbar } from '../components/TableToolbar';
 import { useTableView } from '../components/useTableView';
-import { PageHeader, Segmented, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
+import { PageHeader, Segmented, Skeleton, StatusPanel, usePageHead } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
 import { useI18n } from '../i18n';
@@ -27,7 +27,7 @@ export function TablePage() {
   const series = dataOf(seriesState);
   const failed = hasFailed(seriesState);
   const [granularity, setGranularity] = useState<Granularity>('month');
-  usePageTitle(`${t('table.title')} – ${t('app.title')}`);
+  usePageHead({ page: 'table' });
 
   const data = useMemo<PeriodRow[]>(() => {
     if (!series) return [];

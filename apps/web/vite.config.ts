@@ -38,7 +38,8 @@ function localData(): Plugin {
   };
 }
 
-export default defineConfig({
+// The `--ssr` build bundles the page builder for Node (see src/prerender.ts); it needs no public files.
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react(), localData()],
-  build: { chunkSizeWarningLimit: 1000 },
-});
+  build: { chunkSizeWarningLimit: 1000, copyPublicDir: !isSsrBuild },
+}));

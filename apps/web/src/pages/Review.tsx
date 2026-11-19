@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { PageHeader, usePageTitle } from '../components/ui';
+import { PageHeader, usePageHead } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useHasCorporateGroups } from '../data/useHasCorporateGroups';
 import { useI18n } from '../i18n';
-import { displayName } from '../lib/names';
+import { reviewHeadline } from '../lib/reviewHeadline';
 import {
-  effectiveLevel,
   parseState,
   toSearchParams,
   withAvailableLevel,
@@ -17,22 +16,6 @@ import { EntityView } from './review/EntityView';
 import { ReviewControls } from './review/ReviewControls';
 import { UsedView } from './review/UsedView';
 import { useRangeLabel } from './review/useRangeLabel';
-
-type Translate = ReturnType<typeof useI18n>['t'];
-
-function reviewHeadline(
-  t: Translate,
-  state: ReviewState,
-  entity: { label: string } | undefined,
-  period: string,
-): string {
-  const level = effectiveLevel(state);
-  if (state.source === 'used') return t('review.headline.used', { period });
-  if (level !== 'area') return t(`review.headline.${level}`, { period });
-  return entity
-    ? t('review.headline.areaEntity', { entity: displayName(entity.label), period })
-    : t('review.headline.area', { period });
-}
 
 export function Review() {
   const { t } = useI18n();
@@ -49,7 +32,6 @@ export function Review() {
 
   const { label: periodLabel, kind } = useRangeLabel(months, state.range);
   const fileStem = `${months[state.range.from]}_${months[state.range.to]}`;
-  usePageTitle(`${t('review.title')} – ${t('app.title')}`);
 
   const used = state.source === 'used';
   const headline = reviewHeadline(
@@ -58,6 +40,7 @@ export function Review() {
     state.entity ? byId.get(state.entity) : undefined,
     periodLabel,
   );
+  usePageHead({ page: 'review', headline });
   const partialYear = kind.kind === 'year' && kind.partial;
 
   return (

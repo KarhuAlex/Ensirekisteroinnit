@@ -7,7 +7,9 @@ import {
   headTags,
   LANGS,
   normalizeBase,
+  modelPagePath,
   OG_IMAGE,
+  pageFolders,
   PAGES,
   pagePaths,
   releaseDay,
@@ -182,6 +184,19 @@ describe('withHeadTags', () => {
     expect(once.indexOf('og:type')).toBeLessThan(once.indexOf('</head>'));
     expect(withHeadTags(once, 'https://example.org')).toBe(once);
   });
+
+  it('leaves the structured data out of pages that do not stand for the whole site', () => {
+    const page = withHeadTags(PAGE, 'https://example.org', { structuredData: false });
+    expect(page).toContain('og:title');
+    expect(page).not.toContain('application/ld+json');
+  });
+
+  it('keeps dollar signs in the page text as written', () => {
+    const page = PAGE.replace('Kuvaus', () => "$' 5 $&");
+    expect(withHeadTags(page, 'https://example.org')).toContain(
+      `property="og:description" content="$' 5 $& &amp; lisää"`,
+    );
+  });
 });
 
 describe('the share image', () => {
@@ -189,5 +204,31 @@ describe('the share image', () => {
     // A PNG starts with an 8 byte signature and the header chunk, whose width and height follow.
     const png = readFileSync(new URL(`../public${OG_IMAGE.path}`, import.meta.url));
     expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([OG_IMAGE.width, OG_IMAGE.height]);
+  });
+});
+
+describe('pageFolders', () => {
+  it('puts each page in a folder of its own', () => {
+    expect(pageFolders('/fi')).toEqual(['fi']);
+    expect(pageFolders('/en/models/audi-a4')).toEqual(['en', 'models', 'audi-a4']);
+  });
+
+  it('turns an encoded make or model back into its folder name', () => {
+    expect(pageFolders(`/fi${modelPagePath('citroën c4')}`)).toEqual([
+      'fi',
+      'models',
+      'citroën c4',
+    ]);
+  });
+
+  it('refuses an address that would write outside its own folder', () => {
+    expect(() => pageFolders(`/fi${modelPagePath('a/b')}`)).toThrow(/folder/);
+    expect(() => pageFolders(`/fi${modelPagePath('..')}`)).toThrow(/folder/);
+    expect(() => pageFolders(`/fi${modelPagePath('a\\b')}`)).toThrow(/folder/);
+  });
+
+  it('refuses an address without a leading slash or with a trailing one', () => {
+    expect(() => pageFolders('fi/review')).toThrow(/slash/);
+    expect(() => pageFolders('/fi/review/')).toThrow(/slash/);
   });
 });

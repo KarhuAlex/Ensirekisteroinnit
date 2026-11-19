@@ -10,7 +10,7 @@ import {
   Segmented,
   Skeleton,
   StatusPanel,
-  usePageTitle,
+  usePageHead,
 } from '../components/ui';
 import { useCatalog, useEntitySeries } from '../data/DataProvider';
 import { dataOf, hasFailed } from '../data/remote';
@@ -56,7 +56,7 @@ export function Forecast() {
   const ceiling = parseCeiling(params.get('ceiling'));
   const seriesState = useEntitySeries(TOTAL_ENTITY_ID);
   const series = dataOf(seriesState);
-  usePageTitle(`${t('forecast.title')} – ${t('app.title')}`);
+  usePageHead({ page: 'forecast' });
 
   const history = useMemo(() => {
     if (!series) return null;

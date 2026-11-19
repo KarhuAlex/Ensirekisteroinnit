@@ -7,7 +7,6 @@ import { useColorScheme } from '../lib/colorSchemeStore';
 import { FuelMark } from './FuelMark';
 import { CanonicalLink } from './CanonicalLink';
 import { Icon, type IconName } from './Icon';
-import { MetaDescription } from './MetaDescription';
 import { SearchBox } from './SearchBox';
 import { Loading, Skeleton, StatusPanel } from './ui';
 
@@ -160,7 +159,6 @@ export function Layout() {
   return (
     <div className="app">
       <CanonicalLink />
-      <MetaDescription />
       <a className="skip-link" href="#content">
         {t('skip.content')}
       </a>

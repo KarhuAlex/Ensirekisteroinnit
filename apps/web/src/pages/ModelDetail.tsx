@@ -13,7 +13,7 @@ import {
   Segmented,
   Skeleton,
   StatusPanel,
-  usePageTitle,
+  usePageHead,
 } from '../components/ui';
 import { SourceNote } from '../components/SourceNote';
 import { ModelAreas } from './model/ModelAreas';
@@ -25,8 +25,9 @@ import { useI18n } from '../i18n';
 import { hasPage } from '../lib/entityLevel';
 import { comparePath } from '../lib/compareState';
 import { displayName } from '../lib/names';
+import { entityName, entityStoryText } from '../lib/pageHead';
 import { buildSeriesView } from '../lib/seriesView';
-import { MONTHS_PER_YEAR, modelStory, percent, sumRange } from '../lib/stats';
+import { MONTHS_PER_YEAR, percent, sumRange } from '../lib/stats';
 import { TableFrame } from '../components/TableFrame';
 
 type Granularity = 'monthly' | 'yearly';
@@ -42,12 +43,8 @@ export function ModelDetail() {
   const series = dataOf(seriesState);
   const failed = hasFailed(seriesState);
 
-  const name = entity
-    ? entity.kind === 'total'
-      ? t('entity.total')
-      : displayName(entity.label)
-    : '';
-  usePageTitle(entity ? `${name} – ${t('app.title')}` : t('model.notFound'));
+  const name = entity ? entityName(t, entity) : '';
+  usePageHead(entity ? { page: 'model', entity } : { page: 'modelNotFound' });
 
   const axis = useTimeAxis();
   const n = manifest.months.length;
@@ -66,7 +63,6 @@ export function ModelDetail() {
       total: sumRange(totals, 0, n),
       last12,
       bevShare12: percent(bev12, last12),
-      story: modelStory(last12, bev12),
     };
   }, [series, n, manifest.months]);
 
@@ -107,14 +103,7 @@ export function ModelDetail() {
   }
 
   const parent = entity.makeId ? byId.get(entity.makeId) : undefined;
-  const story = view?.story;
-  const storyText = !story
-    ? ''
-    : story.kind === 'none'
-      ? t('story.model.none')
-      : story.kind === 'all-electric'
-        ? t('story.model.all', { n: fmt.int(story.count) })
-        : t('story.model.mixed', { n: fmt.int(story.count), share: fmt.pct(story.bevShare) });
+  const storyText = entityStoryText({ t, fmt }, entity);
 
   return (
     <>
@@ -128,7 +117,7 @@ export function ModelDetail() {
         )}
       </nav>
 
-      <PageHeader title={name} lede={storyText || undefined}>
+      <PageHeader title={name} lede={storyText}>
         <p className="plate-row">
           <span className="plate">{t(`kind.${entity.kind}`)}</span>
           {entity.kind !== 'total' && (

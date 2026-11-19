@@ -36,9 +36,35 @@ export function emptySitemap() {
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>\n';
 }
 
+/** The address of a make or model page below the language prefix, such as `/models/audi-a4`. */
+export function modelPagePath(id) {
+  return `/models/${encodeURIComponent(id)}`;
+}
+
 /** The fixed pages plus one page for each make and model. */
 export function pagePaths(entityIds = []) {
-  return [...PAGES, ...entityIds.map((id) => `/models/${encodeURIComponent(id)}`)];
+  return [...PAGES, ...entityIds.map(modelPagePath)];
+}
+
+/**
+ * The folders, below the site root, of the file that answers a page address such as
+ * `/fi/models/audi-a4`. Each part must stay one folder, so an address that would lead elsewhere is
+ * refused rather than written.
+ */
+export function pageFolders(path) {
+  if (!path.startsWith('/') || path.endsWith('/')) {
+    throw new Error(`A page address starts with a slash and does not end with one: "${path}"`);
+  }
+  return path
+    .slice(1)
+    .split('/')
+    .map((part) => {
+      const folder = decodeURIComponent(part);
+      if (folder === '' || folder === '.' || folder === '..' || /[/\\]/.test(folder)) {
+        throw new Error(`The page address "${path}" has no folder of its own`);
+      }
+      return folder;
+    });
 }
 
 const hrefOf = (base, lang, path) => `${base}/${lang}${path}`;
@@ -150,8 +176,9 @@ function structuredData(base, { title, description, siteName }) {
  * The tags that make a shared link and a search result readable without running the page: Open
  * Graph and Twitter cards, and structured data. The title, the description and the site name come
  * from the page itself, so they are written in one place. Meta tags keep the text as written.
+ * Structured data describes the whole site, so only the pages that stand for it carry it.
  */
-export function headTags(base, html) {
+export function headTags(base, html, { structuredData: withData = true } = {}) {
   const text = pageText(html);
   const meta = (attribute, name, content) =>
     '    <meta ' + attribute + '="' + name + '" content="' + content + '" />';
@@ -165,12 +192,19 @@ export function headTags(base, html) {
     meta('property', 'og:image:height', String(OG_IMAGE.height)),
     meta('property', 'og:image:alt', escapeXml(OG_IMAGE.alt)),
     meta('name', 'twitter:card', 'summary_large_image'),
-    '    <script type="application/ld+json">' + structuredData(base, text) + '</script>',
+    ...(withData
+      ? ['    <script type="application/ld+json">' + structuredData(base, text) + '</script>']
+      : []),
   ].join('\n');
 }
 
+/** Whether the page already has the tags from `headTags`. */
+export function hasHeadTags(html) {
+  return html.includes('property="og:type"');
+}
+
 /** The page with the tags added before the end of its head; a page that already has them is left alone. */
-export function withHeadTags(html, base) {
-  if (html.includes('property="og:type"')) return html;
-  return html.replace('</head>', `${headTags(base, html).trimStart()}\n  </head>`);
+export function withHeadTags(html, base, options) {
+  if (hasHeadTags(html)) return html;
+  return html.replace('</head>', () => `${headTags(base, html, options).trimStart()}\n  </head>`);
 }

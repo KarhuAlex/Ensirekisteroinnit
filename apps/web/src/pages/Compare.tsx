@@ -1,4 +1,4 @@
-import { PageHeader, Skeleton, StatusPanel, usePageTitle } from '../components/ui';
+import { PageHeader, Skeleton, StatusPanel, usePageHead } from '../components/ui';
 import { useCatalog, useMatrix } from '../data/DataProvider';
 import { useI18n } from '../i18n';
 import { MAX_COMPARED } from '../lib/comparison';
@@ -14,7 +14,7 @@ export function Compare() {
   const compare = useCompare();
   const { state, chosen } = compare;
   const matrix = useMatrix(chosen.length > 0);
-  usePageTitle(`${t('compare.title')} – ${t('app.title')}`);
+  usePageHead({ page: 'compare' });
 
   return (
     <>

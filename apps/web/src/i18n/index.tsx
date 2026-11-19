@@ -1,23 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
-import { makeFormatters, type Formatters, type Lang } from '../lib/format';
-import { en } from './en';
-import { fi, type MessageKey } from './fi';
+import { makeFormatters, type Formatters } from '../lib/format';
+import { translate, type Lang, type MessageKey, type Translate } from './translate';
 
-export type { Lang, MessageKey };
-
-const dictionaries: Record<Lang, Record<MessageKey, string>> = { fi, en };
-
-export type Params = Record<string, string | number>;
-
-export function translate(lang: Lang, key: MessageKey, params?: Params): string {
-  const template = dictionaries[lang][key];
-  if (!params) return template;
-  return template.replace(/\{(\w+)\}/g, (_, name: string) => String(params[name] ?? `{${name}}`));
-}
-
-export function isLang(value: string | undefined): value is Lang {
-  return value === 'fi' || value === 'en';
-}
+export type { Lang, MessageKey, Translate };
+export { isLang, translate, type Params } from './translate';
 
 export function detectLang(): Lang {
   const preferred = typeof navigator === 'undefined' ? '' : navigator.language.toLowerCase();
@@ -26,7 +12,7 @@ export function detectLang(): Lang {
 
 interface I18n {
   lang: Lang;
-  t: (key: MessageKey, params?: Params) => string;
+  t: Translate;
   fmt: Formatters;
 }
 

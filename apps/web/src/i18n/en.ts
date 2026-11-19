@@ -16,6 +16,24 @@ export const en: Record<MessageKey, string> = {
   'nav.main': 'Main navigation',
   'meta.description':
     'First registrations and the car fleet of passenger cars in Finland: fuel type shares, makes, models and the electric share by municipality.',
+  'meta.homeTitle': 'passenger cars and fuel types in Finland',
+  'meta.review':
+    'First registrations of passenger cars in Finland: the most registered models, makes and corporate groups by month and year, and first registrations by region.',
+  'meta.models':
+    'Every passenger car make and model first registered in Finland: registrations in the last 12 months and in total, and the share of battery electric cars.',
+  'meta.compare':
+    'Compare the first registrations of makes, models and corporate groups in Finland side by side, by month and fuel type.',
+  'meta.stock':
+    'Passenger cars in traffic in Finland: the share of electric cars in the car fleet by area, and the most common makes.',
+  'meta.forecast':
+    'A scenario for the share of battery electric cars in Finnish first registrations if the trend of the last two years continues but slows down. A scenario is not a forecast.',
+  'meta.table':
+    'First registrations of passenger cars in mainland Finland by fuel type, month and year, as a table.',
+  'meta.about':
+    'Where the data comes from, how it is processed and what to keep in mind, plus privacy and the disclaimer.',
+  'meta.model': '{name}: first registrations in Finland by month and fuel type. {story}',
+  'meta.linksModels': 'Models',
+  'meta.linksMake': 'Make',
   'lang.switch': 'Suomeksi',
   'lang.switchLabel': 'Vaihda suomeksi',
   'theme.toggle': 'Toggle theme',

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SearchableTable } from '../components/SearchableTable';
 import { ShareValue } from '../components/ShareValue';
-import { PageHeader, Segmented, StatusPanel, usePageTitle } from '../components/ui';
+import { PageHeader, Segmented, StatusPanel, usePageHead } from '../components/ui';
 import { useCatalog } from '../data/DataProvider';
 import { useHasCorporateGroups } from '../data/useHasCorporateGroups';
 import { useI18n } from '../i18n';
@@ -28,7 +28,7 @@ export function Models() {
   const { entities, byId } = useCatalog();
   const hasGroups = useHasCorporateGroups();
   const [filter, setFilter] = useState<ListFilter>('all');
-  usePageTitle(`${t('models.title')} – ${t('app.title')}`);
+  usePageHead({ page: 'models' });
 
   const data = useMemo<Row[]>(
     () =>
