@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_LANG as APP_DEFAULT_LANG } from '../src/i18n/translate';
 import {
   buildRobots,
   buildSitemap,
+  DEFAULT_LANG,
   emptySitemap,
   headTags,
   LANGS,
@@ -230,5 +232,12 @@ describe('pageFolders', () => {
   it('refuses an address without a leading slash or with a trailing one', () => {
     expect(() => pageFolders('fi/review')).toThrow(/slash/);
     expect(() => pageFolders('/fi/review/')).toThrow(/slash/);
+  });
+});
+
+describe('the default language', () => {
+  it('is Finnish, and the sitemap points search engines at the language the front page opens in', () => {
+    expect(APP_DEFAULT_LANG).toBe('fi');
+    expect(DEFAULT_LANG).toBe(APP_DEFAULT_LANG);
   });
 });

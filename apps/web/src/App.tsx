@@ -1,8 +1,17 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes, useParams } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { DataProvider } from './data/DataProvider';
 import { SiteConfigProvider } from './data/SiteConfigProvider';
-import { detectLang, I18nProvider, isLang } from './i18n';
+import { I18nProvider, isLang } from './i18n';
+import { withDefaultLang } from './lib/langPath';
 import { About } from './pages/About';
 import { Compare } from './pages/Compare';
 import { ModelDetail } from './pages/ModelDetail';
@@ -14,9 +23,14 @@ import { Overview } from './pages/Overview';
 import { Review } from './pages/Review';
 import { TablePage } from './pages/TablePage';
 
+/** Opens the address in the default language when it has no language of its own. */
+function ToDefaultLang() {
+  return <Navigate to={withDefaultLang(useLocation())} replace />;
+}
+
 function LangRoute() {
   const { lang } = useParams();
-  if (!isLang(lang)) return <Navigate to={`/${detectLang()}`} replace />;
+  if (!isLang(lang)) return <ToDefaultLang />;
   return (
     <I18nProvider lang={lang}>
       <Outlet />
@@ -30,7 +44,7 @@ export function App() {
       <SiteConfigProvider>
         <DataProvider>
           <Routes>
-            <Route path="/" element={<Navigate to={`/${detectLang()}`} replace />} />
+            <Route path="/" element={<ToDefaultLang />} />
             <Route path="/:lang" element={<LangRoute />}>
               <Route element={<Layout />}>
                 <Route index element={<Overview />} />

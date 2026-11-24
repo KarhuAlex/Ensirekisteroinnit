@@ -5,11 +5,6 @@ import { translate, type Lang, type MessageKey, type Translate } from './transla
 export type { Lang, MessageKey, Translate };
 export { isLang, translate, type Params } from './translate';
 
-export function detectLang(): Lang {
-  const preferred = typeof navigator === 'undefined' ? '' : navigator.language.toLowerCase();
-  return preferred.startsWith('fi') ? 'fi' : 'en';
-}
-
 interface I18n {
   lang: Lang;
   t: Translate;
