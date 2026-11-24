@@ -224,7 +224,7 @@ export const en: Record<MessageKey, string> = {
 
   'about.title': 'About',
   'about.intro':
-    "This service shows Traficom statistics on first registrations of passenger cars. The data is fetched automatically from Traficom's statistics database and published here as ready-made datasets.",
+    'This service shows Traficom statistics on first registrations of passenger cars and on cars in traffic, and fuel prices from Statistics Finland. The data is fetched automatically from the statistics databases and published here as ready-made datasets.',
   'about.sourceTitle': 'Data source',
   'about.sourceText':
     'Source: {name}. The data is licensed under {licence}. Last updated by the source: {updated}. This service compiled the data on {generated}.',
@@ -236,7 +236,7 @@ export const en: Record<MessageKey, string> = {
   'about.caveat3':
     'The source has a separate fuel category only for plug-in hybrids. Other hybrids are included in the source’s other categories, so their share cannot be separated.',
   'about.caveat4':
-    'The figures are first registrations, not the number of cars in use. This version has no vehicle stock data.',
+    'First registrations count cars registered for the first time, not the number of cars in use. Cars in traffic are on the Car fleet page.',
   'about.caveat5':
     'Model figures are at model-series level: the source may have combined several models into one series.',
   'about.caveat6':

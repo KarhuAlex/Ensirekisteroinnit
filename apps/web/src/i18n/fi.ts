@@ -224,7 +224,7 @@ export const fi = {
 
   'about.title': 'Tietoa palvelusta',
   'about.intro':
-    'Palvelu esittää Traficomin tilastoja henkilöautojen ensirekisteröinneistä. Tiedot haetaan tilastotietokannasta automaattisesti ja julkaistaan tälle sivulle valmiina aineistona.',
+    'Palvelu esittää Traficomin tilastoja henkilöautojen ensirekisteröinneistä ja liikennekäytössä olevista autoista sekä Tilastokeskuksen polttoainehintoja. Tiedot haetaan tilastotietokannoista automaattisesti ja julkaistaan tälle sivulle valmiina aineistona.',
   'about.sourceTitle': 'Tietolähde',
   'about.sourceText':
     'Lähde: {name}. Aineisto on lisensoitu {licence} -lisenssillä. Lähteen viimeisin päivitys: {updated}. Palvelun aineisto on koottu {generated}.',
@@ -236,7 +236,7 @@ export const fi = {
   'about.caveat3':
     'Lähteen käyttövoimaluokittelussa on erillinen luokka vain ladattaville hybrideille. Muut hybridit sisältyvät lähteen muihin luokkiin, joten niiden osuutta ei voi erottaa.',
   'about.caveat4':
-    'Luvut ovat ensirekisteröintejä, eivät liikennekäytössä olevien autojen määriä. Autokannasta ei tässä versiossa ole tietoja.',
+    'Ensirekisteröinnit kertovat, montako autoa on rekisteröity ensimmäistä kertaa, eivät liikennekäytössä olevien autojen määrää. Liikennekäytössä olevat autot näkyvät Autokanta-sivulla.',
   'about.caveat5':
     'Mallikohtaiset luvut ovat mallisarjatasoisia: lähde on voinut yhdistää samaan sarjaan useita malleja.',
   'about.caveat6':
